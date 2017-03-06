@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="52dp"
+    android:orientation="horizontal"
+    android:padding="7dp">
+
+    <TextView
+        android:id="@+id/product_txt"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_weight="1.5"
+        android:text="Product Name"
+        android:gravity="center"/>
+
+    <!--<TextView-->
+        <!--android:id="@+id/duration_time_txt"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:layout_weight="1"-->
+        <!--android:text="DurationTime"-->
+        <!--android:gravity="center"/>-->
+
+    <TextView
+        android:id="@+id/order_type_txt"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:text="eatin"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/remark_txt"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:text="remark"
+        android:gravity="center"/>
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_weight="1"-->
+        <!--android:gravity="center">-->
+        <!--<CheckBox-->
+            <!--android:id="@+id/take_away_check"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:checked="true"-->
+            <!--android:theme="@style/MyCheckBox"/>-->
+        <!--&lt;!&ndash;<Button&ndash;&gt;-->
+            <!--&lt;!&ndash;android:id="@+id/cancel_btn"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_height="@dimen/icon_size"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:background="@drawable/flat_selector"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:text="OK"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:textColor="@color/colorAccent" />&ndash;&gt;-->
+    <!--</LinearLayout>-->
+
+</LinearLayout>

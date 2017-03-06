@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">RestaurantManagementSystem</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="activate">set activate key</string>
+    <string name="login">LOG IN</string>
+    <string name="submmit">SUBMMIT</string>
+    <string name="user_login">User Login</string>
+    <string name="company_message">Copyright 2016 All rights reserved by Aceplus Solutions.Co.,ltd.</string>
+    <string name="title_activity_home_page">HomePage</string>
+    <string name="title_activity_take_away">Category</string>
+    <string name="title_table_activity">Table</string>
+    <string name="title_room_activity">Room</string>
+    <string name="title_invoice_activity">Invoice</string>
+    <string name="title_message_activity">Message</string>
+    <string name="action_settings">Setting</string>
+    <string name="invitation_ok">OK</string>
+    <string name="invitation_cancel">CANCEL</string>
+    <string name="invitation_service">SERVICE</string>
+    <string name="invitation_order">ORDER</string>
+    <string name="quantity_title">Choose Quantity</string>
+    <string name="clear">Clear</string>
+    <string name="alert">Alert</string>
+    <string name="Login">Login</string>
+    <string name="table_transfer">Transfer</string>
+    <string name="table_group">Group</string>
+    <string name="room_transfer">Room Transfer</string>
+    <string name="extra_title">Choose Extra</string>
+    <string name="title_activity_postmethod">POSTMethodActivity</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
+</resources>

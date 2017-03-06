@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.aceplus.rmsproject.rmsproject">
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="21" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <android:uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".HomePageActivity"
+            android:label="@string/title_activity_home_page"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".CategoryActivity"
+            android:label="@string/title_activity_take_away"
+            android:screenOrientation="landscape">
+
+            <!-- <meta-data -->
+            <!-- android:name="android.support.PARENT_ACTIVITY" -->
+            <!-- android:value=".HomePageActivity" /> -->
+        </activity>
+        <activity
+            android:name=".TableActivity"
+            android:label="@string/title_table_activity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".RoomActivity"
+            android:label="@string/title_room_activity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".InvoiceActivity"
+            android:label="@string/title_invoice_activity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".InvoiceDetailActivity"
+            android:label="Invoice Detail"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".MessageActivity"
+            android:label="@string/title_message_activity"
+            android:screenOrientation="landscape" />
+    </application>
+
+</manifest>
