@@ -208,7 +208,7 @@ public class CategoryActivity extends ActionBarActivity {
         searchItemAuto = (AutoCompleteTextView) findViewById(R.id.auto_search_item);
     }
 
-    private ArrayList<Category> categoryDataFromDB(String parent_id) {
+    private ArrayList<Category> categoryDataFromDB(String parent_id) {  // gettting category item in category activity
         ArrayList<Category> categoryList = new ArrayList<>();
         try {
             database.beginTransaction();
@@ -252,7 +252,7 @@ public class CategoryActivity extends ActionBarActivity {
         return categoryList;
     }
 
-    private ArrayList<Category> itemDataFromDB(String category_id) {
+    private ArrayList<Category> itemDataFromDB(String category_id) { // getting item from database
         database.beginTransaction();
         ArrayList<Category> itemArrayList = new ArrayList<>();
         Cursor cur = database.rawQuery("SELECT * FROM item WHERE category_id = \"" + category_id + "\"", null);
@@ -421,7 +421,7 @@ public class CategoryActivity extends ActionBarActivity {
     }
 
     @SuppressLint("LongLogTag")
-    private void getVouncherDetailData() {
+    private void getVouncherDetailData() {   // getting voucher invoice data from back end if it's has !!
         RequestInterface requestInterfacefortable = retrofit.create(RequestInterface.class);
         Call<JsonForShowTableId> callfortable = requestInterfacefortable.getforshowOrderTable(getActivateKeyFromDB(), VOUNCHER_ID);
         callfortable.enqueue(new Callback<JsonForShowTableId>() {
@@ -473,16 +473,10 @@ public class CategoryActivity extends ActionBarActivity {
                     Log.i("itemdetailArrayListsiezzze",Download_ForInvoiceItemDetailArrayList.size()+"");
                     Category_Item category_item = new Category_Item();
                     if (Integer.parseInt(download_forInvoiveItemDetail.getItemId())== 0) {
-                        //SetMenuidfromdetail = download_forInvoiveItemDetail.getSetmenuId();
-                        //category_item.setId(SetMenuidfromdetail);
-                        //SetMenuName = getSetMenuName(SetMenuidfromdetail);
-                        //category_item.setItemName(SetMenuName);
-
                         category_item.setId(download_forInvoiveItemDetail.getSetmenuId());
                         SetMenuName = getSetMenuName(download_forInvoiveItemDetail.getSetmenuId());
                         category_item.setItemName(SetMenuName);
                         category_item.setId(null);
-
                     } else {
                         Itemidfromdetail = download_forInvoiveItemDetail.getItemId();
                         category_item.setId(Itemidfromdetail);
@@ -537,10 +531,7 @@ public class CategoryActivity extends ActionBarActivity {
                    }
                     category_item.setCategoryId(category_id);
                     category_item.setAddOnArrayList(addOnArrayList);
-
                         categoryItemList.add(category_item);
-
-
                 }
             }
         } catch (IOException e) {
@@ -619,7 +610,7 @@ public class CategoryActivity extends ActionBarActivity {
         database.endTransaction();
     }
 
-    private void uploadUpdateOrderData() {
+    private void uploadUpdateOrderData() {   //  upload data which has the invoice data already has !!
         double tvalue = Double.parseDouble(tPriceTxt.getText().toString().trim().replaceAll(",", ""));
         double taxamount = tvalue * taxAmt / 100;
         Log.e("TaxValue", taxamount + "," + taxAmt);
@@ -2076,7 +2067,7 @@ public class CategoryActivity extends ActionBarActivity {
         }
     }
 
-    private void uploadOrderData() {
+    private void uploadOrderData() {  // uploading new order data !!
         Calendar todayCal = Calendar.getInstance();
         String todayDate = orderTime.format(todayCal.getTime());
         SharedPreferences prefs = getSharedPreferences(MainActivity.LOGIN_PREFERENCES, MODE_PRIVATE);

@@ -173,7 +173,7 @@ public class InvoiceActivity extends AppCompatActivity {
         });
     }
 
-    private ArrayList<Invoice> getInvoiceData() {
+    private ArrayList<Invoice> getInvoiceData() {  // getting all invoice data for invoice activity
         RequestInterface request = retrofit.create(RequestInterface.class);
         Call<JsonResponseforInvoice> call = request.getforInvoice(getActivateKeyFromDB());
         call.enqueue(new Callback<JsonResponseforInvoice>() {
@@ -219,7 +219,7 @@ public class InvoiceActivity extends AppCompatActivity {
         return forInvoice;
     }
 
-    private String getRoomOrTable (String VoucherID){
+    private String getRoomOrTable (String VoucherID){       //checking  order from room or table or take away !
         String RoomOrTable = null;
         String Room = null;
         String Table = null;
@@ -414,7 +414,7 @@ public class InvoiceActivity extends AppCompatActivity {
         return NameStr;
     }
 
-    public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.ViewHolder> {
+    public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.ViewHolder> {   // view methods
         private ArrayList<Invoice> invoiceList;
         public InvoiceAdapter(ArrayList<Invoice> invoiceList) {
             this.invoiceList = invoiceList;
