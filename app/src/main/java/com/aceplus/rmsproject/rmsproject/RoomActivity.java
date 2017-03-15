@@ -71,6 +71,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RoomActivity extends AppCompatActivity {
 
+
+    // most of all are similar from table !
+
     private Toolbar toolbar;
     private RecyclerView recyclerView;
     private Button transferBtn;

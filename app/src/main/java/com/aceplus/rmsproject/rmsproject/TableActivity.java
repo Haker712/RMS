@@ -141,7 +141,7 @@ public class TableActivity extends ActionBarActivity {
         catchEvents();
     }
 
-    private void getTableData() {
+    private void getTableData() {  // data from database !!
         database.beginTransaction();
         getBookingArrayList.clear();
         Cursor cur;
@@ -189,7 +189,7 @@ public class TableActivity extends ActionBarActivity {
         groupBtn = (Button) findViewById(R.id.group_btn);
     }
 
-    private String getTableInvoiceDataInDB(String table_id) {
+    private String getTableInvoiceDataInDB(String table_id) {  // get invoice data fromback end !
         String callinvoiceid = "";
         RequestInterface requestInterface = retrofit.create(RequestInterface.class);
         Call<Download_ordertable> call = requestInterface.getOrderTable(getActivateKeyFromDB(), table_id);
@@ -207,7 +207,7 @@ public class TableActivity extends ActionBarActivity {
         return callinvoiceid;
     }
 
-    private String getGroupTableInvoiceDataInDB(String table_id) {
+    private String getGroupTableInvoiceDataInDB(String table_id) {  // for group table
         RequestInterface requestInterface = retrofit.create(RequestInterface.class);
         Call<Download_ordertable> call = requestInterface.getOrderTable(getActivateKeyFromDB(), table_id);
         call.enqueue(new Callback<Download_ordertable>() {
@@ -236,7 +236,7 @@ public class TableActivity extends ActionBarActivity {
         }
     }
 
-    private void tableView() {
+    private void tableView() {  // for view !
         getTableData();
         bookingTableArrayList.clear();
         for (BookingTable bookingTable : getBookingArrayList) {
@@ -385,7 +385,7 @@ public class TableActivity extends ActionBarActivity {
                                     String invoiceIDDD;
                                     invoiceIDDD = getTableInvoiceDataInDB(fromTable);
                                     Log.i("invoiceIDDDinvoiceIDDDinvoiceIDDD",invoiceIDDD+"");
-                                    callDialog("Upload Transfer Table data...");
+                                    callDialog("Upload Transfer Table data...");   // transfer table method
                                     RequestInterface request = retrofit.create(RequestInterface.class);
                                     callc = request.postTableTransfer(invoiceIDDD,fromTable,toTable );
                                     Log.i("fromTable",fromTable+"");
@@ -428,7 +428,7 @@ public class TableActivity extends ActionBarActivity {
         });
         groupBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v) {   // group table method
                 final ArrayList<String> groupTableList = new ArrayList<String>();
                 groupTableList.clear();
                 for (BookingTable book : bookingTableArrayList) {
@@ -543,7 +543,7 @@ public class TableActivity extends ActionBarActivity {
         builder.show();
     }
 
-    public class TableAdapter extends RecyclerView.Adapter<TableAdapter.MyViewHolder> {
+    public class TableAdapter extends RecyclerView.Adapter<TableAdapter.MyViewHolder> {   // for view !
         private Context mContext;
         private List<BookingTable> tableList;
         private int PosCheck = 0;
@@ -646,7 +646,7 @@ public class TableActivity extends ActionBarActivity {
                 holder.groupCheck.setChecked(table.isTable_check());
             holder.backgroundLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
+                public void onClick(View v) {  // when you enter the table !
                     if (table.getTableService().equals("1")){
                     final JSONArray tableListJsonArray = new JSONArray();
                     JSONObject product = new JSONObject();
@@ -843,7 +843,7 @@ public class TableActivity extends ActionBarActivity {
         database.endTransaction();
     }
 
-    private void loadTableJson() {
+    private void loadTableJson() {  // for table data from back end !
         callDialog("Download table data....");
         RequestInterface request = retrofit.create(RequestInterface.class);
         Call<JSONResponseTable> call = request.getTable(getActivateKeyFromDB());

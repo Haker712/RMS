@@ -294,7 +294,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                 focAmtEdit.setEnabled(true);
             }
         });
-        memberCardEdit.addTextChangedListener(new TextWatcher() {
+        memberCardEdit.addTextChangedListener(new TextWatcher() {    // for  when enter member ID !!
             @Override
             public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
                 // TODO Auto-generated method stub
@@ -325,7 +325,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                 }
             }
         });
-        focAmtEdit.addTextChangedListener(new TextWatcher() {
+        focAmtEdit.addTextChangedListener(new TextWatcher() {   // when  enter foc amount !
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -368,7 +368,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                   {
                                       @SuppressLint("LongLogTag")
                                       @Override
-                                      public void onClick(View v) {
+                                      public void onClick(View v) {   // add btn which lead to category activity !
                                           CategoryActivity.VOUNCHER_ID = vouncherID;
                                           CategoryActivity.TAKE_AWAY = "add_invoice";
                                           CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
@@ -382,7 +382,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
 
                                    {
                                        @Override
-                                       public void onClick(View v) {
+                                       public void onClick(View v) {   // paid button ! uploading data if get paid !
                                            if (netAmtTxt.getText().toString().length() == 0) {
                                                netAmtTxt.setText("0");
                                            }
@@ -659,7 +659,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         }
         return SetItemReturn;
     }
-
+    // these are for view !!
     private class SetItemDetailAdapter extends ArrayAdapter<SetMenu_Item_for_dialog> {
         public  Activity contxt;
         ArrayList<SetMenu_Item_for_dialog> setMenu_item_name = new ArrayList<>();
