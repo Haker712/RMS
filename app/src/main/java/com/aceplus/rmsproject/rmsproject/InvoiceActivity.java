@@ -298,6 +298,7 @@ public class InvoiceActivity extends AppCompatActivity {
         return backend_activate_key;
     }
 
+    //for InvoiceDetail data and pass to invoicedetail.activity!
     @SuppressLint("LongLogTag")
     private ArrayList<InvoiceDetailProduct> getInvDetailProduct(final Invoice invoice) {
         String vouncherID = invoice.getVouncherID();

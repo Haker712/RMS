@@ -41,6 +41,8 @@ public class MessageActivity extends AppCompatActivity {
         return true;
     }
 
+    //detail in fragmentmessagecancel and fragmentmessagecomplete !!
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();

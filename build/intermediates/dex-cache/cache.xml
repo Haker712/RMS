@@ -1,2 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<items version="2" />
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="/Users/suthinzarkyaw/.android/build-cache/e08ca5491127829397588a4f045e6469c03fa764/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="4356e230a981d1bbf047d848b91bc0d9b7c5bacc">
+        <dex dex="/Users/suthinzarkyaw/Desktop/my_rms/app/build/intermediates/pre-dexed/debug/classes_ab7ed447b62695f71f8d8ac4065a19dd725509ef.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/suthinzarkyaw/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.3.1/19047bdb6a4fc00a44124f64ca98e88fc204e7e3/okhttp-3.3.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="19047bdb6a4fc00a44124f64ca98e88fc204e7e3">
+        <dex dex="/Users/suthinzarkyaw/Desktop/my_rms/app/build/intermediates/pre-dexed/debug/okhttp-3.3.1_2c548eb22ac5f43424c737cabeb6eca29d3950b2.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/suthinzarkyaw/.android/build-cache/4ac5b967a57b7ff530ab9328e2badbc90ce8ceaa/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="e5c61a3169221a89654ffcaaed47bba51cf071ad">
+        <dex dex="/Users/suthinzarkyaw/Desktop/my_rms/app/build/intermediates/pre-dexed/debug/classes_de52aacad4eb81af598ad207b8c9928007b74571.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/suthinzarkyaw/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/logging-interceptor/3.3.1/99ce730034c6f5aaed710d1e0e9df95e8714ed5f/logging-interceptor-3.3.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="99ce730034c6f5aaed710d1e0e9df95e8714ed5f">
+        <dex dex="/Users/suthinzarkyaw/Desktop/my_rms/app/build/intermediates/pre-dexed/debug/logging-interceptor-3.3.1_cc307167a96989fb8f439088bc5dd953abcd2d02.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/suthinzarkyaw/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.8.0/5ea7af56cc7c567ed9856d99efb30740e9b17ff/okio-1.8.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="05ea7af56cc7c567ed9856d99efb30740e9b17ff">
+        <dex dex="/Users/suthinzarkyaw/Desktop/my_rms/app/build/intermediates/pre-dexed/debug/okio-1.8.0_b333b032314eb60b66ce510b022f225296e038dc.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/suthinzarkyaw/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.7/751f548c85fa49f330cecbb1875893f971b33c4e/gson-2.7.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="751f548c85fa49f330cecbb1875893f971b33c4e">
+        <dex dex="/Users/suthinzarkyaw/Desktop/my_rms/app/build/intermediates/pre-dexed/debug/gson-2.7_f065e665e518935b8c11686f5d1f3a23e818cd3a.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/suthinzarkyaw/.android/build-cache/4a14b468cc9f975d0f0c7335f561fbbc9a573e5f/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="57ae0d750ff83f0c738d21720224ac7ea866a094">
+        <dex dex="/Users/suthinzarkyaw/Desktop/my_rms/app/build/intermediates/pre-dexed/debug/classes_843ff616b49b2f8444f9e5a9cf83ba5b26c1c688.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/suthinzarkyaw/.gradle/caches/modules-2/files-2.1/com.squareup.retrofit2/converter-gson/2.1.0/aa557d71ead91cbf26e0c316a0f593d168303309/converter-gson-2.1.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="aa557d71ead91cbf26e0c316a0f593d168303309">
+        <dex dex="/Users/suthinzarkyaw/Desktop/my_rms/app/build/intermediates/pre-dexed/debug/converter-gson-2.1.0_12decc23aa2b38da74d8191075de5b0b1bc62644.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/suthinzarkyaw/.android/build-cache/c3f0e6a19cb57f8f57b268a94deeb53f82c74b62/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="82ce13fd19cdfde0e392f03c27edeba8d4333648">
+        <dex dex="/Users/suthinzarkyaw/Desktop/my_rms/app/build/intermediates/pre-dexed/debug/classes_c5c1eef9ffb363bc2a109894685a79749dd62e94.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/suthinzarkyaw/.android/build-cache/83d7f9ea1078f1b228d7db795d358ab13be3d30b/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="ddde541c289c8b816a8f8fd6c325d80788c522a6">
+        <dex dex="/Users/suthinzarkyaw/Desktop/my_rms/app/build/intermediates/pre-dexed/debug/classes_e1d23086a4c4109babf2e6919a08393924ae5aee.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/suthinzarkyaw/.gradle/caches/modules-2/files-2.1/com.squareup.retrofit2/retrofit/2.1.0/2de7cd8b95b7021b1d597f049bcb422055119f2c/retrofit-2.1.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="2de7cd8b95b7021b1d597f049bcb422055119f2c">
+        <dex dex="/Users/suthinzarkyaw/Desktop/my_rms/app/build/intermediates/pre-dexed/debug/retrofit-2.1.0_d1ed3c80e2288e191b7b747b6468d0b0d54f1393.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/suthinzarkyaw/.android/build-cache/83d7f9ea1078f1b228d7db795d358ab13be3d30b/output/jars/libs/internal_impl-23.1.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="8716243bf04bae8d6c9ca94d27b9a9be7236f0a3">
+        <dex dex="/Users/suthinzarkyaw/Desktop/my_rms/app/build/intermediates/pre-dexed/debug/internal_impl-23.1.0_6a3085e3da79ccdf36d78c2791a571a26c16455e.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/suthinzarkyaw/.gradle/caches/modules-2/files-2.1/com.jakewharton/butterknife/6.1.0/63735f48b82bcd24cdd33821342428252eb1ca5a/butterknife-6.1.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="63735f48b82bcd24cdd33821342428252eb1ca5a">
+        <dex dex="/Users/suthinzarkyaw/Desktop/my_rms/app/build/intermediates/pre-dexed/debug/butterknife-6.1.0_d843b8b2a43b0de772f78d319a4653471046cc66.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/suthinzarkyaw/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/23.1.0/support-annotations-23.1.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="92e3fc113ec3ee36b64603a38857b95700025633">
+        <dex dex="/Users/suthinzarkyaw/Desktop/my_rms/app/build/intermediates/pre-dexed/debug/support-annotations-23.1.0_4ffde1c1e4504cd40946db399d34ea2beb86ee23.jar" />
+    </item>
+
+</items>

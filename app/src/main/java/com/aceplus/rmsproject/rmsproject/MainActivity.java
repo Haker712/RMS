@@ -110,7 +110,7 @@ public class MainActivity extends Activity {
         database = new Database(this).getDataBase();
         sharedpreferences = getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE);
         registerIds();
-        if (getActivateKeyStatus() == true) {
+        if (getActivateKeyStatus() == true) {  // get ket from backend
             loginLayout.setVisibility(View.GONE);
             activateLayout.setVisibility(View.VISIBLE);
             nameTxt.setText("Activate Key");
@@ -215,7 +215,7 @@ public class MainActivity extends Activity {
         progressDialog.show();
     }
 
-    private void catchEvents() {
+    private void catchEvents() { // log in processes !
         ipchangeTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -255,8 +255,8 @@ public class MainActivity extends Activity {
                 if (hasCategoryDataInDb()) {
                     callDialog("User Login....");
                     RequestInterface request = retrofit.create(RequestInterface.class);
-                     Call<Login> call = request.createTask("Phyoe Lay", "11111111", getActivateKeyFromDB());
-                    //Call<Login> call = request.createTask(usernameEdit.getText().toString(), passwordEdit.getText().toString() , getActivateKeyFromDB());
+                    // Call<Login> call = request.createTask("Phyoe Lay", "11111111", getActivateKeyFromDB());
+                    Call<Login> call = request.createTask(usernameEdit.getText().toString(), passwordEdit.getText().toString() , getActivateKeyFromDB());
                     call.enqueue(new Callback<Login>() {
                         @Override
                         public void onResponse(Call<Login> call, Response<Login> response) {
@@ -345,7 +345,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private String getActivateKeyFromDB() {
+    private String getActivateKeyFromDB() { // for activation key
         database.beginTransaction();
         String backend_activate_key = null;
         Cursor cur = database.rawQuery("SELECT * FROM activate_key", null);
@@ -358,7 +358,7 @@ public class MainActivity extends Activity {
         return backend_activate_key;
     }
 
-    private void loadTableVersion(final int value) {
+    private void loadTableVersion(final int value) {  // tables are update by version loading table version processes here !!
         if (value == 0) {
             callDialog("Download table data....");
         }
@@ -415,7 +415,7 @@ public class MainActivity extends Activity {
         return versionList;
     }
 
-    private void loadSyncsTable(ArrayList<String> version) {
+    private void loadSyncsTable(ArrayList<String> version) {  // syncs down the tables from back end !!
         callDialog("Update Data....");
         final RequestInterface request = retrofit.create(RequestInterface.class);
         String vCategory = null;

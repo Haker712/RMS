@@ -102,7 +102,7 @@ public class HomePageActivity extends ActionBarActivity {
         messageBtn = (Button) findViewById(R.id.message_btn);
     }
 
-    private void notificationView(int size) {
+    private void notificationView(int size) { // for notification in status bar
         Intent intent = new Intent(HomePageActivity.this, MessageActivity.class);
         PendingIntent pending = PendingIntent.getActivity(HomePageActivity.this, 0, intent, 0);
         Notification notifications = new Notification.Builder(HomePageActivity.this)
@@ -121,7 +121,7 @@ public class HomePageActivity extends ActionBarActivity {
         return useWhiteIcon ? R.drawable.noti_icon : R.drawable.noti_icon;
     }
 
-    private void loadOrderStatusJson() {
+    private void loadOrderStatusJson() { //  downloading order status from back end for message activity !!
         RequestInterface request = retrofit.create(RequestInterface.class);
         Call<JSONResponseOrderStatus> call = request.getOrderStatus();
 
@@ -172,7 +172,7 @@ public class HomePageActivity extends ActionBarActivity {
         }
     }
 
-    private void catchEvents() {
+    private void catchEvents() {  // onclick are lead to related activity !!
         takeawayBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

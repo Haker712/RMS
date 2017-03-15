@@ -1,5 +1,6 @@
 package com.aceplus.rmsproject.rmsproject;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
@@ -168,7 +169,7 @@ public class CategoryActivity extends ActionBarActivity {
     private ArrayList<Download_forShow_roomID> download_forShow_roomIDs;
     String SetMenuName = null;
     String ItemName = null;
-    String SetMenuidfromdetail = null;
+
     String Itemidfromdetail = null;
 
     @Override
@@ -419,6 +420,7 @@ public class CategoryActivity extends ActionBarActivity {
         return setItemArrayList;
     }
 
+    @SuppressLint("LongLogTag")
     private void getVouncherDetailData() {
         RequestInterface requestInterfacefortable = retrofit.create(RequestInterface.class);
         Call<JsonForShowTableId> callfortable = requestInterfacefortable.getforshowOrderTable(getActivateKeyFromDB(), VOUNCHER_ID);
@@ -431,6 +433,7 @@ public class CategoryActivity extends ActionBarActivity {
                     TABLE_ID = download_forShow_tableID.getTable_id();
                 }
             }
+            @SuppressLint("LongLogTag")
             @Override
             public void onFailure(Call<JsonForShowTableId> call, Throwable t) {
                     Log.i("Error At Inserting TableID","?!?!?!?!?!?!?");
@@ -1986,6 +1989,7 @@ public class CategoryActivity extends ActionBarActivity {
                 title = (TextView) view.findViewById(R.id.title);
                 thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
                 thumbnail.setOnClickListener(new View.OnClickListener() {
+                    @SuppressLint("LongLogTag")
                     @Override
                     public void onClick(View v) {
                         categoryTxt.setText("Item");

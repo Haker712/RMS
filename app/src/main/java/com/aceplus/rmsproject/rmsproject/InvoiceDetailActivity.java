@@ -166,6 +166,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         catchEvents();
         }
 
+        // This is where get data from invoice.activity
     @SuppressLint("LongLogTag")
     private void setAdapter() {
         invoiceDetailAdapter = new InvoiceDetailAdapter(InvoiceDetailActivity.this, InvoiceActivity.detailProductArrayList);
