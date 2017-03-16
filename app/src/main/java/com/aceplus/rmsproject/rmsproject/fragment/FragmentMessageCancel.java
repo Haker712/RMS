@@ -106,7 +106,7 @@ public class FragmentMessageCancel extends Fragment {
         return view;
     }
 
-    private void setDataInRecycler() {
+    private void setDataInRecycler() {    // for view !!
         ArrayList<Order_Complete> ocompleteList = new ArrayList<>();
         for (Order_Complete ocomplete : completeArrayList) {
             Order_Complete com = new Order_Complete();
@@ -287,7 +287,7 @@ public class FragmentMessageCancel extends Fragment {
         }
     }
 
-    private void loadOrderStatusJson() {
+    private void loadOrderStatusJson() {    // geting data from back end !!
         final ProgressDialog mProgressDialog = new ProgressDialog(getActivity(), ProgressDialog.THEME_HOLO_LIGHT);
         mProgressDialog.setIndeterminate(false);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -347,7 +347,7 @@ public class FragmentMessageCancel extends Fragment {
         });
     }
 
-    private void refreshOrderStatusJson() {
+    private void refreshOrderStatusJson() {     // refreashing data from back end between a time interval !!
         RequestInterface request = retrofit.create(RequestInterface.class);
         Call<JSONResponseOrderStatus> call = request.getOrderStatus();
         call.enqueue(new Callback<JSONResponseOrderStatus>() {
@@ -418,7 +418,7 @@ public class FragmentMessageCancel extends Fragment {
         builder.show();
     }
 
-    public void onStart() {
+    public void onStart() {  // the tim interval !!!!
         super.onStart();
         Thread background = new Thread(new Runnable() {
             public void run() {

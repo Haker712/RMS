@@ -110,7 +110,7 @@ public class FragmentMessageComplete extends Fragment {
     }
 
     @SuppressLint("LongLogTag")
-    private void setDataInRecycler() {
+    private void setDataInRecycler() {   // for view !!
         boolean canAdd = false;
         ArrayList<Order_Complete> ocompleteList = new ArrayList<>();
         for (Order_Complete ocomplete : completeArrayList) {
@@ -348,7 +348,7 @@ public class FragmentMessageComplete extends Fragment {
         }
     }
 
-    private void loadOrderStatusJson() {
+    private void loadOrderStatusJson() {   // geting data from back end !!
         final ProgressDialog mProgressDialog = new ProgressDialog(getActivity(), ProgressDialog.THEME_HOLO_LIGHT);
         mProgressDialog.setIndeterminate(false);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -416,7 +416,7 @@ public class FragmentMessageComplete extends Fragment {
         });
     }
 
-    private void refreshOrderStatusJson() {
+    private void refreshOrderStatusJson() {   // refreashing data from back end between a time interval !!
         RequestInterface request = retrofit.create(RequestInterface.class);
         Call<JSONResponseOrderStatus> call = request.getOrderStatus();
         call.enqueue(new Callback<JSONResponseOrderStatus>() {
@@ -498,7 +498,7 @@ public class FragmentMessageComplete extends Fragment {
         }
     }
 
-    public void onStart() {
+    public void onStart() {  // the tim interval !!!!
         super.onStart();
         Thread background = new Thread(new Runnable() {
 
