@@ -72,7 +72,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RoomActivity extends AppCompatActivity {
 
 
-    // most of all are similar from table !
+    // most of all are similar from table ! different only group methods
 
     private Toolbar toolbar;
     private RecyclerView recyclerView;
