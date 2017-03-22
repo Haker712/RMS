@@ -255,8 +255,8 @@ public class MainActivity extends Activity {
                 if (hasCategoryDataInDb()) {
                     callDialog("User Login....");
                     RequestInterface request = retrofit.create(RequestInterface.class);
-                    // Call<Login> call = request.createTask("Phyoe Lay", "11111111", getActivateKeyFromDB());
-                    Call<Login> call = request.createTask(usernameEdit.getText().toString(), passwordEdit.getText().toString() , getActivateKeyFromDB());
+                    Call<Login> call = request.createTask("Phyoe Lay", "11111111", getActivateKeyFromDB());
+                    //Call<Login> call = request.createTask(usernameEdit.getText().toString(), passwordEdit.getText().toString() , getActivateKeyFromDB());
                     call.enqueue(new Callback<Login>() {
                         @Override
                         public void onResponse(Call<Login> call, Response<Login> response) {

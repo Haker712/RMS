@@ -27,6 +27,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aceplus.rmsproject.rmsproject.object.InvoiceDetailProduct;
 import com.aceplus.rmsproject.rmsproject.object.SetMenu_Item_for_dialog;
@@ -121,6 +122,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     ArrayList<InvoiceDetailProduct> arrayList = new ArrayList<>();
     private ArrayList<Download_forShow_tableID> download_orderTableArrayList = new ArrayList<>();
     private ArrayList<Download_forShow_roomID> download_orderRoomArrayList = new ArrayList<>();
+    Boolean paidavailable = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,6 +176,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         productListView = (ListView) findViewById(R.id.list_view);
         productListView.setAdapter(invoiceDetailAdapter);
         invoiceDetailAdapter.notifyDataSetChanged();
+
     }
 
     private void registerIDs() {
@@ -251,6 +254,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     }
 
     private void catchEvents() {
+
         vouncherTxt.setText(vouncherID);
         waiterIDTxt.setText(userID);
         dateTxt.setText(date);
@@ -378,11 +382,18 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                       }
                                   }
         );
+
         paidBtn.setOnClickListener(new View.OnClickListener()
 
                                    {
                                        @Override
                                        public void onClick(View v) {   // paid button ! uploading data if get paid !
+
+                                           if (paidavailable == false) {
+                                               Toast.makeText(InvoiceDetailActivity.this, "Nope nope nope!", Toast.LENGTH_SHORT).show();
+                                           }
+
+                                           else if (paidavailable == true) {
                                            if (netAmtTxt.getText().toString().length() == 0) {
                                                netAmtTxt.setText("0");
                                            }
@@ -395,49 +406,50 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                                payAmt = Double.parseDouble(payAmount);
                                            }
                                            if (payAmt >= total) {
-                                               TABLE_ID =  gettableIDD(vouncherID);
-                                                   if (TABLE_ID == null) {
-                                                       Log.e("TableID", TABLE_ID + "");
-                                                   } else {
-                                                       JSONArray tableListJsonArray = new JSONArray();
-                                                       for (String tableName : getGroupTableListInDB(vouncherID)) {
-                                                           JSONObject jsonObject = new JSONObject();
-                                                           try {
-                                                               jsonObject.put("table_id", tableName);
-                                                               jsonObject.put("status", "0");
-                                                               jsonObject.put("booking_id", "null");
-                                                           } catch (JSONException e) {
-                                                               e.printStackTrace();
-                                                           }
-                                                           tableListJsonArray.put(jsonObject);
+                                               TABLE_ID = gettableIDD(vouncherID);
+                                               if (TABLE_ID == null) {
+                                                   Log.e("TableID", TABLE_ID + "");
+                                               } else {
+                                                   JSONArray tableListJsonArray = new JSONArray();
+                                                   for (String tableName : getGroupTableListInDB(vouncherID)) {
+                                                       JSONObject jsonObject = new JSONObject();
+                                                       try {
+                                                           jsonObject.put("table_id", tableName);
+                                                           jsonObject.put("status", "0");
+                                                           jsonObject.put("booking_id", "null");
+                                                       } catch (JSONException e) {
+                                                           e.printStackTrace();
                                                        }
-                                                       Log.e("InvoiceTableStatus", tableListJsonArray.toString());
-                                                       RequestInterface request = retrofit.create(RequestInterface.class);
-                                                       Call<Success> call = request.postTableStatus(tableListJsonArray + "");
-                                                       call.enqueue(new Callback<Success>() {
-                                                           @Override
-                                                           public void onResponse(Call<Success> call, Response<Success> response) {
-                                                               try {
-                                                                   Success jsonResponse = response.body();
-                                                                   String message = jsonResponse.getMessage();
-                                                                   if (message.equals("Success")) {
-                                                                       Log.d("TableStatus", message);
-                                                                       String arg[] = {vouncherID};
-                                                                   }
-                                                               } catch (Exception e) {
-                                                                   e.printStackTrace();
-                                                                   //callUploadDialog("Problem in table status!");
-                                                                   Log.i("Problem in table status!","Problem in table status!");
-                                                               }
-                                                           }
-                                                           @Override
-                                                           public void onFailure(Call<Success> call, Throwable t) {
-                                                               Log.d("TableStatus", t.getMessage());
-                                                               callUploadDialog("Please upload again!");
-                                                           }
-                                                       });
-                                                       Log.e("TableID", TABLE_ID + "");
+                                                       tableListJsonArray.put(jsonObject);
                                                    }
+                                                   Log.e("InvoiceTableStatus", tableListJsonArray.toString());
+                                                   RequestInterface request = retrofit.create(RequestInterface.class);
+                                                   Call<Success> call = request.postTableStatus(tableListJsonArray + "");
+                                                   call.enqueue(new Callback<Success>() {
+                                                       @Override
+                                                       public void onResponse(Call<Success> call, Response<Success> response) {
+                                                           try {
+                                                               Success jsonResponse = response.body();
+                                                               String message = jsonResponse.getMessage();
+                                                               if (message.equals("Success")) {
+                                                                   Log.d("TableStatus", message);
+                                                                   String arg[] = {vouncherID};
+                                                               }
+                                                           } catch (Exception e) {
+                                                               e.printStackTrace();
+                                                               //callUploadDialog("Problem in table status!");
+                                                               Log.i("Problem in table status!", "Problem in table status!");
+                                                           }
+                                                       }
+
+                                                       @Override
+                                                       public void onFailure(Call<Success> call, Throwable t) {
+                                                           Log.d("TableStatus", t.getMessage());
+                                                           callUploadDialog("Please upload again!");
+                                                       }
+                                                   });
+                                                   Log.e("TableID", TABLE_ID + "");
+                                               }
                                                ROOM_ID = getroomIDD(vouncherID);
                                                if (ROOM_ID == null) {
                                                    Log.e("RoomID", ROOM_ID + "");
@@ -465,9 +477,10 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                                            } catch (Exception e) {
                                                                e.printStackTrace();
                                                                //callUploadDialog("Problem in room status.");
-                                                               Log.i("Problem in room status.","Problem in room status.");
+                                                               Log.i("Problem in room status.", "Problem in room status.");
                                                            }
                                                        }
+
                                                        @Override
                                                        public void onFailure(Call<Success> call, Throwable t) {
                                                            Log.d("RoomStatus", t.getMessage());
@@ -504,7 +517,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                                } else if (memberID == null && foc_amount == 0) {
                                                    call = request.createMember(vouncherID, "null", total_amount, tax_amount, service_amount, 0, all_total_amount, "null", pay_amount, refund, 0);
                                                } else if (memberID != null && foc_amount == 0) {
-                                                  call = request.createMember(vouncherID, memberID, total_amount, tax_amount, service_amount, 0, all_total_amount, "null", pay_amount, refund, dicount_amount);
+                                                   call = request.createMember(vouncherID, memberID, total_amount, tax_amount, service_amount, 0, all_total_amount, "null", pay_amount, refund, dicount_amount);
                                                    Log.d("param", "v id=" + vouncherID + "\n" + "m id=" + String.valueOf(memberID) + "\n" + "total amt=" + String.valueOf(total_amount) + "ser amt" + String.valueOf(service_amount) + "\n" + "all t amt=" + String.valueOf(all_total_amount) + "\n" + "refund=" + String.valueOf(refund) + "\n" + "dis amnt=" + String.valueOf(dicount_amount));
                                                } else {
                                                    call = request.createMember(vouncherID, "null", total_amount, tax_amount, service_amount, foc_amount, all_total_amount, foc_description, pay_amount, refund, 0);
@@ -528,6 +541,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                                            callUploadDialog("Order data is null.");
                                                        }
                                                    }
+
                                                    @Override
                                                    public void onFailure(Call<Success> call, Throwable t) {
                                                        Log.d("Member", t.getMessage());
@@ -538,6 +552,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                            } else {
                                                callUploadDialog("Please check you payment amount!");
                                            }
+                                       }
                                        }
                                    }
         );
@@ -686,24 +701,29 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                 SetStatus.setTextColor(getResources().getColor(R.color.order_disable));
                 SetStatus.setEnabled(false);
                 SetStatus.setEnabled(false);
+
             } else if (invoiceDetailProduct.getStatus().equals("2")) {
                 SetStatus.setText("Cooking");
                 SetStatus.setBackgroundColor(Color.TRANSPARENT);
                 SetStatus.setTextColor(getResources().getColor(R.color.order_cooking));
                 SetStatus.setEnabled(false);
+
             } else if (invoiceDetailProduct.getStatus().equals("3")) {
                 SetStatus.setText("Cooked");
                 SetStatus.setBackgroundColor(Color.TRANSPARENT);
                 SetStatus.setTextColor(getResources().getColor(R.color.order_cooked));
                 SetStatus.setEnabled(false);
+
             } else if (invoiceDetailProduct.getStatus().equals("4")) {
                 SetStatus.setText("Serve");
                 SetStatus.setBackgroundColor(Color.TRANSPARENT);
                 SetStatus.setTextColor(getResources().getColor(R.color.order_serve));
                 SetStatus.setEnabled(false);
+
             } else {
                 SetStatus.setText("Cancel");
                 SetStatus.setEnabled(false);
+
             }
             return setview;
         }
@@ -776,21 +796,25 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                 statusBtn.setTextColor(getResources().getColor(R.color.order_disable));
                 statusBtn.setEnabled(false);
                 statusBtn.setEnabled(false);
+
             } else if (detailProduct.getStatus().equals("2")) {
                 statusBtn.setText("Cooking");
                 statusBtn.setBackgroundColor(Color.TRANSPARENT);
                 statusBtn.setTextColor(getResources().getColor(R.color.order_cooking));
                 statusBtn.setEnabled(false);
+                paidavailable = false;
             } else if (detailProduct.getStatus().equals("3")) {
                 statusBtn.setText("Cooked");
                 statusBtn.setBackgroundColor(Color.TRANSPARENT);
                 statusBtn.setTextColor(getResources().getColor(R.color.order_cooked));
                 statusBtn.setEnabled(false);
+                paidavailable = false;
             } else if (detailProduct.getStatus().equals("4")) {
                 statusBtn.setText("Serve");
                 statusBtn.setBackgroundColor(Color.TRANSPARENT);
                 statusBtn.setTextColor(getResources().getColor(R.color.order_serve));
                 statusBtn.setEnabled(false);
+
             }
             else if (detailProduct.getStatus().equals("7")){
                 itemNameTxt.setPaintFlags(itemNameTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
@@ -804,10 +828,12 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                 statusBtn.setTextColor(getResources().getColor(R.color.order_disable));
                 statusBtn.setEnabled(false);
                 statusBtn.setEnabled(false);
+
             }
             else {
                 statusBtn.setText("Cancel");
                 statusBtn.setEnabled(true);
+                paidavailable = false;
             }
             Log.i("testing >>>>>>>>>>", detailProduct.getStatus() +"");
             final String order_detail_id = detailProduct.getId();
