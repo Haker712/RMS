@@ -488,6 +488,7 @@ public class CategoryActivity extends ActionBarActivity {
                     if(takeiddd.equals("1") ){
                         TAKE_AWAY = "take";
                     }
+                    category_item.setTakeAway(settakeitemID(download_forInvoiveItemDetail.getTake_item()));
                     category_item.setOrderIDD(download_forInvoiveItemDetail.getOrderId());
                     category_item.setOrderDetailIDD(download_forInvoiveItemDetail.getOrderDetailId());
                     category_item.setStatusid(download_forInvoiveItemDetail.getStatusId());
@@ -673,6 +674,7 @@ public class CategoryActivity extends ActionBarActivity {
                         detail_object.put("set_item", setItemJsonArray);
                         Log.e("SetID", category_item.getSetid() + "");
                     }
+                    detail_object.put("take_item", gettakeitemID(category_item.getTakeAway()) );
                     detail_object.put("order_detail_id", VOUNCHER_ID + order_detail_id);
                     detail_object.put("discount_amount", category_item.getDiscount() + "");
                     detail_object.put("promotion_id", category_item.getPromotion_id() + "");
@@ -850,6 +852,10 @@ public class CategoryActivity extends ActionBarActivity {
                     database.setTransactionSuccessful();
                     database.endTransaction();
                     loadItemJson();
+                    /*loadSetMenuJson();
+                    loadSetItemJson();
+                    loadAddONJson();
+                    loadDiscountJson();*/
                 } catch (Exception e) {
                     e.printStackTrace();
                     mProgressDialog.dismiss();
@@ -956,13 +962,13 @@ public class CategoryActivity extends ActionBarActivity {
                 try {
                     JSONResponseSetItem jsonResponse = response.body();
                     mProgressDialog.dismiss();
-                    deleteTableVersion("setMenu");
+                    deleteTableVersion("setItem");
                     download_setItemArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getSet_item()));
                     database.beginTransaction();
                     for (Download_SetItem download_setItem : download_setItemArrayList) {
                         ContentValues cv = new ContentValues();
                         cv.put("id", download_setItem.getId());
-                        cv.put("set_menu_item", download_setItem.getSet_menu_id());
+                        cv.put("set_menu_id", download_setItem.getSet_menu_id());
                         cv.put("item_id", download_setItem.getItem_id());
                         database.insert("setItem", null, cv);
                     }
@@ -1365,19 +1371,7 @@ public class CategoryActivity extends ActionBarActivity {
                     priceTxt.setText(commaSepFormat.format(categoryItem.getPrice()));
                     discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
                 }
-                if (ADD_INVOICE == "EDITING_INVOICE" ){
-                    clearBtn.setEnabled(false);
-                    clearBtn.setColorFilter(Color.argb(220,220,220,220));
-                    clearBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Toast.makeText(CategoryActivity.this, "Can't Cancel NOW !", Toast.LENGTH_SHORT).show();
-                            Log.e("Can't Cancel NOW !", "Can't Cancel NOW !Can't Cancel NOW !");
-                        }
-                    });
-                }
-
-                else {
+                if ( ADD_INVOICE.equals("NULL") || ADD_INVOICE == null ){
                     clearBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -1435,6 +1429,21 @@ public class CategoryActivity extends ActionBarActivity {
                                 }
                             });
                             builder.show();
+                        }
+
+                    });
+
+
+                }
+
+                else if (ADD_INVOICE == "EDITING_INVOICE" || ADD_INVOICE.equals("EDITING_INVOICE") ) {
+                    clearBtn.setEnabled(false);
+                    clearBtn.setColorFilter(Color.argb(220,220,220,220));
+                    clearBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(CategoryActivity.this, "Can't Cancel NOW !", Toast.LENGTH_SHORT).show();
+                            Log.e("Can't Cancel NOW !", "Can't Cancel NOW !Can't Cancel NOW !");
                         }
                     });
                 }
@@ -1596,7 +1605,7 @@ public class CategoryActivity extends ActionBarActivity {
                         builder.show();
                     }
                 });
-                ADD_INVOICE = null;
+                //ADD_INVOICE = null;
             }
             else {
                  Log.i("takeaway!!!!!",TAKE_AWAY+"");      // for from  take away including new invoice and exiting invoice
@@ -1639,7 +1648,7 @@ public class CategoryActivity extends ActionBarActivity {
                             }
                         });
                     }
-                    else {
+                    else if (ADD_INVOICE == "NULL"){
                         clearBtn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -2139,6 +2148,7 @@ public class CategoryActivity extends ActionBarActivity {
                     double extraPrice = category_item.getExtraPrice();
                     double totalAmt = (price + extraPrice) - discount;
 
+                    detail_object.put("take_item",gettakeitemID(category_item.getTakeAway()) );
                     detail_object.put("discount_amount", discount + "");
                     detail_object.put("promotion_id", category_item.getPromotion_id() + "");
                     detail_object.put("price", price);
@@ -2358,6 +2368,28 @@ public class CategoryActivity extends ActionBarActivity {
         database.update("voucher", invCountCV, "id LIKE ?", arg);
         database.setTransactionSuccessful();
         database.endTransaction();
+    }
+
+    private Integer gettakeitemID(Boolean takeID ){
+        Integer TakeItemID;
+        if (takeID == true){
+            TakeItemID = 1;
+        }
+        else {
+            TakeItemID = 0;
+        }
+        return TakeItemID;
+    }
+
+    private Boolean settakeitemID(Integer takeID ){
+        Boolean TakeItemID;
+        if (takeID == 1){
+            TakeItemID = true;
+        }
+        else {
+            TakeItemID = false;
+        }
+        return TakeItemID;
     }
 
     @Override

@@ -326,6 +326,7 @@ public class InvoiceActivity extends AppCompatActivity {
                             Name = getSetMenuName(SetMenuid);
                         }
                         invDetail.setItemName(Name);
+
                         invDetail.setPrice(String.valueOf(commaSepFormat.format(download_forInvoiveItemDetail.getAmount())));
                         invDetail.setQuantity(commaSepFormat.format(download_forInvoiveItemDetail.getQuantity()));
                         invDetail.setDiscount(commaSepFormat.format(download_forInvoiveItemDetail.getDiscountAmount()));
