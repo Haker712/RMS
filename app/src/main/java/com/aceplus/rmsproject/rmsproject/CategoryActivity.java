@@ -1371,11 +1371,7 @@ public class CategoryActivity extends ActionBarActivity {
                     priceTxt.setText(commaSepFormat.format(categoryItem.getPrice()));
                     discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
                 }
-
-
-
                 if ( ADD_INVOICE.equals("NULL") || ADD_INVOICE == null ){
-
                     clearBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
