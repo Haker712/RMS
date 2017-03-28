@@ -31,6 +31,9 @@ public class Download_ForInvoiveItemDetail {
     @SerializedName("quantity")
     @Expose
     private Integer quantity;
+    @SerializedName("take_item")
+    @Expose
+    private Integer take_item;
     @SerializedName("exception")
     @Expose
     private String exception;
@@ -107,6 +110,13 @@ public class Download_ForInvoiveItemDetail {
     @Expose
     private ArrayList<Download_orderroom>  orderrooms;
 
+    public Integer getTake_item() {
+        return take_item;
+    }
+
+    public void setTake_item(Integer take_item) {
+        this.take_item = take_item;
+    }
 
     public String getId() {
         return id;

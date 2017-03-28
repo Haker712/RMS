@@ -758,8 +758,8 @@ public class TableActivity extends ActionBarActivity {
                                         CategoryActivity.groupTableArrayList = tableNameList;
                                         CategoryActivity.TAKE_AWAY = "table";
                                         CategoryActivity.ROOM_ID = null;
-                                        CategoryActivity.VOUNCHER_ID = null;
                                         CategoryActivity.ADD_INVOICE = "NULL";
+                                        CategoryActivity.VOUNCHER_ID = "NULL";
                                         startActivity(new Intent(TableActivity.this, CategoryActivity.class));
                                         finish();
                                     }

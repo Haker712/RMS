@@ -15,6 +15,7 @@ public class InvoiceDetailProduct implements Parcelable {
     String discount;
     String amount;
     String duration;
+
     String status;
     //ksl
     String set_id;

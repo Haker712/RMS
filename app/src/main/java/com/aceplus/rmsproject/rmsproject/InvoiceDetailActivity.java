@@ -390,7 +390,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                        public void onClick(View v) {   // paid button ! uploading data if get paid !
 
                                            if (paidavailable == false) {
-                                               Toast.makeText(InvoiceDetailActivity.this, "Nope nope nope!", Toast.LENGTH_SHORT).show();
+                                               Toast.makeText(InvoiceDetailActivity.this, "Can't pay right now!", Toast.LENGTH_SHORT).show();
                                            }
 
                                            else if (paidavailable == true) {
