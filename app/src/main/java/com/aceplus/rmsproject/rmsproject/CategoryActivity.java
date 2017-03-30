@@ -473,7 +473,7 @@ public class CategoryActivity extends ActionBarActivity {
                     Log.i("itemdetailArrayListsiezzze",Download_ForInvoiceItemDetailArrayList.size()+"");
                     Category_Item category_item = new Category_Item();
                     if (Integer.parseInt(download_forInvoiveItemDetail.getItemId())== 0) {
-                        category_item.setId(download_forInvoiveItemDetail.getSetmenuId());
+                        category_item.setSetid(download_forInvoiveItemDetail.getSetmenuId());
                         SetMenuName = getSetMenuName(download_forInvoiveItemDetail.getSetmenuId());
                         category_item.setItemName(SetMenuName);
                         category_item.setId(null);
@@ -693,6 +693,12 @@ public class CategoryActivity extends ActionBarActivity {
         }
         JSONArray jsonArray = new JSONArray();
         try {
+            orderjsonObject.put("user_id", WAITER_ID);
+            if (TAKE_AWAY.equals("take")) {
+                orderjsonObject.put("take_id", "1");
+            } else {
+                orderjsonObject.put("take_id", "null");
+            }
             orderjsonObject.put("order_id", VOUNCHER_ID);
             orderjsonObject.put("total_price", tvalue);
             orderjsonObject.put("net_price", Double.parseDouble(tnetPriceTxt.getText().toString().trim().replaceAll(",", "")));
@@ -1648,7 +1654,7 @@ public class CategoryActivity extends ActionBarActivity {
                             }
                         });
                     }
-                    else if (ADD_INVOICE == "NULL"){
+                    else if (ADD_INVOICE == "NULL" || ADD_INVOICE == null){
                         clearBtn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
