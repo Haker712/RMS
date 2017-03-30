@@ -639,7 +639,9 @@ public class RoomActivity extends AppCompatActivity {
                                         CategoryActivity.VOUNCHER_ID = invoice_id;
                                         Log.i("CategoryActivity.vouncherIDfromRoom", CategoryActivity.VOUNCHER_ID + "");
                                         if (invoice_id.equals("NULL")  ){
-                                            CategoryActivity.ADD_INVOICE = "NULL";
+                                            //CategoryActivity.ADD_INVOICE = "NULL";
+                                            CategoryActivity.ADD_INVOICE = "status1";
+                                            CategoryActivity.VOUNCHER_ID = "NULL";
                                         }
                                         else {
                                             CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";

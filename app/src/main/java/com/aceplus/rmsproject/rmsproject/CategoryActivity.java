@@ -1442,7 +1442,7 @@ public class CategoryActivity extends ActionBarActivity {
 
                 }
 
-                else if (ADD_INVOICE == "EDITING_INVOICE" || ADD_INVOICE.equals("EDITING_INVOICE") ) {
+                else if (ADD_INVOICE == "EDITING_INVOICE" || ADD_INVOICE.equals("EDITING_INVOICE") || ADD_INVOICE.equals("status1") ) {
                     clearBtn.setEnabled(false);
                     clearBtn.setColorFilter(Color.argb(220,220,220,220));
                     clearBtn.setOnClickListener(new View.OnClickListener() {
