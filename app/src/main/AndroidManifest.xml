@@ -61,6 +61,11 @@
             android:name=".MessageActivity"
             android:label="@string/title_message_activity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name=".PrintActivity"
+            android:label="Print"
+            android:screenOrientation="landscape" />
+
     </application>
 
 </manifest>

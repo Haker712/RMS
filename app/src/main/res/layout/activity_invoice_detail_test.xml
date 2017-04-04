@@ -31,6 +31,12 @@
             android:layout_height="10dp" />
 
         <Button
+            android:id="@+id/print_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/print"/>
+
+        <Button
             android:id="@+id/paid_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

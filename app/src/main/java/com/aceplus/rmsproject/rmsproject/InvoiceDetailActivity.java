@@ -108,6 +108,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     private ListView productListView;
     private Button addBtn;
     private Button paidBtn;
+    private Button printBtn;
     double FOC_Amount = 0.0;
     double old_totalAmt = 0.0;
     double totalAmt_calc = 0.0;
@@ -199,6 +200,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         refundTxt = (TextView) findViewById(R.id.refund_txt);
         addBtn = (Button) findViewById(R.id.add_btn);
         paidBtn = (Button) findViewById(R.id.paid_btn);
+        printBtn = (Button) findViewById(R.id.print_btn);
     }
 
     private void callUploadDialog(String message) {
@@ -382,6 +384,38 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                       }
                                   }
         );
+
+        printBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                       /* PrintActivity.print_datetime = null;
+                        PrintActivity.print_voucherID = null;
+                        PrintActivity.print_tableNo = null;
+                        PrintActivity.print_staffName = null;
+                        PrintActivity.print_tax = null;
+                        PrintActivity.print_service = null;
+                        PrintActivity.print_totalAmount = null;
+                        PrintActivity.print_netAmount = null;*/
+//here!!
+
+
+
+
+
+                Intent intent = new Intent(InvoiceDetailActivity.this, PrintActivity.class);
+                                intent.putExtra("voucherID",vouncherID);
+                                intent.putExtra("datetime",date);
+                                intent.putExtra("tableNo",tableNo);
+                                intent.putExtra("staffName",userID);
+                                intent.putExtra("totalAmt",totalAmount);
+                                intent.putExtra("netAmt",netAmount);
+                                intent.putExtra("taxAmt",taxTxt.getText().toString().trim().replace(",", ""));
+                                intent.putExtra("serviceAmt",serviceTxt.getText().toString().trim().replace(",", ""));
+                                //intent.putCharSequenceArrayListExtra("json", );
+
+                startActivity(intent);
+            }
+        });
 
         paidBtn.setOnClickListener(new View.OnClickListener()
 
