@@ -52,6 +52,7 @@ public class PrintActivity extends ActionBarActivity {
     private ListView productListView;
 
     printDetailAdapter PrintDetailAdapter;
+    private ArrayList<InvoiceDetailProduct> printProductArrayList = new ArrayList<>();
 
 
 
@@ -106,7 +107,16 @@ public class PrintActivity extends ActionBarActivity {
     }
 
     private void setAdapter() {
-        PrintDetailAdapter = new PrintActivity.printDetailAdapter(PrintActivity.this, InvoiceActivity.detailProductArrayList);
+        ArrayList<InvoiceDetailProduct> printProductsArrayList;
+        printProductsArrayList = InvoiceActivity.detailProductArrayList;
+        for (int i = 0; i < printProductsArrayList.size(); i++){
+            if (printProductsArrayList.get(i).getStatus().equals("6") || printProductsArrayList.get(i).getStatus().equals("7")){
+            }
+            else {
+                printProductArrayList.add(printProductsArrayList.get(i));
+            }
+        }
+        PrintDetailAdapter = new PrintActivity.printDetailAdapter(PrintActivity.this, printProductArrayList);
         productListView = (ListView) findViewById(R.id.print_list_view);
         productListView.setAdapter(PrintDetailAdapter);
         PrintDetailAdapter.notifyDataSetChanged();
