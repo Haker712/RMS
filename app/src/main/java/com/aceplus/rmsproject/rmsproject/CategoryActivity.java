@@ -121,6 +121,7 @@ public class CategoryActivity extends ActionBarActivity {
     private ArrayList<String> searchItemList = new ArrayList<>();
     public static ArrayList<String> groupTableArrayList = null;
     private ArrayList<Category> searchItemSetMenuList = new ArrayList<>();
+    private ArrayList<Category> searchTotallist = new ArrayList<>();
     SQLiteDatabase database;
     CategoryItemAdapter categoryItemAdapter;
     AddOnAdapter addOnAdapter;
@@ -293,6 +294,7 @@ public class CategoryActivity extends ActionBarActivity {
                 item.setPrice(cur.getDouble(cur.getColumnIndex("set_menu_price")));
                 item.setCategory_id("set_menu");
                 itemArrayList.add(item);
+                searchTotallist.add(item);
             }
             cur.close();
             database.setTransactionSuccessful();
@@ -348,6 +350,7 @@ public class CategoryActivity extends ActionBarActivity {
                 item.setDiscount_type(curDiscount.getString(curDiscount.getColumnIndex("type")));
             }
             itemArrayList.add(item);
+            searchTotallist.add(item);
         }
         cur.close();
         database.setTransactionSuccessful();
@@ -1076,7 +1079,7 @@ public class CategoryActivity extends ActionBarActivity {
     }
 
     private void catchEvents() {
-        searchItemSetMenuList.clear();
+        searchTotallist.clear();
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Interceptor interceptor = new Interceptor() {
@@ -1101,9 +1104,11 @@ public class CategoryActivity extends ActionBarActivity {
             getVouncherDetailData();
         }
         getConfigData();
-        searchItemSetMenuList = getItemForAuotSearch();
-        searchItemSetMenuList = setMenuDataFromDB();
-        for (Category item : searchItemSetMenuList) {
+       /* searchItemSetMenuList = getItemForAuotSearch();
+       searchItemSetMenuList =  setMenuDataFromDB();*/
+        getItemForAuotSearch();
+        setMenuDataFromDB();
+        for (Category item : searchTotallist) {
             searchItemList.add(item.getName());
         }
         searchItemAuto.setAdapter(new ArrayAdapter<String>(
@@ -1114,14 +1119,24 @@ public class CategoryActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
-                for (Category searchList : searchItemSetMenuList) {
+                for (Category searchList : searchTotallist) {
                     String itemName = searchList.getName();
                     if (itemName.equals(parent.getItemAtPosition(position).toString())) {
                         Category_Item category_item = new Category_Item();
                         category_item.setId(searchList.getId());
+                        if (searchList.getCategory_id().equals("set_menu")){
+                            category_item.setSetid(searchList.getId());
+                        }
                         category_item.setItemName(searchList.getName());
                         category_item.setQuantity(searchList.getQuantity());
                         category_item.setPrice(searchList.getPrice());
+                        category_item.setStatusid("1");
+                        if(TAKE_AWAY == "take") {
+                            category_item.setTakeid("1");
+                        }
+                        else {
+                            category_item.setTakeid("0");
+                        }
                         category_item.setDiscount(searchList.getDiscount());
                         String discountType = searchList.getDiscount_type();
                         if (discountType == null) {
@@ -1138,7 +1153,14 @@ public class CategoryActivity extends ActionBarActivity {
                         category_item.setDiscount_id(searchList.getDiscount_id());
                         category_item.setExtraPrice(searchList.getExtraPrice());
                         category_item.setAmount(searchList.getAmount());
-                        category_item.setTakeAway(searchList.isTakeAway());
+                        if (TAKE_AWAY == "take"){
+                            category_item.setTakeAway(true);
+                            category_item.setOrder_type_id("2");
+                        }
+                        else {
+                            category_item.setTakeAway(false);
+                            category_item.setOrder_type_id("1");
+                        }
                         category_item.setCategoryId(searchList.getCategory_id());
                         String value = getAddOnID(searchList.getCategory_id());
                         category_item.setAddOnArrayList(getAddonData(value));
