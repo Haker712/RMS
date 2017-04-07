@@ -1104,8 +1104,7 @@ public class CategoryActivity extends ActionBarActivity {
             getVouncherDetailData();
         }
         getConfigData();
-       /* searchItemSetMenuList = getItemForAuotSearch();
-       searchItemSetMenuList =  setMenuDataFromDB();*/
+       
         getItemForAuotSearch();
         setMenuDataFromDB();
         for (Category item : searchTotallist) {
