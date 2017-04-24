@@ -685,7 +685,7 @@ public class CategoryActivity extends ActionBarActivity {
                     detail_object.put("quantity", category_item.getQuantity());
                     detail_object.put("amount", category_item.getTotalAmount());
                     detail_object.put("order_type_id", orderType);
-                    detail_object.put("status", "1");
+                    detail_object.put("status", category_item.getStatusid());
                     detail_object.put("exception", category_item.getUserRemark() + "");
                     detail_object.put("extra", orderExtraJsonArray);
                 } catch (JSONException e) {
@@ -1104,7 +1104,7 @@ public class CategoryActivity extends ActionBarActivity {
             getVouncherDetailData();
         }
         getConfigData();
-       
+
         getItemForAuotSearch();
         setMenuDataFromDB();
         for (Category item : searchTotallist) {
