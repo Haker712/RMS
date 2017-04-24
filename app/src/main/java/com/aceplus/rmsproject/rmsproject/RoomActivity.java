@@ -638,9 +638,16 @@ public class RoomActivity extends AppCompatActivity {
                                         invoice_id = invoiceeece_id;
                                         CategoryActivity.VOUNCHER_ID = invoice_id;
                                         Log.i("CategoryActivity.vouncherIDfromRoom", CategoryActivity.VOUNCHER_ID + "");
-                                        if (invoice_id.equals("NULL")  ){
-                                            //CategoryActivity.ADD_INVOICE = "NULL";
-                                            CategoryActivity.ADD_INVOICE = "status1";
+
+                                        if (invoice_id.equals("NULL") || invoice_id.equals(null)  ){
+                                            if (table.getTableService().equals("1")){
+                                                CategoryActivity.ADD_INVOICE = "status1";
+                                            }
+                                            else {
+                                                CategoryActivity.ADD_INVOICE = "NULL";
+                                            }
+
+                                            //
                                             CategoryActivity.VOUNCHER_ID = "NULL";
                                         }
                                         else {
