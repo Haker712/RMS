@@ -80,6 +80,7 @@ public class RoomActivity extends AppCompatActivity {
     SQLiteDatabase database;
     private RoomAdapter adapter;
     ArrayList<String> roomName = new ArrayList<String>();
+    ArrayList<String> fortransferroomName = new ArrayList<String>();
     ArrayList<BookingTable> bookingTableArrayList = new ArrayList<>();
     ArrayList<BookingTable> getRoomArrayList = new ArrayList<>();
     private ArrayList<Download_Room> download_roomArrayList;
@@ -152,6 +153,7 @@ public class RoomActivity extends AppCompatActivity {
             Room room = new Room();
             room.setId(cur.getString(cur.getColumnIndex("id")));
             room.setRoom_name(cur.getString(cur.getColumnIndex("room_name")));
+            room.setStatus(cur.getString(cur.getColumnIndex("status")));
             roomArrayList.add(room);
         }
         cur.close();
@@ -433,8 +435,15 @@ public class RoomActivity extends AppCompatActivity {
                 LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 final View view = layoutInflater.inflate(R.layout.activity_table_transfer_dialog, null);
                 roomName.clear();
+                fortransferroomName.clear();
                 for (Room room : getRoomData()) {
                     roomName.add(room.getRoom_name());
+                }
+                for (Room room : getRoomData()) {
+                    if(room.getStatus().equals("0") || room.getStatus().equals(0)){
+                        fortransferroomName.add(room.getRoom_name());
+                    }
+
                 }
                 final Spinner from_spinner = (Spinner) view.findViewById(R.id.from_spinner);
                 final Spinner to_spinner = (Spinner) view.findViewById(R.id.to_spinner);
@@ -452,7 +461,7 @@ public class RoomActivity extends AppCompatActivity {
                         // TODO Auto-generated method stub
                     }
                 });
-                ArrayAdapter<String> toArrayAdapter = new ArrayAdapter<String>(RoomActivity.this, R.layout.spinner_text, roomName);
+                ArrayAdapter<String> toArrayAdapter = new ArrayAdapter<String>(RoomActivity.this, R.layout.spinner_text, fortransferroomName);
                 toArrayAdapter.setDropDownViewResource(R.layout.spinner_dropdown_textview);
                 to_spinner.setAdapter(toArrayAdapter);
                 to_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

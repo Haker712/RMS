@@ -6,6 +6,15 @@ package com.aceplus.rmsproject.rmsproject.object;
 public class Room {
     String id;
     String room_name;
+    String status;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public String getId() {
         return id;

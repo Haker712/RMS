@@ -83,8 +83,10 @@ public class TableActivity extends ActionBarActivity {
     SQLiteDatabase database;
     private TableAdapter adapter;
     ArrayList<String> tableName = new ArrayList<String>();
+    ArrayList<String> fortransfertableName = new ArrayList<String>();
     ArrayList<BookingTable> bookingTableArrayList = new ArrayList<>();
     ArrayList<BookingTable> getBookingArrayList = new ArrayList<>();
+    ArrayList<BookingTable> get4transfertableArrayList = new ArrayList<>();
     SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:SS");
     private ProgressDialog mProgressDialog;
     private Retrofit retrofit;
@@ -177,6 +179,7 @@ public class TableActivity extends ActionBarActivity {
                 bookingTable.setBooking_warning(curConfig.getString(curConfig.getColumnIndex("booking_warning_time")));
             }
             getBookingArrayList.add(bookingTable);
+            get4transfertableArrayList.add(bookingTable);
         }
         cur.close();
         database.setTransactionSuccessful();
@@ -318,8 +321,14 @@ public class TableActivity extends ActionBarActivity {
                 LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 final View view = layoutInflater.inflate(R.layout.activity_table_transfer_dialog, null);
                 tableName.clear();
+                fortransfertableName.clear();
                 for (BookingTable table : getBookingArrayList) {
                     tableName.add(table.getTable_no());
+                }
+                for (BookingTable table : get4transfertableArrayList) {
+                    if (table.getTableStatus().equals("0") || table.getTableStatus().equals(0) ){
+                        fortransfertableName.add(table.getTable_no());
+                    }
                 }
                 final Spinner from_spinner = (Spinner) view.findViewById(R.id.from_spinner);
                 final Spinner to_spinner = (Spinner) view.findViewById(R.id.to_spinner);
@@ -340,13 +349,15 @@ public class TableActivity extends ActionBarActivity {
 
                     }
                 });
-                ArrayAdapter<String> toArrayAdapter = new ArrayAdapter<String>(TableActivity.this, R.layout.spinner_text, tableName);
+                ArrayAdapter<String> toArrayAdapter = new ArrayAdapter<String>(TableActivity.this, R.layout.spinner_text, fortransfertableName);
                 toArrayAdapter.setDropDownViewResource(R.layout.spinner_dropdown_textview);
                 to_spinner.setAdapter(toArrayAdapter);
                 to_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        toTable = getBookingArrayList.get(position).getTableID();
+                        //getavailable table
+
+                        toTable = get4transfertableArrayList.get(position).getTableID();
                         toPos = position;
                     }
                     @Override
