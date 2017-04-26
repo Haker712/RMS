@@ -476,7 +476,7 @@ public class RoomActivity extends AppCompatActivity {
                     }
                 });
                 builder.setView(view);
-                builder.setTitle(R.string.table_transfer);
+                builder.setTitle(R.string.room_transfer);
                 builder.setOnShowListener(new DialogInterface.OnShowListener() {
                     @Override
                     public void onShow(DialogInterface dialog) {

@@ -331,6 +331,32 @@ public class CategoryActivity extends ActionBarActivity {
         database.endTransaction();
     }
 
+    private void getPromotionDataInDBforsetmenu (String setmenu_id) {
+        database.beginTransaction();
+        String promotionID = null;
+        Cursor cur = database.rawQuery("SELECT * FROM promotionItem WHERE setmenu_id = \"" + setmenu_id + "\"", null);
+        while (cur.moveToNext()) {
+            promotionID = cur.getString(cur.getColumnIndex("promotion_id"));
+            Log.e("PromotionID", promotionID);
+            Cursor curPro = database.rawQuery("SELECT * FROM promotion WHERE id = \"" + promotionID + "\"", null);
+            while (curPro.moveToNext()) {
+                promotion_id = promotionID;
+                try {
+                    from_date = date_format.parse(curPro.getString(curPro.getColumnIndex("from_date")));
+                    to_date = date_format.parse(curPro.getString(curPro.getColumnIndex("to_date")));
+                    from_time = time_format.parse(curPro.getString(curPro.getColumnIndex("from_time")));
+                    to_time = time_format.parse(curPro.getString(curPro.getColumnIndex("to_time")));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                sell_quantity = curPro.getInt(curPro.getColumnIndex("sell_item_qty"));
+            }
+        }
+        cur.close();
+        database.setTransactionSuccessful();
+        database.endTransaction();
+    }
+
     private ArrayList<Category> getItemForAuotSearch() {
         database.beginTransaction();
         ArrayList<Category> itemArrayList = new ArrayList<>();
@@ -1544,7 +1570,16 @@ public class CategoryActivity extends ActionBarActivity {
                                             qtyEdit.requestFocus();
                                         } else {
                                             int qty = Integer.valueOf(qtyEdit.getText().toString());
-                                            getPromotionDataInDB(categoryItem.getId());
+                                            String idid;
+                                            if (categoryItem.getId().equals(null)){
+                                                idid = categoryItem.getSetid();
+                                                getPromotionDataInDBforsetmenu(idid);
+                                            }
+                                            else {
+                                                idid = categoryItem.getId();
+                                                getPromotionDataInDB(/*categoryItem.getId()*/ idid);
+                                            }
+
                                             if (from_date == null && to_date == null && from_time == null && to_time == null) {
                                                 Log.e("PromotionItem", "This item is not promotion.");
                                             } else {
@@ -1833,7 +1868,7 @@ public class CategoryActivity extends ActionBarActivity {
                                                         e.printStackTrace();
                                                     }
                                                 }
-                                                Log.e("ItemID", categoryItem.getId());
+                                                //Log.e("ItemID", categoryItem.getId());
                                                 categoryItem.setQuantity(qty);
                                                 Log.d("Quantity", "You have entered: " + qtyEdit.getText().toString());
                                                 builder.dismiss();
@@ -2125,7 +2160,7 @@ public class CategoryActivity extends ActionBarActivity {
 
             Log.e("ItemQuantity", quantity + "");
 
-            for (int i = 0; i < quantity; i++) {
+            //for (int i = 0; i < quantity; i++) {
                 JSONObject detail_object = new JSONObject();
                 String orderType = null;
 
@@ -2179,7 +2214,8 @@ public class CategoryActivity extends ActionBarActivity {
                     detail_object.put("discount_amount", discount + "");
                     detail_object.put("promotion_id", category_item.getPromotion_id() + "");
                     detail_object.put("price", price);
-                    detail_object.put("quantity", "1");
+                    //needtocheck
+                    detail_object.put("quantity", category_item.getQuantity());
                     detail_object.put("amount", totalAmt);
                     detail_object.put("order_type_id", orderType);
                     detail_object.put("status", "1");
@@ -2210,7 +2246,7 @@ public class CategoryActivity extends ActionBarActivity {
                 }
                 orderDetailJsonArray.put(detail_object);
                 invoiceDetailID++;
-            }
+            //}
         }
         Log.d("OrderList", makeOrderID());
 
