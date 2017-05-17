@@ -1,5 +1,8 @@
 package com.aceplus.rmsproject.rmsproject.object;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by kyawminlwin on 7/14/16.
  */
@@ -9,6 +12,9 @@ public class Download_Config {
     String booking_warning_time;
     String booking_waiting_time;
     String booking_service_time;
+    @SerializedName("room_charge")
+    @Expose
+    int room_charge;
     String restaurant_name;
     String logo;
     String mobile_logo;
@@ -78,5 +84,9 @@ public class Download_Config {
 
     public String getMobile_image() {
         return mobile_image;
+    }
+
+    public int getRoom_charge() {
+        return room_charge;
     }
 }

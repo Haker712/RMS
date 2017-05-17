@@ -32,15 +32,6 @@ public class PrintActivity extends ActionBarActivity {
     private Toolbar toolbar;
     private ProgressDialog mProgressDialog;
     private Button onprintBtn;
-    /*public static String print_datetime = null;
-    public static String print_voucherID = null;
-    public static String print_tableNo = null;
-    public static String print_staffName = null;
-    public static String print_tax = null;
-    public static String print_service = null;
-    public static String print_totalAmount = null;
-    public static String print_netAmount = null;*/
-
     private TextView datetimetxt;
     private TextView voucgerIDtxt;
     private TextView tablenotxt;
@@ -50,11 +41,8 @@ public class PrintActivity extends ActionBarActivity {
     private TextView totalamttxt;
     private TextView netamttxt;
     private ListView productListView;
-
     printDetailAdapter PrintDetailAdapter;
     private ArrayList<InvoiceDetailProduct> printProductArrayList = new ArrayList<>();
-
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -91,11 +79,8 @@ public class PrintActivity extends ActionBarActivity {
     }
 
     private void catchEvents() {
-
         Intent i = getIntent();
-
         Bundle extras = i.getExtras();
-
         datetimetxt.setText((String) extras.get("datetime"));
         voucgerIDtxt.setText((String) extras.get("voucherID"));
         tablenotxt.setText((String) extras.get("tableNo"));
@@ -120,7 +105,6 @@ public class PrintActivity extends ActionBarActivity {
         productListView = (ListView) findViewById(R.id.print_list_view);
         productListView.setAdapter(PrintDetailAdapter);
         PrintDetailAdapter.notifyDataSetChanged();
-
     }
 
     private class printDetailAdapter extends ArrayAdapter<InvoiceDetailProduct>{

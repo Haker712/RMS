@@ -138,6 +138,7 @@ public class CategoryActivity extends ActionBarActivity {
     public static String ROOM_ID = null;
     public static String VOUNCHER_ID = null;
     public static String ADD_INVOICE = null;
+    public String ROOM_CHARGE = null;
     public String WAITER_ID = null;
     public Date from_time = null;
     public Date to_time = null;
@@ -148,6 +149,7 @@ public class CategoryActivity extends ActionBarActivity {
     private int invoicecount;
     private double taxAmt = 0.0;
     private double serviceAmt = 0.0;
+    private double roomchargeAmt = 0.0;
     private int count = 0;
     private int count2 = 0;
     double taxValue = 0.0;
@@ -232,6 +234,8 @@ public class CategoryActivity extends ActionBarActivity {
         }
         return categoryList;
     }
+
+
 
     private ArrayList<Category> cateDataFromDB(String id) {
         database.beginTransaction();
@@ -634,6 +638,8 @@ public class CategoryActivity extends ActionBarActivity {
         while (cur.moveToNext()) {
             taxAmt = cur.getDouble(cur.getColumnIndex("tax"));
             serviceAmt = cur.getDouble(cur.getColumnIndex("service"));
+            roomchargeAmt = cur.getDouble(cur.getColumnIndex("room_charge"));
+           // Log.i("roomchargeAmtroomchargeAmt",roomchargeAmt+"");
         }
         cur.close();
         database.setTransactionSuccessful();
@@ -722,6 +728,8 @@ public class CategoryActivity extends ActionBarActivity {
         }
         JSONArray jsonArray = new JSONArray();
         try {
+            double totalcharge = 0;
+            double netcharge;
             orderjsonObject.put("user_id", WAITER_ID);
             if (TAKE_AWAY.equals("take")) {
                 orderjsonObject.put("take_id", "1");
@@ -730,11 +738,22 @@ public class CategoryActivity extends ActionBarActivity {
             }
             orderjsonObject.put("order_id", VOUNCHER_ID);
             orderjsonObject.put("total_price", tvalue);
-            orderjsonObject.put("net_price", Double.parseDouble(tnetPriceTxt.getText().toString().trim().replaceAll(",", "")));
             orderjsonObject.put("extra_price", totalExtraAmt);
             orderjsonObject.put("discount_amount", totalDisAmt);
-            orderjsonObject.put("service_amount", serviceamont);
+            if (ROOM_ID != null /*|| !ROOM_ID.equals("")*/){
+
+                totalcharge =(serviceamont + roomchargeAmt);
+                orderjsonObject.put("service_amount",totalcharge );
+                Log.i("totalcharge111",totalcharge+"");
+            }
+            else {
+                totalcharge = serviceamont;
+                orderjsonObject.put("service_amount", serviceamont);
+            }
             orderjsonObject.put("tax_amount", taxamount);
+            netcharge = tvalue+totalExtraAmt+totalDisAmt+totalcharge+taxamount;
+
+            orderjsonObject.put("net_price", netcharge);
             orderjsonObject.put("order_detail", orderDetailJsonArray);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -846,6 +865,8 @@ public class CategoryActivity extends ActionBarActivity {
         database.endTransaction();
         return backend_activate_key;
     }
+
+
 
     private void loadCategoryJson() {
         callDialog("Updating category data....");
@@ -2214,7 +2235,7 @@ public class CategoryActivity extends ActionBarActivity {
                     detail_object.put("discount_amount", discount + "");
                     detail_object.put("promotion_id", category_item.getPromotion_id() + "");
                     detail_object.put("price", price);
-                    //needtocheck
+
                     detail_object.put("quantity", category_item.getQuantity());
                     detail_object.put("amount", totalAmt);
                     detail_object.put("order_type_id", orderType);
@@ -2279,6 +2300,8 @@ public class CategoryActivity extends ActionBarActivity {
 
         JSONArray jsonArray = new JSONArray();
         try {
+            double totalcharge = 0;
+            double netcharge;
             orderjsonObject.put("order_id", order_id);
             orderjsonObject.put("user_id", WAITER_ID);
             orderjsonObject.put("order_table", tableArray);
@@ -2290,12 +2313,22 @@ public class CategoryActivity extends ActionBarActivity {
                 orderjsonObject.put("take_id", "null");
             }
             orderjsonObject.put("total_price", tvalue);
-            orderjsonObject.put("net_price", Double.parseDouble(tnetPriceTxt.getText().toString().trim().replaceAll(",", "")));
             orderjsonObject.put("extra_price", totalExtraAmt);
             orderjsonObject.put("discount_amount", totalDisAmt);
-            orderjsonObject.put("service_amount", service_value);
+            if (ROOM_ID != null /*|| !ROOM_ID.equals("")*/){
+
+                totalcharge =(service_value + roomchargeAmt);
+                orderjsonObject.put("service_amount",totalcharge );
+                Log.i("totalcharge111",totalcharge+"");
+            }
+            else {
+                totalcharge = service_value;
+                orderjsonObject.put("service_amount", totalcharge);
+            }
             orderjsonObject.put("tax_amount", tax_value);
             orderjsonObject.put("order_detail", orderDetailJsonArray);
+            netcharge = tvalue+totalExtraAmt+totalDisAmt+totalcharge+tax_value;
+            orderjsonObject.put("net_price", netcharge);
         } catch (JSONException e) {
             e.printStackTrace();
         }

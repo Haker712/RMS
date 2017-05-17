@@ -42,8 +42,6 @@ public interface RequestInterface {
     Call<JSONResponseOrderStatus> getOrderStatus();
 
 
-
-
     @FormUrlEncoded
     @POST("api/v1/item")
     Call<JSONResponseItem> getItem(@Field("site_activation_key") String activate_key);

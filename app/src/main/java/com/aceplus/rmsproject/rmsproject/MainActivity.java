@@ -93,9 +93,13 @@ public class MainActivity extends Activity {
     //    public static final String URL = "http://192.168.11.57:9090";
     //public static  String URL = "http://192.168.11.62:8800";
     //i/me/my/mine//
-    public static String URL = "http://192.168.11.57:8900";
+    //public static String URL = "http://192.168.11.57:8900";
     //public static String URL = "http://192.168.11.62:8019";
 //    public static String URL = "http://192.168.195.1:8900";
+    //public static String URL = "http://192.168.11.180:8080";
+    //public static String URL = "http://192.168.11.57:8900";
+    //public static String URL = "http://192.168.195.1:8900";
+    public static String URL = "http://192.168.11.201:8080";
 
     SharedPreferences sharedpreferences;
     public static final String LOGIN_PREFERENCES = "Login";
@@ -630,6 +634,7 @@ public class MainActivity extends Activity {
                             database.insert("booking", null, cv);
                         }
                         Log.d("Demo Booking", download_bookingArrayList.size() + "");
+
                         download_configArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getConfig()));
                         if (download_configArrayList.size() > 0) {
                             deleteTableVersion("config");
@@ -650,6 +655,8 @@ public class MainActivity extends Activity {
                             cv.put("address", download_config.getAddress());
                             cv.put("message", download_config.getMessage());
                             cv.put("remark", download_config.getRemark());
+                            cv.put("room_charge", download_config.getRoom_charge());
+
                             database.insert("config", null, cv);
                         }
                         Log.d("Demo Config", download_configArrayList.size() + "");

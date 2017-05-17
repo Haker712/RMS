@@ -285,6 +285,8 @@ public class InvoiceActivity extends AppCompatActivity {
         for (Download_forShow_roomID download_forShow_roomID : download_orderRoomArrayList){
             roommmID =  "ROOM " + (download_forShow_roomID.getRoom_id());
         }
+        InvoiceDetailActivity.RommCharge = "";
+        InvoiceDetailActivity.RommCharge = roommmID;
         return roommmID;
     }
 

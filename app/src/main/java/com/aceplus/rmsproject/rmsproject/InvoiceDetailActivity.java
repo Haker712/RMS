@@ -73,6 +73,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     public static String userID = null;
     public static String date = null;
     public static String tableNo = null;
+    public static String RommCharge = null;
     public static String TABLE_ID = null;
     public static String ROOM_ID = null;
     public static String totalAmount = null;
@@ -81,6 +82,8 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     public static String netAmount = null;
     private double taxAmt = 0.0;
     private double serviceAmt = 0.0;
+    private double roomchargeAmt = 0.0;
+    private double totalroomchargeAmt = 0.0;
     private double discount = 0.0;
     private String memberID = null;
     DecimalFormat commaSepFormat = new DecimalFormat("###,##0");
@@ -235,6 +238,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
             while (cur.moveToNext()) {
                 taxAmt = cur.getDouble(cur.getColumnIndex("tax"));
                 serviceAmt = cur.getDouble(cur.getColumnIndex("service"));
+                roomchargeAmt = cur.getDouble(cur.getColumnIndex("room_charge"));
             }
             cur.close();
             database.setTransactionSuccessful();
@@ -270,9 +274,14 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         double taxValue = total * taxAmt / 100;
         taxTxt.setText(commaSepFormat.format(taxValue));
         Log.d("TaxValue", taxAmt + "%");
-        double serviceValue = total * serviceAmt / 100;
+        double serviceValue = 0;
+        if (RommCharge != ""){
+            serviceValue = (total * serviceAmt / 100) + roomchargeAmt;
+        }else{
+            serviceValue = total * serviceAmt / 100;
+        }
         serviceTxt.setText(commaSepFormat.format(serviceValue));
-        Log.d("Service", serviceAmt + "%");
+        Log.d("Service", serviceValue + "%");
         focAmtEdit.setEnabled(false);
         payAmtEdit.addTextChangedListener(new TextWatcher() {
             @Override
