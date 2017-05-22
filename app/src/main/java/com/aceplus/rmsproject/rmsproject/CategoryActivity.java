@@ -1590,7 +1590,7 @@ public class CategoryActivity extends ActionBarActivity {
                                             qtyEdit.setError("Quantity is required.");
                                             qtyEdit.requestFocus();
                                         } else {
-                                            int qty = Integer.valueOf(qtyEdit.getText().toString());
+                                            int qty = Integer.parseInt(qtyEdit.getText().toString());
                                             String idid;
                                             if (categoryItem.getId().equals(null)){
                                                 idid = categoryItem.getSetid();
@@ -1625,8 +1625,14 @@ public class CategoryActivity extends ActionBarActivity {
                                                 }
                                             }
                                             Log.e("ItemID", categoryItem.getId());
-                                            categoryItem.setQuantity(qty);
-                                            Log.d("Quantity", "You have entered: " + qtyEdit.getText().toString());
+                                            /*if (qty = 0){
+                                                qtyEdit.setError("Quantity is required.");
+                                            }
+                                            else{
+                                                categoryItem.setQuantity(qty);
+                                            }*/
+
+                                            Log.d("Quantity", "You have entered: " + qty);
                                             builder.dismiss();
                                             categoryItemAdapter.notifyDataSetChanged();
                                         }
@@ -1890,8 +1896,13 @@ public class CategoryActivity extends ActionBarActivity {
                                                     }
                                                 }
                                                 //Log.e("ItemID", categoryItem.getId());
-                                                categoryItem.setQuantity(qty);
-                                                Log.d("Quantity", "You have entered: " + qtyEdit.getText().toString());
+                                                if  (qty == 0){
+                                                    qtyEdit.setError("Quantity is required.");
+                                                }
+                                                else {
+                                                    categoryItem.setQuantity(qty);
+                                                }
+                                                Log.d("Quantity", "You have entered: " + qty);
                                                 builder.dismiss();
                                                 categoryItemAdapter.notifyDataSetChanged();
                                             }
