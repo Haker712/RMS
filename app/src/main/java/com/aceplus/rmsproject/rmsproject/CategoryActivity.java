@@ -1625,12 +1625,12 @@ public class CategoryActivity extends ActionBarActivity {
                                                 }
                                             }
                                             Log.e("ItemID", categoryItem.getId());
-                                            /*if (qty = 0){
+                                            if (qty == 0){
                                                 qtyEdit.setError("Quantity is required.");
                                             }
                                             else{
                                                 categoryItem.setQuantity(qty);
-                                            }*/
+                                            }
 
                                             Log.d("Quantity", "You have entered: " + qty);
                                             builder.dismiss();
