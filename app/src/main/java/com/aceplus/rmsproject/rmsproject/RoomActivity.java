@@ -605,9 +605,10 @@ public class RoomActivity extends AppCompatActivity {
             holder.backgroundLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final String room_id = table.getTableID();
-                    final String status = table.getTableService();
-                    JSONObject jsonObject = new JSONObject();
+                    //if (table.getTableService().equals("0")) {
+                        final String room_id = table.getTableID();
+                        final String status = table.getTableService();
+                        JSONObject jsonObject = new JSONObject();
                         try {
                             jsonObject.put("room_id", room_id + "");
                             jsonObject.put("status", "1");
@@ -648,18 +649,16 @@ public class RoomActivity extends AppCompatActivity {
                                         CategoryActivity.VOUNCHER_ID = invoice_id;
                                         Log.i("CategoryActivity.vouncherIDfromRoom", CategoryActivity.VOUNCHER_ID + "");
 
-                                        if (invoice_id.equals("NULL") || invoice_id.equals(null)  ){
-                                            if (table.getTableService().equals("1")){
+                                        if (invoice_id.equals("NULL") || invoice_id.equals(null)) {
+                                            if (table.getTableService().equals("1")) {
                                                 CategoryActivity.ADD_INVOICE = "status1";
-                                            }
-                                            else {
+                                            } else {
                                                 CategoryActivity.ADD_INVOICE = "NULL";
                                             }
 
                                             //
                                             CategoryActivity.VOUNCHER_ID = "NULL";
-                                        }
-                                        else {
+                                        } else {
                                             CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
                                         }
                                         startActivity(new Intent(RoomActivity.this, CategoryActivity.class));
@@ -671,6 +670,7 @@ public class RoomActivity extends AppCompatActivity {
                                     callUploadDialog("Room status is null.");
                                 }
                             }
+
                             @Override
                             public void onFailure(Call<Success> call, Throwable t) {
                                 Log.d("RoomStatus", t.getMessage());
@@ -678,7 +678,8 @@ public class RoomActivity extends AppCompatActivity {
                                 callUploadDialog("Please upload again!");
                             }
                         });
-                }
+                    }
+                //}
 
             });
         }
