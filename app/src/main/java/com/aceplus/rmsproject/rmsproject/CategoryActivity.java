@@ -529,7 +529,7 @@ public class CategoryActivity extends ActionBarActivity {
                     category_item.setPrice(download_forInvoiveItemDetail.getAmount());
                     category_item.setDiscount(download_forInvoiveItemDetail.getDiscountAmount());
                     category_item.setAmount(download_forInvoiveItemDetail.getAmountWithDiscount());
-                    category_item.setUserRemark(download_forInvoiveItemDetail.getRemark());
+                    category_item.setUserRemark(download_forInvoiveItemDetail.getException());
                     String orderType = (download_forInvoiveItemDetail.getOrderTypeId());
                     if (orderType.equals("2")) {
                         category_item.setOrder_type_id("2");
@@ -890,7 +890,7 @@ public class CategoryActivity extends ActionBarActivity {
                     ContentValues setMenuCV = new ContentValues();
                     setMenuCV.put("id", "set_menu");
                     setMenuCV.put("name", "SetMenu");
-                    setMenuCV.put("status", "1");
+                    setMenuCV.put("status", "");
                     setMenuCV.put("parent_id", "0");
                     setMenuCV.put("kitchen_id", "0");
                     setMenuCV.put("image", imageEncoded);
@@ -908,10 +908,10 @@ public class CategoryActivity extends ActionBarActivity {
                     database.setTransactionSuccessful();
                     database.endTransaction();
                     loadItemJson();
-                    /*loadSetMenuJson();
-                    loadSetItemJson();
-                    loadAddONJson();
-                    loadDiscountJson();*/
+                    //loadSetMenuJson();
+                    //loadSetItemJson();
+                    //loadAddONJson();
+                    //loadDiscountJson();
                 } catch (Exception e) {
                     e.printStackTrace();
                     mProgressDialog.dismiss();
@@ -1217,6 +1217,7 @@ public class CategoryActivity extends ActionBarActivity {
                 searchItemAuto.setText("");
             }
         });
+
         CategoryArrayAdapter adapter = new CategoryArrayAdapter(this, categoryDataFromDB("0"));
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(mLayoutManager);
@@ -1309,6 +1310,7 @@ public class CategoryActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 loadCategoryJson();
+
             }
         });
         saveBtn.setOnClickListener(new View.OnClickListener() {

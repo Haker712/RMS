@@ -29,11 +29,13 @@ import android.widget.Toast;
 
 import com.aceplus.rmsproject.rmsproject.object.Download_ForInvoiceDetail;
 import com.aceplus.rmsproject.rmsproject.object.Download_ForInvoiceExtraDetail;
+import com.aceplus.rmsproject.rmsproject.object.Download_ForInvoiceSetItemDetail;
 import com.aceplus.rmsproject.rmsproject.object.Download_ForInvoiveItemDetail;
 import com.aceplus.rmsproject.rmsproject.object.Download_OrderStatus;
 import com.aceplus.rmsproject.rmsproject.object.Download_forInvoice;
 import com.aceplus.rmsproject.rmsproject.object.Invoice;
 import com.aceplus.rmsproject.rmsproject.object.InvoiceDetailProduct;
+import com.aceplus.rmsproject.rmsproject.object.InvoiceDetailProductSetItem;
 import com.aceplus.rmsproject.rmsproject.object.JsonResponseforInvoice;
 import com.aceplus.rmsproject.rmsproject.object.JsonResponseforInvoiceDetail;
 import com.aceplus.rmsproject.rmsproject.object.Order_Complete;
@@ -328,6 +330,26 @@ public class InvoiceActivity extends AppCompatActivity {
                             Name = getSetMenuName(SetMenuid);
                         }
                         invDetail.setItemName(Name);
+
+                        ArrayList<Download_ForInvoiceSetItemDetail> download_forInvoiceSetItemDetailArrayList = download_forInvoiveItemDetail.getOrderSetMenus();
+                        if(download_forInvoiceSetItemDetailArrayList.size() == 0){
+                            invDetail.setInvoiceDetailProductSetItemArrayList(null);
+                        }
+                        else {
+                            ArrayList<InvoiceDetailProductSetItem> invoiceDetailProductSetItemArrayList = new ArrayList<InvoiceDetailProductSetItem>();
+
+                            for (Download_ForInvoiceSetItemDetail download_forInvoiceSetItemDetail : download_forInvoiceSetItemDetailArrayList){
+                                InvoiceDetailProductSetItem invoiceDetailProductSetItem = new InvoiceDetailProductSetItem();
+                                invoiceDetailProductSetItem.setItemId(download_forInvoiceSetItemDetail.getItemId());
+                                invoiceDetailProductSetItem.setSetMenuId(download_forInvoiceSetItemDetail.getSetmenuId());
+                                invoiceDetailProductSetItem.setStatusId(download_forInvoiceSetItemDetail.getStatusId());
+                                invoiceDetailProductSetItemArrayList.add(invoiceDetailProductSetItem);
+                            }
+
+                            invDetail.setInvoiceDetailProductSetItemArrayList(invoiceDetailProductSetItemArrayList);
+
+                        }
+
 
                         invDetail.setPrice(String.valueOf(commaSepFormat.format(download_forInvoiveItemDetail.getAmount())));
                         invDetail.setQuantity(commaSepFormat.format(download_forInvoiveItemDetail.getQuantity()));

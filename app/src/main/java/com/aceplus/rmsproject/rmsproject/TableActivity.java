@@ -146,6 +146,7 @@ public class TableActivity extends ActionBarActivity {
     private void getTableData() {  // data from database !!
         database.beginTransaction();
         getBookingArrayList.clear();
+        get4transfertableArrayList.clear();
         Cursor cur;
         Cursor curBooking = null;
         Cursor curBTable = null;
@@ -179,6 +180,50 @@ public class TableActivity extends ActionBarActivity {
                 bookingTable.setBooking_warning(curConfig.getString(curConfig.getColumnIndex("booking_warning_time")));
             }
             getBookingArrayList.add(bookingTable);
+
+
+        }
+        cur.close();
+        database.setTransactionSuccessful();
+        database.endTransaction();
+        getTransferTableData();
+    }
+
+    private void getTransferTableData() {
+        database.beginTransaction();
+        get4transfertableArrayList.clear();
+        Cursor cur;
+        Cursor curBooking = null;
+        Cursor curBTable = null;
+        Cursor curConfig = null;
+        cur = database.rawQuery("SELECT * FROM tableList WHERE status = '0'", null);
+        while (cur.moveToNext()) {
+            BookingTable bookingTable = new BookingTable();
+            String table_id = cur.getString(cur.getColumnIndex("id"));
+            bookingTable.setTableID(table_id);
+            bookingTable.setTable_no(cur.getString(cur.getColumnIndex("table_no")));
+            bookingTable.setTableStatus(cur.getString(cur.getColumnIndex("status")));
+            bookingTable.setTable_check(false);
+            curBTable = database.rawQuery("SELECT * FROM booking_table WHERE table_id = \"" + table_id + "\"", null);
+            while (curBTable.moveToNext()) {
+                bookingTable.setTable_id(curBTable.getString(curBTable.getColumnIndex("table_id")));
+                String booking_id = curBTable.getString(curBTable.getColumnIndex("booking_id"));
+                String booking_time = null;
+                curBooking = database.rawQuery("SELECT * FROM booking WHERE id = \"" + booking_id + "\"", null);
+                while (curBooking.moveToNext()) {
+                    bookingTable.setBookingID(curBooking.getString(curBooking.getColumnIndex("id")));
+                    bookingTable.setBooking_time(curBooking.getString(curBooking.getColumnIndex("from_time")));
+                    booking_time = curBooking.getString(curBooking.getColumnIndex("from_time"));
+                }
+                Log.e("TableIDBooking", table_id+","+booking_id+"," +booking_time+"");
+            }
+
+            curConfig = database.rawQuery("SELECT * FROM config", null);
+            while (curConfig.moveToNext()) {
+                bookingTable.setBooking_waiting(curConfig.getString(curConfig.getColumnIndex("booking_waiting_time")));
+                bookingTable.setBooking_service(curConfig.getString(curConfig.getColumnIndex("booking_service_time")));
+                bookingTable.setBooking_warning(curConfig.getString(curConfig.getColumnIndex("booking_warning_time")));
+            }
             get4transfertableArrayList.add(bookingTable);
         }
         cur.close();
@@ -325,7 +370,7 @@ public class TableActivity extends ActionBarActivity {
                 for (BookingTable table : getBookingArrayList) {
                     tableName.add(table.getTable_no());
                 }
-                for (BookingTable table : get4transfertableArrayList) {
+                for (BookingTable table : getBookingArrayList) {
                     if (table.getTableStatus().equals("0") || table.getTableStatus().equals(0) ){
                         fortransfertableName.add(table.getTable_no());
                     }
@@ -357,8 +402,8 @@ public class TableActivity extends ActionBarActivity {
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         //getavailable table
 
-                        toTable = get4transfertableArrayList.get(position).getTableID();
-                        toPos = position;
+                        toTable =   get4transfertableArrayList.get(position).getTableID();
+                        toPos = position ;
                     }
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
@@ -383,7 +428,7 @@ public class TableActivity extends ActionBarActivity {
                                     ContentValues cv = new ContentValues();
                                     cv.put("table_id", toTable);
                                     bookingTableArrayList.get(fromPos).setTableService("0");
-                                    bookingTableArrayList.get(toPos).setTableService("1");
+                                    bookingTableArrayList.get(Integer.parseInt(toTable)-1).setTableService("1");
                                     adapter.notifyDataSetChanged();
                                     JSONObject tableTransferJson = new JSONObject();
                                     try {

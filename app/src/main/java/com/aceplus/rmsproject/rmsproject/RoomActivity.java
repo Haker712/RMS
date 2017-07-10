@@ -162,6 +162,23 @@ public class RoomActivity extends AppCompatActivity {
         return roomArrayList;
     }
 
+    private ArrayList<Room> gettransferRoomData() {
+        database.beginTransaction();
+        ArrayList<Room> roomArrayList = new ArrayList<>();
+        Cursor cur = database.rawQuery("SELECT * FROM room WHERE status = '0'", null);
+        while (cur.moveToNext()) {
+            Room room = new Room();
+            room.setId(cur.getString(cur.getColumnIndex("id")));
+            room.setRoom_name(cur.getString(cur.getColumnIndex("room_name")));
+            room.setStatus(cur.getString(cur.getColumnIndex("status")));
+            roomArrayList.add(room);
+        }
+        cur.close();
+        database.setTransactionSuccessful();
+        database.endTransaction();
+        return roomArrayList;
+    }
+
     private void deleteTableVersion(String tableName) {
         database.beginTransaction();
         database.execSQL("DELETE FROM " + tableName);
@@ -467,8 +484,8 @@ public class RoomActivity extends AppCompatActivity {
                 to_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        toRoom = getRoomData().get(position).getId();
-                        toPos = position;
+                        toRoom = gettransferRoomData().get(position).getId();
+                        toPos = Integer.parseInt(toRoom);
                     }
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
@@ -488,7 +505,7 @@ public class RoomActivity extends AppCompatActivity {
                                 ContentValues cv = new ContentValues();
                                 cv.put("room_id", toRoom);
                                 bookingTableArrayList.get(fromPos).setTableService("0");
-                                bookingTableArrayList.get(toPos).setTableService("1");
+                                bookingTableArrayList.get(toPos-1).setTableService("1");
                                 adapter.notifyDataSetChanged();
                                 JSONObject jsonObject = new JSONObject();
                                 try {

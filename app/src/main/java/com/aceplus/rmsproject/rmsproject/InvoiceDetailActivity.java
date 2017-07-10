@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aceplus.rmsproject.rmsproject.object.InvoiceDetailProduct;
+import com.aceplus.rmsproject.rmsproject.object.InvoiceDetailProductSetItem;
 import com.aceplus.rmsproject.rmsproject.object.SetMenu_Item_for_dialog;
 import com.aceplus.rmsproject.rmsproject.object.Success;
 import com.aceplus.rmsproject.rmsproject.utils.Database;
@@ -46,6 +47,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;
@@ -651,6 +653,8 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         return  setidreturn;
     }
 
+
+
     private ArrayList<SetMenu_Item_for_dialog>  get_setMeu_item_name (String setMenu_id){
         ArrayList<SetMenu_Item_for_dialog> arrayList = new ArrayList<>();
         SetMenu_Item_for_dialog S_I_F_D = null;
@@ -721,12 +725,10 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     private class SetItemDetailAdapter extends ArrayAdapter<SetMenu_Item_for_dialog> {
         public  Activity contxt;
         ArrayList<SetMenu_Item_for_dialog> setMenu_item_name = new ArrayList<>();
-        InvoiceDetailProduct invoiceDetailProduct;
-        public SetItemDetailAdapter (Activity contxt, ArrayList<SetMenu_Item_for_dialog> setmenudetailArrayList, InvoiceDetailProduct detailProduct){
+        public SetItemDetailAdapter (Activity contxt, ArrayList<SetMenu_Item_for_dialog> setmenudetailArrayList){
             super(contxt, R.layout.invoice_detail_product_setitem_view_inner, setmenudetailArrayList);
             this.contxt = contxt;
             this.setMenu_item_name = setmenudetailArrayList;
-            invoiceDetailProduct = detailProduct;
             Log.i("Arr size in adapter>>>", setMenu_item_name.size() + "");
         }
         @Override
@@ -737,27 +739,26 @@ public class InvoiceDetailActivity extends ActionBarActivity {
             Button SetStatus = (Button) setview.findViewById(R.id.setitem_status_btn);
             SetMenu_Item_for_dialog setMenu_item_for_dialog = setMenu_item_name.get(position);
             SetItemNameTxt.setText(setMenu_item_for_dialog.getSetMenu_Item_Name() );
-            if (invoiceDetailProduct.getStatus().equals("6")) {
+            if (setMenu_item_for_dialog.getSetMenu_Item_Status().equals("6")) {
                 SetItemNameTxt.setPaintFlags(SetItemNameTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
                 SetStatus.setText("Disable");
                 SetStatus.setBackgroundColor(Color.TRANSPARENT);
                 SetStatus.setTextColor(getResources().getColor(R.color.order_disable));
                 SetStatus.setEnabled(false);
                 SetStatus.setEnabled(false);
-
-            } else if (invoiceDetailProduct.getStatus().equals("2")) {
+            } else if (setMenu_item_for_dialog.getSetMenu_Item_Status().equals("2")) {
                 SetStatus.setText("Cooking");
                 SetStatus.setBackgroundColor(Color.TRANSPARENT);
                 SetStatus.setTextColor(getResources().getColor(R.color.order_cooking));
                 SetStatus.setEnabled(false);
 
-            } else if (invoiceDetailProduct.getStatus().equals("3")) {
+            } else if (setMenu_item_for_dialog.getSetMenu_Item_Status().equals("3")) {
                 SetStatus.setText("Cooked");
                 SetStatus.setBackgroundColor(Color.TRANSPARENT);
                 SetStatus.setTextColor(getResources().getColor(R.color.order_cooked));
                 SetStatus.setEnabled(false);
 
-            } else if (invoiceDetailProduct.getStatus().equals("4")) {
+            } else if (setMenu_item_for_dialog.getSetMenu_Item_Status().equals("4")) {
                 SetStatus.setText("Serve");
                 SetStatus.setBackgroundColor(Color.TRANSPARENT);
                 SetStatus.setTextColor(getResources().getColor(R.color.order_serve));
@@ -806,17 +807,29 @@ public class InvoiceDetailActivity extends ActionBarActivity {
             Log.i("PRICE>>>>h>>>>", detailProduct.getPrice().toString());
             Log.i("AMOUNT>>>>h>>>>", detailProduct.getAmount().toString());
             Log.i("EXTRA>>>>h>>>>", detailProduct.getExtraPrice().toString());
+            final ArrayList<InvoiceDetailProductSetItem> invoiceDetailProductSetItemArrayList = detailProduct.getInvoiceDetailProductSetItemArrayList();
+            final ArrayList<SetMenu_Item_for_dialog> setMenu_item_for_dialogArrayList = new ArrayList<>();
             view.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
+                                            setMenu_item_for_dialogArrayList.clear();
+                                            for(InvoiceDetailProductSetItem invoiceDetailProductSetItem : invoiceDetailProductSetItemArrayList){
+                                                SetMenu_Item_for_dialog setMenu_item_for_dialog = new SetMenu_Item_for_dialog();
+                                                setMenu_item_for_dialog.setSetMenu_Item_ID(invoiceDetailProductSetItem.getItemId());
+                                                setMenu_item_for_dialog.setSetMenu_Item_Name(getSetMenuItemName(invoiceDetailProductSetItem.getItemId()));
+                                                setMenu_item_for_dialog.setSetMenu_Item_Status(invoiceDetailProductSetItem.getStatusId());
+                                                setMenu_item_for_dialogArrayList.add(setMenu_item_for_dialog);
+                                            }
                                             set_MenuID = get_setmenu_id(detailProduct.getItemName());
+
                                             Log.i("set_MenuID>>>>>>>", set_MenuID);
                                             ArrayList<SetMenu_Item_for_dialog> arrayList = get_setMeu_item_name(set_MenuID);
                                             Log.i("Arr sixe>>>onclick>>>", arrayList.size() + "");
+
                                             final LayoutInflater layoutInflater = context.getLayoutInflater();
                                             View setview = layoutInflater.inflate(R.layout.invoice_detail_product_setitem_view, null, true);
                                             ListView listView = (ListView) setview.findViewById(R.id.listViewSetItemName);
-                                            SetItemDetailAdapter setItemDetailAdapter = new SetItemDetailAdapter(InvoiceDetailActivity.this, arrayList, detailProduct);
+                                            SetItemDetailAdapter setItemDetailAdapter = new SetItemDetailAdapter(InvoiceDetailActivity.this, setMenu_item_for_dialogArrayList);
                                             listView.setAdapter(setItemDetailAdapter);
                                             setItemDetailAdapter.notifyDataSetChanged();
                                             if (arrayList.size() != 0) {
