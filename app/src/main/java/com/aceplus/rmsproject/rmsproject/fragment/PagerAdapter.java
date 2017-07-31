@@ -40,7 +40,7 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
                 title="Order Complete";
                 break;
             case 1:
-                title="Order Cancle";
+                title="Order Cancel";
                 break;
         }
 

@@ -317,6 +317,7 @@ public class InvoiceActivity extends AppCompatActivity {
                 JsonResponseforInvoiceDetail jsonResponseforInvoiceDetail = response.body();
                 ArrayList<Download_ForInvoiceDetail> Download_ForInvoiveDetailArrayList = jsonResponseforInvoiceDetail.getDownload_forInvoiceDetailArrayList();
                 for (Download_ForInvoiceDetail download_forInvoiceDetail : Download_ForInvoiveDetailArrayList) {
+                    InvoiceDetailActivity.userID = download_forInvoiceDetail.getUserId();
                     ArrayList<Download_ForInvoiveItemDetail> Download_ForInoviceItemDetailArrayList = download_forInvoiceDetail.getForInvoiveItemDetail();
                     for (Download_ForInvoiveItemDetail download_forInvoiveItemDetail : Download_ForInoviceItemDetailArrayList) {
                         InvoiceDetailProduct invDetail = new InvoiceDetailProduct();
@@ -356,7 +357,7 @@ public class InvoiceActivity extends AppCompatActivity {
                         invDetail.setDiscount(commaSepFormat.format(download_forInvoiveItemDetail.getDiscountAmount()));
                         invDetail.setAmount(commaSepFormat.format(download_forInvoiveItemDetail.getAmountWithDiscount()));
                         invDetail.setStatus(download_forInvoiveItemDetail.getStatusId());
-                        Double ExtraAmount = null;
+                        Double ExtraAmount = 0.0;
                         int i = 0;
                         ArrayList<Download_ForInvoiceExtraDetail> download_forInvoiceExtraDetailsArrayList = download_forInvoiveItemDetail.getOrderExtras();
                         if (download_forInvoiceExtraDetailsArrayList.size() == 0) {
@@ -366,7 +367,8 @@ public class InvoiceActivity extends AppCompatActivity {
                             for (Download_ForInvoiceExtraDetail download_forInvoiceExtraDetail : download_forInvoiceExtraDetailsArrayList) {
                                 Log.i("ExtraAmount_size>>>>>>>>>>>>",download_forInvoiceExtraDetailsArrayList.size()+"");
                                 if (download_forInvoiceExtraDetailsArrayList.size() > 1){
-                                    ExtraAmount = Double.valueOf(invoice.getExtraAmount());
+                                    Log.i("extraamount>-------",download_forInvoiceExtraDetail.getAmount()+"");
+                                    ExtraAmount += download_forInvoiceExtraDetail.getAmount();
                                 }
                                 else {
                                     ExtraAmount = download_forInvoiceExtraDetail.getAmount();
@@ -375,6 +377,7 @@ public class InvoiceActivity extends AppCompatActivity {
                              }
                         }
                         invDetail.setExtraPrice(String.valueOf(ExtraAmount));
+
                         Log.i("status>>>>hak>>>>", invDetail.getStatus().toString());
                         Log.i("ID>>>>hak>>>>", invDetail.getId().toString());
                         Log.i("NAME>>>>hak>>>>", invDetail.getItemName().toString());
@@ -387,7 +390,7 @@ public class InvoiceActivity extends AppCompatActivity {
                 }
                 Log.i("detailProductArrayList>>Response>>", String.valueOf(detailProductArrayList.size()));
                 InvoiceDetailActivity.vouncherID = invoice.getVouncherID();
-                InvoiceDetailActivity.userID = invoice.getUser_id();
+
                 InvoiceDetailActivity.date = invoice.getDate();
                 String invoiceIDDD = invoice.getVouncherID();
                 String TableID = null;

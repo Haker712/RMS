@@ -751,7 +751,7 @@ public class CategoryActivity extends ActionBarActivity {
                 orderjsonObject.put("service_amount", serviceamont);
             }
             orderjsonObject.put("tax_amount", taxamount);
-            netcharge = tvalue+totalExtraAmt+totalDisAmt+totalcharge+taxamount;
+            netcharge = (tvalue+totalcharge+taxamount);
 
             orderjsonObject.put("net_price", netcharge);
             orderjsonObject.put("order_detail", orderDetailJsonArray);
@@ -2242,7 +2242,8 @@ public class CategoryActivity extends ActionBarActivity {
                     double discount = category_item.getDiscount();
                     double price = category_item.getPrice();
                     double extraPrice = category_item.getExtraPrice();
-                    double totalAmt = (price + extraPrice) - discount;
+                    double quantityy = category_item.getQuantity();
+                    double totalAmt = ((price + extraPrice) - discount) * quantityy;
 
                     detail_object.put("take_item",gettakeitemID(category_item.getTakeAway()) );
                     detail_object.put("discount_amount", discount + "");
@@ -2340,7 +2341,7 @@ public class CategoryActivity extends ActionBarActivity {
             }
             orderjsonObject.put("tax_amount", tax_value);
             orderjsonObject.put("order_detail", orderDetailJsonArray);
-            netcharge = tvalue+totalExtraAmt+totalDisAmt+totalcharge+tax_value;
+            netcharge = (tvalue+totalcharge+tax_value);
             orderjsonObject.put("net_price", netcharge);
         } catch (JSONException e) {
             e.printStackTrace();
