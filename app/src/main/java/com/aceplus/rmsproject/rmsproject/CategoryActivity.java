@@ -71,6 +71,7 @@ import com.aceplus.rmsproject.rmsproject.utils.Download_forShow_tableID;
 import com.aceplus.rmsproject.rmsproject.utils.JsonForShowRoomId;
 import com.aceplus.rmsproject.rmsproject.utils.JsonForShowTableId;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
+import com.bumptech.glide.Glide;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -220,7 +221,12 @@ public class CategoryActivity extends ActionBarActivity {
                 Category category = new Category();
                 category.setId(cur.getString(cur.getColumnIndex("id")));
                 category.setName(cur.getString(cur.getColumnIndex("name")));
-                category.setImage(cur.getString(cur.getColumnIndex("image")));
+                try {
+                    category.setImage(cur.getString(cur.getColumnIndex("image")));
+                }catch (OutOfMemoryError outOfMemoryError){
+                    Runtime.getRuntime().gc();
+                    category.setImage(cur.getString(cur.getColumnIndex("image")));
+                }
                 category.setStatus(cur.getString(cur.getColumnIndex("status")));
                 category.setParent_id(cur.getString(cur.getColumnIndex("parent_id")));
                 category.setKitchen_id(cur.getString(cur.getColumnIndex("kitchen_id")));
@@ -291,7 +297,13 @@ public class CategoryActivity extends ActionBarActivity {
                 String itemID = cur.getString(cur.getColumnIndex("id"));
                 item.setId(itemID);
                 item.setName(cur.getString(cur.getColumnIndex("set_menu_name")));
-                item.setImage(cur.getString(cur.getColumnIndex("image")));
+                try {
+                    item.setImage(cur.getString(cur.getColumnIndex("image")));
+                }catch (OutOfMemoryError outOfMemoryError){
+                    Runtime.getRuntime().gc();
+                    item.setImage(cur.getString(cur.getColumnIndex("image")));
+                }
+
                 item.setStatus(cur.getString(cur.getColumnIndex("status")));
                 item.setPrice(cur.getDouble(cur.getColumnIndex("set_menu_price")));
                 item.setCategory_id("set_menu");
@@ -369,7 +381,13 @@ public class CategoryActivity extends ActionBarActivity {
             String itemID = cur.getString(cur.getColumnIndex("id"));
             item.setId(itemID);
             item.setName(cur.getString(cur.getColumnIndex("name")));
-            item.setImage(cur.getString(cur.getColumnIndex("image")));
+            try {
+                item.setImage(cur.getString(cur.getColumnIndex("image")));
+            }
+            catch (OutOfMemoryError outOfMemoryError){
+                Runtime.getRuntime().gc();
+                item.setImage(cur.getString(cur.getColumnIndex("image")));
+            }
             item.setStatus(cur.getString(cur.getColumnIndex("status")));
             item.setPrice(cur.getDouble(cur.getColumnIndex("price")));
             item.setCategory_id(cur.getString(cur.getColumnIndex("category_id")));
@@ -2062,9 +2080,15 @@ public class CategoryActivity extends ActionBarActivity {
             categoryTxt.setText("Category");
 
             Category album = albumList.get(position);
-            byte[] ImageShow = Base64.decode(album.getImage(), Base64.DEFAULT);
-            Bitmap mBitmap = BitmapFactory.decodeByteArray(ImageShow, 0, ImageShow.length);
-            holder.thumbnail.setImageBitmap(mBitmap);
+            //byte[] ImageShow = Base64.decode(album.getImage(), Base64.DEFAULT);
+            //Bitmap mBitmap = BitmapFactory.decodeByteArray(ImageShow, 0, ImageShow.length);
+
+
+            Glide.with(mContext)
+                    .load(Base64.decode(album.getImage(), Base64.DEFAULT))
+                    .into(holder.thumbnail);
+
+            //holder.thumbnail.setImageBitmap(mBitmap);
             holder.title.setText(album.getName());
         }
         @Override
@@ -2161,9 +2185,12 @@ public class CategoryActivity extends ActionBarActivity {
             Log.e("ParentID", parent_ID);
             Category item = itemList.get(position);
             holder.title.setText(item.getName());
-            byte[] ImageShow = Base64.decode(item.getImage(), Base64.DEFAULT);
-            Bitmap mBitmap = BitmapFactory.decodeByteArray(ImageShow, 0, ImageShow.length);
-            holder.thumbnail.setImageBitmap(mBitmap);
+            //byte[] ImageShow = Base64.decode(item.getImage(), Base64.DEFAULT);
+            //Bitmap mBitmap = BitmapFactory.decodeByteArray(ImageShow, 0, ImageShow.length);
+            Glide.with(mContext)
+                    .load(Base64.decode(item.getImage(), Base64.DEFAULT))
+                    .into(holder.thumbnail);
+            //holder.thumbnail.setImageBitmap(mBitmap);
         }
         @Override
         public int getItemCount() {
