@@ -235,8 +235,6 @@ public class CategoryActivity extends ActionBarActivity {
         return categoryList;
     }
 
-
-
     private ArrayList<Category> cateDataFromDB(String id) {
         database.beginTransaction();
         ArrayList<Category> categoryList = new ArrayList<>();
@@ -362,6 +360,7 @@ public class CategoryActivity extends ActionBarActivity {
     }
 
     private ArrayList<Category> getItemForAuotSearch() {
+        searchTotallist.clear();
         database.beginTransaction();
         ArrayList<Category> itemArrayList = new ArrayList<>();
         Cursor cur = database.rawQuery("SELECT * FROM item", null);
@@ -1310,7 +1309,7 @@ public class CategoryActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 loadCategoryJson();
-
+                getItemForAuotSearch();
             }
         });
         saveBtn.setOnClickListener(new View.OnClickListener() {

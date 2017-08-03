@@ -95,7 +95,7 @@ public class MainActivity extends Activity {
     //i/me/my/mine//
     //public static String URL = "http://192.168.11.57:8900";
     //public static String URL = "http://192.168.11.62:8019";
-//    public static String URL = "http://192.168.195.1:8900";
+    //public static String URL = "http://192.168.195.1:8900";
     //public static String URL = "http://192.168.11.180:8080";
     //public static String URL = "http://192.168.11.57:8900";
     //public static String URL = "http://192.168.195.1:8900";
