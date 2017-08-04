@@ -101,9 +101,9 @@ public class MainActivity extends Activity {
     //public static String URL = "http://192.168.195.1:8900";
     //public static String URL = "http://192.168.11.201:8080";
 
-    //public static String URL = "http://192.168.137.1:8080";
+    public static String URL = "http://192.168.137.1:8080";
 
-    public static String URL = "http://10.42.0.1:8080";
+    //public static String URL = "http://10.42.0.1:8080";
 
     SharedPreferences sharedpreferences;
     public static final String LOGIN_PREFERENCES = "Login";
