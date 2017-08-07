@@ -121,6 +121,7 @@ public class CategoryActivity extends ActionBarActivity {
     private ArrayList<String> searchItemList = new ArrayList<>();
     public static ArrayList<String> groupTableArrayList = null;
     private ArrayList<Category> searchItemSetMenuList = new ArrayList<>();
+    private ArrayList<Category> searchTotallist = new ArrayList<>();
     SQLiteDatabase database;
     CategoryItemAdapter categoryItemAdapter;
     AddOnAdapter addOnAdapter;
@@ -137,6 +138,7 @@ public class CategoryActivity extends ActionBarActivity {
     public static String ROOM_ID = null;
     public static String VOUNCHER_ID = null;
     public static String ADD_INVOICE = null;
+    public String ROOM_CHARGE = null;
     public String WAITER_ID = null;
     public Date from_time = null;
     public Date to_time = null;
@@ -147,6 +149,7 @@ public class CategoryActivity extends ActionBarActivity {
     private int invoicecount;
     private double taxAmt = 0.0;
     private double serviceAmt = 0.0;
+    private double roomchargeAmt = 0.0;
     private int count = 0;
     private int count2 = 0;
     double taxValue = 0.0;
@@ -232,6 +235,8 @@ public class CategoryActivity extends ActionBarActivity {
         return categoryList;
     }
 
+
+
     private ArrayList<Category> cateDataFromDB(String id) {
         database.beginTransaction();
         ArrayList<Category> categoryList = new ArrayList<>();
@@ -293,6 +298,7 @@ public class CategoryActivity extends ActionBarActivity {
                 item.setPrice(cur.getDouble(cur.getColumnIndex("set_menu_price")));
                 item.setCategory_id("set_menu");
                 itemArrayList.add(item);
+                searchTotallist.add(item);
             }
             cur.close();
             database.setTransactionSuccessful();
@@ -307,6 +313,32 @@ public class CategoryActivity extends ActionBarActivity {
         database.beginTransaction();
         String promotionID = null;
         Cursor cur = database.rawQuery("SELECT * FROM promotionItem WHERE item_id = \"" + item_id + "\"", null);
+        while (cur.moveToNext()) {
+            promotionID = cur.getString(cur.getColumnIndex("promotion_id"));
+            Log.e("PromotionID", promotionID);
+            Cursor curPro = database.rawQuery("SELECT * FROM promotion WHERE id = \"" + promotionID + "\"", null);
+            while (curPro.moveToNext()) {
+                promotion_id = promotionID;
+                try {
+                    from_date = date_format.parse(curPro.getString(curPro.getColumnIndex("from_date")));
+                    to_date = date_format.parse(curPro.getString(curPro.getColumnIndex("to_date")));
+                    from_time = time_format.parse(curPro.getString(curPro.getColumnIndex("from_time")));
+                    to_time = time_format.parse(curPro.getString(curPro.getColumnIndex("to_time")));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                sell_quantity = curPro.getInt(curPro.getColumnIndex("sell_item_qty"));
+            }
+        }
+        cur.close();
+        database.setTransactionSuccessful();
+        database.endTransaction();
+    }
+
+    private void getPromotionDataInDBforsetmenu (String setmenu_id) {
+        database.beginTransaction();
+        String promotionID = null;
+        Cursor cur = database.rawQuery("SELECT * FROM promotionItem WHERE setmenu_id = \"" + setmenu_id + "\"", null);
         while (cur.moveToNext()) {
             promotionID = cur.getString(cur.getColumnIndex("promotion_id"));
             Log.e("PromotionID", promotionID);
@@ -348,6 +380,7 @@ public class CategoryActivity extends ActionBarActivity {
                 item.setDiscount_type(curDiscount.getString(curDiscount.getColumnIndex("type")));
             }
             itemArrayList.add(item);
+            searchTotallist.add(item);
         }
         cur.close();
         database.setTransactionSuccessful();
@@ -473,7 +506,7 @@ public class CategoryActivity extends ActionBarActivity {
                     Log.i("itemdetailArrayListsiezzze",Download_ForInvoiceItemDetailArrayList.size()+"");
                     Category_Item category_item = new Category_Item();
                     if (Integer.parseInt(download_forInvoiveItemDetail.getItemId())== 0) {
-                        category_item.setId(download_forInvoiveItemDetail.getSetmenuId());
+                        category_item.setSetid(download_forInvoiveItemDetail.getSetmenuId());
                         SetMenuName = getSetMenuName(download_forInvoiveItemDetail.getSetmenuId());
                         category_item.setItemName(SetMenuName);
                         category_item.setId(null);
@@ -496,7 +529,7 @@ public class CategoryActivity extends ActionBarActivity {
                     category_item.setPrice(download_forInvoiveItemDetail.getAmount());
                     category_item.setDiscount(download_forInvoiveItemDetail.getDiscountAmount());
                     category_item.setAmount(download_forInvoiveItemDetail.getAmountWithDiscount());
-                    category_item.setUserRemark(download_forInvoiveItemDetail.getRemark());
+                    category_item.setUserRemark(download_forInvoiveItemDetail.getException());
                     String orderType = (download_forInvoiveItemDetail.getOrderTypeId());
                     if (orderType.equals("2")) {
                         category_item.setOrder_type_id("2");
@@ -605,6 +638,8 @@ public class CategoryActivity extends ActionBarActivity {
         while (cur.moveToNext()) {
             taxAmt = cur.getDouble(cur.getColumnIndex("tax"));
             serviceAmt = cur.getDouble(cur.getColumnIndex("service"));
+            roomchargeAmt = cur.getDouble(cur.getColumnIndex("room_charge"));
+           // Log.i("roomchargeAmtroomchargeAmt",roomchargeAmt+"");
         }
         cur.close();
         database.setTransactionSuccessful();
@@ -682,7 +717,7 @@ public class CategoryActivity extends ActionBarActivity {
                     detail_object.put("quantity", category_item.getQuantity());
                     detail_object.put("amount", category_item.getTotalAmount());
                     detail_object.put("order_type_id", orderType);
-                    detail_object.put("status", "1");
+                    detail_object.put("status", category_item.getStatusid());
                     detail_object.put("exception", category_item.getUserRemark() + "");
                     detail_object.put("extra", orderExtraJsonArray);
                 } catch (JSONException e) {
@@ -693,13 +728,32 @@ public class CategoryActivity extends ActionBarActivity {
         }
         JSONArray jsonArray = new JSONArray();
         try {
+            double totalcharge = 0;
+            double netcharge;
+            orderjsonObject.put("user_id", WAITER_ID);
+            if (TAKE_AWAY.equals("take")) {
+                orderjsonObject.put("take_id", "1");
+            } else {
+                orderjsonObject.put("take_id", "null");
+            }
             orderjsonObject.put("order_id", VOUNCHER_ID);
             orderjsonObject.put("total_price", tvalue);
-            orderjsonObject.put("net_price", Double.parseDouble(tnetPriceTxt.getText().toString().trim().replaceAll(",", "")));
             orderjsonObject.put("extra_price", totalExtraAmt);
             orderjsonObject.put("discount_amount", totalDisAmt);
-            orderjsonObject.put("service_amount", serviceamont);
+            if (ROOM_ID != null /*|| !ROOM_ID.equals("")*/){
+
+                totalcharge =(serviceamont + roomchargeAmt);
+                orderjsonObject.put("service_amount",totalcharge );
+                Log.i("totalcharge111",totalcharge+"");
+            }
+            else {
+                totalcharge = serviceamont;
+                orderjsonObject.put("service_amount", serviceamont);
+            }
             orderjsonObject.put("tax_amount", taxamount);
+            netcharge = (tvalue+totalcharge+taxamount);
+
+            orderjsonObject.put("net_price", netcharge);
             orderjsonObject.put("order_detail", orderDetailJsonArray);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -812,6 +866,8 @@ public class CategoryActivity extends ActionBarActivity {
         return backend_activate_key;
     }
 
+
+
     private void loadCategoryJson() {
         callDialog("Updating category data....");
         RequestInterface request = retrofit.create(RequestInterface.class);
@@ -834,7 +890,7 @@ public class CategoryActivity extends ActionBarActivity {
                     ContentValues setMenuCV = new ContentValues();
                     setMenuCV.put("id", "set_menu");
                     setMenuCV.put("name", "SetMenu");
-                    setMenuCV.put("status", "1");
+                    setMenuCV.put("status", "");
                     setMenuCV.put("parent_id", "0");
                     setMenuCV.put("kitchen_id", "0");
                     setMenuCV.put("image", imageEncoded);
@@ -852,10 +908,10 @@ public class CategoryActivity extends ActionBarActivity {
                     database.setTransactionSuccessful();
                     database.endTransaction();
                     loadItemJson();
-                    /*loadSetMenuJson();
-                    loadSetItemJson();
-                    loadAddONJson();
-                    loadDiscountJson();*/
+                    //loadSetMenuJson();
+                    //loadSetItemJson();
+                    //loadAddONJson();
+                    //loadDiscountJson();
                 } catch (Exception e) {
                     e.printStackTrace();
                     mProgressDialog.dismiss();
@@ -1070,7 +1126,7 @@ public class CategoryActivity extends ActionBarActivity {
     }
 
     private void catchEvents() {
-        searchItemSetMenuList.clear();
+        searchTotallist.clear();
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Interceptor interceptor = new Interceptor() {
@@ -1095,9 +1151,10 @@ public class CategoryActivity extends ActionBarActivity {
             getVouncherDetailData();
         }
         getConfigData();
-        searchItemSetMenuList = getItemForAuotSearch();
-        searchItemSetMenuList = setMenuDataFromDB();
-        for (Category item : searchItemSetMenuList) {
+
+        getItemForAuotSearch();
+        setMenuDataFromDB();
+        for (Category item : searchTotallist) {
             searchItemList.add(item.getName());
         }
         searchItemAuto.setAdapter(new ArrayAdapter<String>(
@@ -1108,14 +1165,24 @@ public class CategoryActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
-                for (Category searchList : searchItemSetMenuList) {
+                for (Category searchList : searchTotallist) {
                     String itemName = searchList.getName();
                     if (itemName.equals(parent.getItemAtPosition(position).toString())) {
                         Category_Item category_item = new Category_Item();
                         category_item.setId(searchList.getId());
+                        if (searchList.getCategory_id().equals("set_menu")){
+                            category_item.setSetid(searchList.getId());
+                        }
                         category_item.setItemName(searchList.getName());
                         category_item.setQuantity(searchList.getQuantity());
                         category_item.setPrice(searchList.getPrice());
+                        category_item.setStatusid("1");
+                        if(TAKE_AWAY == "take") {
+                            category_item.setTakeid("1");
+                        }
+                        else {
+                            category_item.setTakeid("0");
+                        }
                         category_item.setDiscount(searchList.getDiscount());
                         String discountType = searchList.getDiscount_type();
                         if (discountType == null) {
@@ -1132,7 +1199,14 @@ public class CategoryActivity extends ActionBarActivity {
                         category_item.setDiscount_id(searchList.getDiscount_id());
                         category_item.setExtraPrice(searchList.getExtraPrice());
                         category_item.setAmount(searchList.getAmount());
-                        category_item.setTakeAway(searchList.isTakeAway());
+                        if (TAKE_AWAY == "take"){
+                            category_item.setTakeAway(true);
+                            category_item.setOrder_type_id("2");
+                        }
+                        else {
+                            category_item.setTakeAway(false);
+                            category_item.setOrder_type_id("1");
+                        }
                         category_item.setCategoryId(searchList.getCategory_id());
                         String value = getAddOnID(searchList.getCategory_id());
                         category_item.setAddOnArrayList(getAddonData(value));
@@ -1143,6 +1217,7 @@ public class CategoryActivity extends ActionBarActivity {
                 searchItemAuto.setText("");
             }
         });
+
         CategoryArrayAdapter adapter = new CategoryArrayAdapter(this, categoryDataFromDB("0"));
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(mLayoutManager);
@@ -1235,6 +1310,7 @@ public class CategoryActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 loadCategoryJson();
+
             }
         });
         saveBtn.setOnClickListener(new View.OnClickListener() {
@@ -1436,7 +1512,7 @@ public class CategoryActivity extends ActionBarActivity {
 
                 }
 
-                else if (ADD_INVOICE == "EDITING_INVOICE" || ADD_INVOICE.equals("EDITING_INVOICE") ) {
+                else if (ADD_INVOICE == "EDITING_INVOICE" || ADD_INVOICE.equals("EDITING_INVOICE") || ADD_INVOICE.equals("status1") ) {
                     clearBtn.setEnabled(false);
                     clearBtn.setColorFilter(Color.argb(220,220,220,220));
                     clearBtn.setOnClickListener(new View.OnClickListener() {
@@ -1516,8 +1592,17 @@ public class CategoryActivity extends ActionBarActivity {
                                             qtyEdit.setError("Quantity is required.");
                                             qtyEdit.requestFocus();
                                         } else {
-                                            int qty = Integer.valueOf(qtyEdit.getText().toString());
-                                            getPromotionDataInDB(categoryItem.getId());
+                                            int qty = Integer.parseInt(qtyEdit.getText().toString());
+                                            String idid;
+                                            if (categoryItem.getId().equals(null)){
+                                                idid = categoryItem.getSetid();
+                                                getPromotionDataInDBforsetmenu(idid);
+                                            }
+                                            else {
+                                                idid = categoryItem.getId();
+                                                getPromotionDataInDB(/*categoryItem.getId()*/ idid);
+                                            }
+
                                             if (from_date == null && to_date == null && from_time == null && to_time == null) {
                                                 Log.e("PromotionItem", "This item is not promotion.");
                                             } else {
@@ -1542,8 +1627,14 @@ public class CategoryActivity extends ActionBarActivity {
                                                 }
                                             }
                                             Log.e("ItemID", categoryItem.getId());
-                                            categoryItem.setQuantity(qty);
-                                            Log.d("Quantity", "You have entered: " + qtyEdit.getText().toString());
+                                            if (qty == 0){
+                                                qtyEdit.setError("Quantity is required.");
+                                            }
+                                            else{
+                                                categoryItem.setQuantity(qty);
+                                            }
+
+                                            Log.d("Quantity", "You have entered: " + qty);
                                             builder.dismiss();
                                             categoryItemAdapter.notifyDataSetChanged();
                                         }
@@ -1648,7 +1739,7 @@ public class CategoryActivity extends ActionBarActivity {
                             }
                         });
                     }
-                    else if (ADD_INVOICE == "NULL"){
+                    else if (ADD_INVOICE == "NULL" || ADD_INVOICE == null){
                         clearBtn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -1806,9 +1897,14 @@ public class CategoryActivity extends ActionBarActivity {
                                                         e.printStackTrace();
                                                     }
                                                 }
-                                                Log.e("ItemID", categoryItem.getId());
-                                                categoryItem.setQuantity(qty);
-                                                Log.d("Quantity", "You have entered: " + qtyEdit.getText().toString());
+                                                //Log.e("ItemID", categoryItem.getId());
+                                                if  (qty == 0){
+                                                    qtyEdit.setError("Quantity is required.");
+                                                }
+                                                else {
+                                                    categoryItem.setQuantity(qty);
+                                                }
+                                                Log.d("Quantity", "You have entered: " + qty);
                                                 builder.dismiss();
                                                 categoryItemAdapter.notifyDataSetChanged();
                                             }
@@ -2098,7 +2194,7 @@ public class CategoryActivity extends ActionBarActivity {
 
             Log.e("ItemQuantity", quantity + "");
 
-            for (int i = 0; i < quantity; i++) {
+            //for (int i = 0; i < quantity; i++) {
                 JSONObject detail_object = new JSONObject();
                 String orderType = null;
 
@@ -2146,13 +2242,15 @@ public class CategoryActivity extends ActionBarActivity {
                     double discount = category_item.getDiscount();
                     double price = category_item.getPrice();
                     double extraPrice = category_item.getExtraPrice();
-                    double totalAmt = (price + extraPrice) - discount;
+                    double quantityy = category_item.getQuantity();
+                    double totalAmt = ((price + extraPrice) - discount) * quantityy;
 
                     detail_object.put("take_item",gettakeitemID(category_item.getTakeAway()) );
                     detail_object.put("discount_amount", discount + "");
                     detail_object.put("promotion_id", category_item.getPromotion_id() + "");
                     detail_object.put("price", price);
-                    detail_object.put("quantity", "1");
+
+                    detail_object.put("quantity", category_item.getQuantity());
                     detail_object.put("amount", totalAmt);
                     detail_object.put("order_type_id", orderType);
                     detail_object.put("status", "1");
@@ -2183,7 +2281,7 @@ public class CategoryActivity extends ActionBarActivity {
                 }
                 orderDetailJsonArray.put(detail_object);
                 invoiceDetailID++;
-            }
+            //}
         }
         Log.d("OrderList", makeOrderID());
 
@@ -2216,6 +2314,8 @@ public class CategoryActivity extends ActionBarActivity {
 
         JSONArray jsonArray = new JSONArray();
         try {
+            double totalcharge = 0;
+            double netcharge;
             orderjsonObject.put("order_id", order_id);
             orderjsonObject.put("user_id", WAITER_ID);
             orderjsonObject.put("order_table", tableArray);
@@ -2227,12 +2327,22 @@ public class CategoryActivity extends ActionBarActivity {
                 orderjsonObject.put("take_id", "null");
             }
             orderjsonObject.put("total_price", tvalue);
-            orderjsonObject.put("net_price", Double.parseDouble(tnetPriceTxt.getText().toString().trim().replaceAll(",", "")));
             orderjsonObject.put("extra_price", totalExtraAmt);
             orderjsonObject.put("discount_amount", totalDisAmt);
-            orderjsonObject.put("service_amount", service_value);
+            if (ROOM_ID != null /*|| !ROOM_ID.equals("")*/){
+
+                totalcharge =(service_value + roomchargeAmt);
+                orderjsonObject.put("service_amount",totalcharge );
+                Log.i("totalcharge111",totalcharge+"");
+            }
+            else {
+                totalcharge = service_value;
+                orderjsonObject.put("service_amount", totalcharge);
+            }
             orderjsonObject.put("tax_amount", tax_value);
             orderjsonObject.put("order_detail", orderDetailJsonArray);
+            netcharge = (tvalue+totalcharge+tax_value);
+            orderjsonObject.put("net_price", netcharge);
         } catch (JSONException e) {
             e.printStackTrace();
         }

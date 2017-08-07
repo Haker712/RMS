@@ -29,11 +29,13 @@ import android.widget.Toast;
 
 import com.aceplus.rmsproject.rmsproject.object.Download_ForInvoiceDetail;
 import com.aceplus.rmsproject.rmsproject.object.Download_ForInvoiceExtraDetail;
+import com.aceplus.rmsproject.rmsproject.object.Download_ForInvoiceSetItemDetail;
 import com.aceplus.rmsproject.rmsproject.object.Download_ForInvoiveItemDetail;
 import com.aceplus.rmsproject.rmsproject.object.Download_OrderStatus;
 import com.aceplus.rmsproject.rmsproject.object.Download_forInvoice;
 import com.aceplus.rmsproject.rmsproject.object.Invoice;
 import com.aceplus.rmsproject.rmsproject.object.InvoiceDetailProduct;
+import com.aceplus.rmsproject.rmsproject.object.InvoiceDetailProductSetItem;
 import com.aceplus.rmsproject.rmsproject.object.JsonResponseforInvoice;
 import com.aceplus.rmsproject.rmsproject.object.JsonResponseforInvoiceDetail;
 import com.aceplus.rmsproject.rmsproject.object.Order_Complete;
@@ -285,6 +287,8 @@ public class InvoiceActivity extends AppCompatActivity {
         for (Download_forShow_roomID download_forShow_roomID : download_orderRoomArrayList){
             roommmID =  "ROOM " + (download_forShow_roomID.getRoom_id());
         }
+        InvoiceDetailActivity.RommCharge = "";
+        InvoiceDetailActivity.RommCharge = roommmID;
         return roommmID;
     }
 
@@ -313,6 +317,7 @@ public class InvoiceActivity extends AppCompatActivity {
                 JsonResponseforInvoiceDetail jsonResponseforInvoiceDetail = response.body();
                 ArrayList<Download_ForInvoiceDetail> Download_ForInvoiveDetailArrayList = jsonResponseforInvoiceDetail.getDownload_forInvoiceDetailArrayList();
                 for (Download_ForInvoiceDetail download_forInvoiceDetail : Download_ForInvoiveDetailArrayList) {
+                    InvoiceDetailActivity.userID = download_forInvoiceDetail.getUserId();
                     ArrayList<Download_ForInvoiveItemDetail> Download_ForInoviceItemDetailArrayList = download_forInvoiceDetail.getForInvoiveItemDetail();
                     for (Download_ForInvoiveItemDetail download_forInvoiveItemDetail : Download_ForInoviceItemDetailArrayList) {
                         InvoiceDetailProduct invDetail = new InvoiceDetailProduct();
@@ -327,12 +332,32 @@ public class InvoiceActivity extends AppCompatActivity {
                         }
                         invDetail.setItemName(Name);
 
+                        ArrayList<Download_ForInvoiceSetItemDetail> download_forInvoiceSetItemDetailArrayList = download_forInvoiveItemDetail.getOrderSetMenus();
+                        if(download_forInvoiceSetItemDetailArrayList.size() == 0){
+                            invDetail.setInvoiceDetailProductSetItemArrayList(null);
+                        }
+                        else {
+                            ArrayList<InvoiceDetailProductSetItem> invoiceDetailProductSetItemArrayList = new ArrayList<InvoiceDetailProductSetItem>();
+
+                            for (Download_ForInvoiceSetItemDetail download_forInvoiceSetItemDetail : download_forInvoiceSetItemDetailArrayList){
+                                InvoiceDetailProductSetItem invoiceDetailProductSetItem = new InvoiceDetailProductSetItem();
+                                invoiceDetailProductSetItem.setItemId(download_forInvoiceSetItemDetail.getItemId());
+                                invoiceDetailProductSetItem.setSetMenuId(download_forInvoiceSetItemDetail.getSetmenuId());
+                                invoiceDetailProductSetItem.setStatusId(download_forInvoiceSetItemDetail.getStatusId());
+                                invoiceDetailProductSetItemArrayList.add(invoiceDetailProductSetItem);
+                            }
+
+                            invDetail.setInvoiceDetailProductSetItemArrayList(invoiceDetailProductSetItemArrayList);
+
+                        }
+
+
                         invDetail.setPrice(String.valueOf(commaSepFormat.format(download_forInvoiveItemDetail.getAmount())));
                         invDetail.setQuantity(commaSepFormat.format(download_forInvoiveItemDetail.getQuantity()));
                         invDetail.setDiscount(commaSepFormat.format(download_forInvoiveItemDetail.getDiscountAmount()));
                         invDetail.setAmount(commaSepFormat.format(download_forInvoiveItemDetail.getAmountWithDiscount()));
                         invDetail.setStatus(download_forInvoiveItemDetail.getStatusId());
-                        Double ExtraAmount = null;
+                        Double ExtraAmount = 0.0;
                         int i = 0;
                         ArrayList<Download_ForInvoiceExtraDetail> download_forInvoiceExtraDetailsArrayList = download_forInvoiveItemDetail.getOrderExtras();
                         if (download_forInvoiceExtraDetailsArrayList.size() == 0) {
@@ -342,7 +367,8 @@ public class InvoiceActivity extends AppCompatActivity {
                             for (Download_ForInvoiceExtraDetail download_forInvoiceExtraDetail : download_forInvoiceExtraDetailsArrayList) {
                                 Log.i("ExtraAmount_size>>>>>>>>>>>>",download_forInvoiceExtraDetailsArrayList.size()+"");
                                 if (download_forInvoiceExtraDetailsArrayList.size() > 1){
-                                    ExtraAmount = Double.valueOf(invoice.getExtraAmount());
+                                    Log.i("extraamount>-------",download_forInvoiceExtraDetail.getAmount()+"");
+                                    ExtraAmount += download_forInvoiceExtraDetail.getAmount();
                                 }
                                 else {
                                     ExtraAmount = download_forInvoiceExtraDetail.getAmount();
@@ -351,6 +377,7 @@ public class InvoiceActivity extends AppCompatActivity {
                              }
                         }
                         invDetail.setExtraPrice(String.valueOf(ExtraAmount));
+
                         Log.i("status>>>>hak>>>>", invDetail.getStatus().toString());
                         Log.i("ID>>>>hak>>>>", invDetail.getId().toString());
                         Log.i("NAME>>>>hak>>>>", invDetail.getItemName().toString());
@@ -363,7 +390,7 @@ public class InvoiceActivity extends AppCompatActivity {
                 }
                 Log.i("detailProductArrayList>>Response>>", String.valueOf(detailProductArrayList.size()));
                 InvoiceDetailActivity.vouncherID = invoice.getVouncherID();
-                InvoiceDetailActivity.userID = invoice.getUser_id();
+
                 InvoiceDetailActivity.date = invoice.getDate();
                 String invoiceIDDD = invoice.getVouncherID();
                 String TableID = null;

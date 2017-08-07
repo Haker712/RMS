@@ -31,10 +31,17 @@
             android:layout_height="10dp" />
 
         <Button
+            android:id="@+id/print_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/print"/>
+
+        <Button
             android:id="@+id/paid_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/paid" />
+            android:background="@drawable/paid"
+            android:visibility="gone"/>
 
     </LinearLayout>
 
@@ -71,7 +78,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="7dp"
-                            android:text="Staff Name : "
+                            android:text="Staff ID : "
                             android:textColor="@color/blackColor" />
 
                         <TextView
@@ -267,7 +274,8 @@
                                 android:inputType="number"
                                 android:singleLine="true"
                                 android:textColor="@color/blackColor"
-                                android:textSize="16dp">
+                                android:textSize="16dp"
+                                android:visibility="gone">
 
                                 <requestFocus />
                             </EditText>
@@ -283,7 +291,8 @@
                                 android:singleLine="true"
                                 android:hint="Free Of Charge"
                                 android:textSize="16dp"
-                                android:inputType="number" />
+                                android:inputType="number"
+                                android:visibility="gone"/>
 
                             <EditText
                                 android:id="@+id/remark_of_FOC_edit"
@@ -293,7 +302,7 @@
                                 android:singleLine="true"
                                 android:hint="Remark"
                                 android:textSize="16dp"
-                                 />
+                                android:visibility="gone"/>
 
 
 
@@ -306,7 +315,8 @@
                                 android:inputType="number"
                                 android:singleLine="true"
                                 android:textColor="@color/blackColor"
-                                android:textSize="16dp">
+                                android:textSize="16dp"
+                                android:visibility="gone">
 
 
 
@@ -318,7 +328,9 @@
                             <RelativeLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:padding="7dp">
+                                android:padding="7dp"
+                                android:visibility="gone"
+                                >
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -351,7 +363,7 @@
                                     android:text="0" />
                             </RelativeLayout>
 
-                            <RelativeLayout
+                            <!--<RelativeLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:padding="7dp">
@@ -367,9 +379,9 @@
                                     android:layout_height="wrap_content"
                                     android:layout_alignParentRight="true"
                                     android:text="0" />
-                            </RelativeLayout>
+                            </RelativeLayout>-->
 
-                            <RelativeLayout
+                            <!--<RelativeLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:padding="7dp">
@@ -385,7 +397,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_alignParentRight="true"
                                     android:text="0" />
-                            </RelativeLayout>
+                            </RelativeLayout>-->
 
                             <RelativeLayout
                                 android:layout_width="match_parent"

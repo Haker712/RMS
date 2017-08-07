@@ -106,6 +106,14 @@ public class FragmentMessageComplete extends Fragment {
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
+
+        /*view.findViewById(R.id.buttonRefresh).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadOrderStatusJson();
+            }
+        });*/
+
         return view;
     }
 
@@ -164,6 +172,7 @@ public class FragmentMessageComplete extends Fragment {
         }
         adapter = new DataAdapter(completeArrayList);
         recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 
     public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
@@ -271,6 +280,7 @@ public class FragmentMessageComplete extends Fragment {
                                     }
                                 } catch (Exception e) {
                                     e.printStackTrace();
+                                    mProgressDialog.dismiss();
                                 }
                             }
                             @Override
@@ -417,6 +427,7 @@ public class FragmentMessageComplete extends Fragment {
     }
 
     private void refreshOrderStatusJson() {   // refreashing data from back end between a time interval !!
+        adapter.notifyDataSetChanged();
         RequestInterface request = retrofit.create(RequestInterface.class);
         Call<JSONResponseOrderStatus> call = request.getOrderStatus();
         call.enqueue(new Callback<JSONResponseOrderStatus>() {
@@ -498,6 +509,7 @@ public class FragmentMessageComplete extends Fragment {
         }
     }
 
+    @Override
     public void onStart() {  // the tim interval !!!!
         super.onStart();
         Thread background = new Thread(new Runnable() {
@@ -505,11 +517,11 @@ public class FragmentMessageComplete extends Fragment {
             public void run() {
                 try {
                     while (ContinueThread.get()) {
-                        Thread.sleep(30000);
+                        Thread.sleep(40000);
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                refreshOrderStatusJson();
+                                loadOrderStatusJson();
                             }
                         });
                     }
@@ -523,6 +535,7 @@ public class FragmentMessageComplete extends Fragment {
         background.start();
     }
 
+    @Override
     public void onStop() {
         super.onStop();
         ContinueThread.set(false);

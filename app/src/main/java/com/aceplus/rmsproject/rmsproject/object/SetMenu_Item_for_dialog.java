@@ -7,6 +7,7 @@ public class SetMenu_Item_for_dialog {
 
     String SetMenu_Item_ID;
     String SetMenu_Item_Name;
+    String SetMenu_Item_Status;
 
     public String getSetMenu_Item_ID() {
         return SetMenu_Item_ID;
@@ -22,5 +23,13 @@ public class SetMenu_Item_for_dialog {
 
     public void setSetMenu_Item_Name(String setMenu_Item_Name) {
         SetMenu_Item_Name = setMenu_Item_Name;
+    }
+
+    public String getSetMenu_Item_Status() {
+        return SetMenu_Item_Status;
+    }
+
+    public void setSetMenu_Item_Status(String setMenu_Item_Status) {
+        SetMenu_Item_Status = setMenu_Item_Status;
     }
 }

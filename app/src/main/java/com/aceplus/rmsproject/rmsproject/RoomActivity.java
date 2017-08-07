@@ -80,6 +80,7 @@ public class RoomActivity extends AppCompatActivity {
     SQLiteDatabase database;
     private RoomAdapter adapter;
     ArrayList<String> roomName = new ArrayList<String>();
+    ArrayList<String> fortransferroomName = new ArrayList<String>();
     ArrayList<BookingTable> bookingTableArrayList = new ArrayList<>();
     ArrayList<BookingTable> getRoomArrayList = new ArrayList<>();
     private ArrayList<Download_Room> download_roomArrayList;
@@ -152,6 +153,24 @@ public class RoomActivity extends AppCompatActivity {
             Room room = new Room();
             room.setId(cur.getString(cur.getColumnIndex("id")));
             room.setRoom_name(cur.getString(cur.getColumnIndex("room_name")));
+            room.setStatus(cur.getString(cur.getColumnIndex("status")));
+            roomArrayList.add(room);
+        }
+        cur.close();
+        database.setTransactionSuccessful();
+        database.endTransaction();
+        return roomArrayList;
+    }
+
+    private ArrayList<Room> gettransferRoomData() {
+        database.beginTransaction();
+        ArrayList<Room> roomArrayList = new ArrayList<>();
+        Cursor cur = database.rawQuery("SELECT * FROM room WHERE status = '0'", null);
+        while (cur.moveToNext()) {
+            Room room = new Room();
+            room.setId(cur.getString(cur.getColumnIndex("id")));
+            room.setRoom_name(cur.getString(cur.getColumnIndex("room_name")));
+            room.setStatus(cur.getString(cur.getColumnIndex("status")));
             roomArrayList.add(room);
         }
         cur.close();
@@ -433,8 +452,15 @@ public class RoomActivity extends AppCompatActivity {
                 LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 final View view = layoutInflater.inflate(R.layout.activity_table_transfer_dialog, null);
                 roomName.clear();
+                fortransferroomName.clear();
                 for (Room room : getRoomData()) {
                     roomName.add(room.getRoom_name());
+                }
+                for (Room room : getRoomData()) {
+                    if(room.getStatus().equals("0") || room.getStatus().equals(0)){
+                        fortransferroomName.add(room.getRoom_name());
+                    }
+
                 }
                 final Spinner from_spinner = (Spinner) view.findViewById(R.id.from_spinner);
                 final Spinner to_spinner = (Spinner) view.findViewById(R.id.to_spinner);
@@ -452,14 +478,14 @@ public class RoomActivity extends AppCompatActivity {
                         // TODO Auto-generated method stub
                     }
                 });
-                ArrayAdapter<String> toArrayAdapter = new ArrayAdapter<String>(RoomActivity.this, R.layout.spinner_text, roomName);
+                ArrayAdapter<String> toArrayAdapter = new ArrayAdapter<String>(RoomActivity.this, R.layout.spinner_text, fortransferroomName);
                 toArrayAdapter.setDropDownViewResource(R.layout.spinner_dropdown_textview);
                 to_spinner.setAdapter(toArrayAdapter);
                 to_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        toRoom = getRoomData().get(position).getId();
-                        toPos = position;
+                        toRoom = gettransferRoomData().get(position).getId();
+                        toPos = Integer.parseInt(toRoom);
                     }
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
@@ -467,7 +493,7 @@ public class RoomActivity extends AppCompatActivity {
                     }
                 });
                 builder.setView(view);
-                builder.setTitle(R.string.table_transfer);
+                builder.setTitle(R.string.room_transfer);
                 builder.setOnShowListener(new DialogInterface.OnShowListener() {
                     @Override
                     public void onShow(DialogInterface dialog) {
@@ -479,7 +505,7 @@ public class RoomActivity extends AppCompatActivity {
                                 ContentValues cv = new ContentValues();
                                 cv.put("room_id", toRoom);
                                 bookingTableArrayList.get(fromPos).setTableService("0");
-                                bookingTableArrayList.get(toPos).setTableService("1");
+                                bookingTableArrayList.get(toPos-1).setTableService("1");
                                 adapter.notifyDataSetChanged();
                                 JSONObject jsonObject = new JSONObject();
                                 try {
@@ -596,9 +622,10 @@ public class RoomActivity extends AppCompatActivity {
             holder.backgroundLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final String room_id = table.getTableID();
-                    final String status = table.getTableService();
-                    JSONObject jsonObject = new JSONObject();
+                    //if (table.getTableService().equals("0")) {
+                        final String room_id = table.getTableID();
+                        final String status = table.getTableService();
+                        JSONObject jsonObject = new JSONObject();
                         try {
                             jsonObject.put("room_id", room_id + "");
                             jsonObject.put("status", "1");
@@ -638,10 +665,17 @@ public class RoomActivity extends AppCompatActivity {
                                         invoice_id = invoiceeece_id;
                                         CategoryActivity.VOUNCHER_ID = invoice_id;
                                         Log.i("CategoryActivity.vouncherIDfromRoom", CategoryActivity.VOUNCHER_ID + "");
-                                        if (invoice_id.equals("NULL")  ){
-                                            CategoryActivity.ADD_INVOICE = "NULL";
-                                        }
-                                        else {
+
+                                        if (invoice_id.equals("NULL") || invoice_id.equals(null)) {
+                                            if (table.getTableService().equals("1")) {
+                                                CategoryActivity.ADD_INVOICE = "status1";
+                                            } else {
+                                                CategoryActivity.ADD_INVOICE = "NULL";
+                                            }
+
+                                            //
+                                            CategoryActivity.VOUNCHER_ID = "NULL";
+                                        } else {
                                             CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
                                         }
                                         startActivity(new Intent(RoomActivity.this, CategoryActivity.class));
@@ -653,6 +687,7 @@ public class RoomActivity extends AppCompatActivity {
                                     callUploadDialog("Room status is null.");
                                 }
                             }
+
                             @Override
                             public void onFailure(Call<Success> call, Throwable t) {
                                 Log.d("RoomStatus", t.getMessage());
@@ -660,7 +695,8 @@ public class RoomActivity extends AppCompatActivity {
                                 callUploadDialog("Please upload again!");
                             }
                         });
-                }
+                    }
+                //}
 
             });
         }

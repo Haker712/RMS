@@ -3,6 +3,8 @@ package com.aceplus.rmsproject.rmsproject.object;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+
 /**
  * Created by kyawminlwin on 8/8/16.
  */
@@ -22,6 +24,15 @@ public class InvoiceDetailProduct implements Parcelable {
     String set_item_name;
     String set_menus_name;
 
+    private ArrayList<InvoiceDetailProductSetItem> invoiceDetailProductSetItemArrayList;
+
+    public ArrayList<InvoiceDetailProductSetItem> getInvoiceDetailProductSetItemArrayList() {
+        return invoiceDetailProductSetItemArrayList;
+    }
+
+    public void setInvoiceDetailProductSetItemArrayList(ArrayList<InvoiceDetailProductSetItem> invoiceDetailProductSetItemArrayList) {
+        this.invoiceDetailProductSetItemArrayList = invoiceDetailProductSetItemArrayList;
+    }
 
     public String getSet_menus_name() {
         return set_menus_name;
