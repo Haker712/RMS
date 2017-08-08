@@ -40,6 +40,7 @@ import android.widget.Toast;
 import com.aceplus.rmsproject.rmsproject.object.BRoom;
 import com.aceplus.rmsproject.rmsproject.object.BTable;
 import com.aceplus.rmsproject.rmsproject.object.BookingTable;
+import com.aceplus.rmsproject.rmsproject.object.Category;
 import com.aceplus.rmsproject.rmsproject.object.Download_Booking;
 import com.aceplus.rmsproject.rmsproject.object.Download_Table;
 import com.aceplus.rmsproject.rmsproject.object.Download_ordertable;
@@ -788,8 +789,7 @@ public class TableActivity extends ActionBarActivity {
                                         }
                                         CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
                                     }
-
-
+                                    CategoryActivity.check_check = "null";
                                     startActivity(new Intent(TableActivity.this, CategoryActivity.class));
                                     finish();
                                 }

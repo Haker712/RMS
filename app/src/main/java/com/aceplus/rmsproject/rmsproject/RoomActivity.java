@@ -311,6 +311,7 @@ public class RoomActivity extends AppCompatActivity {
                     callUploadDialog("Room data is null.");
                 }
             }
+
             @Override
             public void onFailure(Call<JSONResponseRoom> call, Throwable t) {
                 Log.d("ErrorRoom", t.getMessage());
@@ -362,6 +363,7 @@ public class RoomActivity extends AppCompatActivity {
                     callUploadDialog("Booking data is null.");
                 }
             }
+
             @Override
             public void onFailure(Call<JSONResponseBooking> call, Throwable t) {
                 Log.d("ErrorTable", t.getMessage());
@@ -457,7 +459,7 @@ public class RoomActivity extends AppCompatActivity {
                     roomName.add(room.getRoom_name());
                 }
                 for (Room room : getRoomData()) {
-                    if(room.getStatus().equals("0") || room.getStatus().equals(0)){
+                    if (room.getStatus().equals("0") || room.getStatus().equals(0)) {
                         fortransferroomName.add(room.getRoom_name());
                     }
 
@@ -473,6 +475,7 @@ public class RoomActivity extends AppCompatActivity {
                         fromRoom = getRoomData().get(position).getId();
                         fromPos = position;
                     }
+
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
                         // TODO Auto-generated method stub
@@ -487,6 +490,7 @@ public class RoomActivity extends AppCompatActivity {
                         toRoom = gettransferRoomData().get(position).getId();
                         toPos = Integer.parseInt(toRoom);
                     }
+
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
                         // TODO Auto-generated method stub
@@ -505,7 +509,7 @@ public class RoomActivity extends AppCompatActivity {
                                 ContentValues cv = new ContentValues();
                                 cv.put("room_id", toRoom);
                                 bookingTableArrayList.get(fromPos).setTableService("0");
-                                bookingTableArrayList.get(toPos-1).setTableService("1");
+                                bookingTableArrayList.get(toPos - 1).setTableService("1");
                                 adapter.notifyDataSetChanged();
                                 JSONObject jsonObject = new JSONObject();
                                 try {
@@ -540,6 +544,7 @@ public class RoomActivity extends AppCompatActivity {
                                             callUploadDialog("Room transfer is null.");
                                         }
                                     }
+
                                     @Override
                                     public void onFailure(Call<Success> call, Throwable t) {
                                         Log.d("RoomTransfer", t.getMessage());
@@ -587,24 +592,29 @@ public class RoomActivity extends AppCompatActivity {
         private Context mContext;
         private List<BookingTable> roomList;
         String checkinvoiceid;
+
         public RoomAdapter(Context mContext, List<BookingTable> roomList) {
             this.mContext = mContext;
             this.roomList = roomList;
         }
+
         @Override
         public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.room_cardview, parent, false);
             return new MyViewHolder(itemView);
         }
+
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public TextView tableTxt;
             public RelativeLayout backgroundLayout;
+
             public MyViewHolder(View view) {
                 super(view);
                 tableTxt = (TextView) view.findViewById(R.id.table_txt);
                 backgroundLayout = (RelativeLayout) view.findViewById(R.id.background_layout);
             }
         }
+
         @Override
         public void onBindViewHolder(final MyViewHolder holder, int position) {
             final BookingTable table = roomList.get(position);
@@ -622,7 +632,110 @@ public class RoomActivity extends AppCompatActivity {
             holder.backgroundLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //if (table.getTableService().equals("0")) {
+                    if (table.getTableService().equals("0")) {
+                        final AlertDialog builder = new AlertDialog.Builder(RoomActivity.this, R.style.InvitationDialog)
+                                .setPositiveButton(R.string.invitation_ok, null)
+                                .setNegativeButton(R.string.invitation_cancel, null)
+                                .create();
+                        builder.setTitle(R.string.clear);
+                        builder.setMessage("Do you want to clear this item?");
+                        builder.setOnShowListener(new DialogInterface.OnShowListener() {
+                            @Override
+                            public void onShow(DialogInterface dialog) {
+                                final Button btnAccept = builder.getButton(AlertDialog.BUTTON_POSITIVE);
+                                btnAccept.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        final String room_id = table.getTableID();
+                                        final String status = table.getTableService();
+                                        JSONObject jsonObject = new JSONObject();
+                                        try {
+                                            jsonObject.put("room_id", room_id + "");
+                                            jsonObject.put("status", "1");
+                                            String booking_id = table.getBookingID();
+                                            if (booking_id == null) {
+                                                jsonObject.put("booking_id", "null");
+                                            } else {
+                                                jsonObject.put("booking_id", table.getBookingID());
+                                            }
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        Log.e("RoomStatusJson", jsonObject + "");
+                                        callDialog("Uploading room status....");
+                                        RequestInterface request = retrofit.create(RequestInterface.class);
+                                        Call<Success> call = request.postRoomStatus(jsonObject + "");
+                                        call.enqueue(new Callback<Success>() {
+                                            @SuppressLint("LongLogTag")
+                                            @Override
+                                            public void onResponse(Call<Success> call, Response<Success> response) {
+                                                try {
+                                                    Success jsonResponse = response.body();
+                                                    String message = jsonResponse.getMessage();
+                                                    if (message.equals("Success")) {
+                                                        Log.d("RoomStatus", message);
+                                                        mProgressDialog.dismiss();
+                                                        CategoryActivity.ROOM_ID = room_id;
+                                                        CategoryActivity.TAKE_AWAY = "room";
+                                                        CategoryActivity.groupTableArrayList = null;
+                                                        CategoryActivity.TABLE_ID = null;
+                                                        String vouncherid = getRoomInvoiceDataInDB(room_id);
+                                                        CategoryActivity.VOUNCHER_ID = vouncherid;
+                                                        Log.e("RoomVouncherID", vouncherid + "");
+                                                        String invoiceeece_id;
+                                                        invoiceeece_id = getRoomInvoiceDetail(room_id);
+                                                        String invoice_id = null;
+                                                        invoice_id = invoiceeece_id;
+                                                        CategoryActivity.VOUNCHER_ID = invoice_id;
+                                                        Log.i("CategoryActivity.vouncherIDfromRoom", CategoryActivity.VOUNCHER_ID + "");
+
+                                                        if (invoice_id.equals("NULL") || invoice_id.equals(null)) {
+                                                            if (table.getTableService().equals("1")) {
+                                                                CategoryActivity.ADD_INVOICE = "status1";
+                                                            } else {
+                                                                CategoryActivity.ADD_INVOICE = "NULL";
+                                                            }
+
+                                                            //
+                                                            CategoryActivity.VOUNCHER_ID = "NULL";
+                                                        } else {
+                                                            CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
+                                                        }
+                                                        CategoryActivity.check_check = "room";
+                                                        startActivity(new Intent(RoomActivity.this, CategoryActivity.class));
+                                                        finish();
+                                                    }
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                    mProgressDialog.dismiss();
+                                                    callUploadDialog("Room status is null.");
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onFailure(Call<Success> call, Throwable t) {
+                                                Log.d("RoomStatus", t.getMessage());
+                                                mProgressDialog.dismiss();
+                                                callUploadDialog("Please upload again!");
+                                            }
+                                        });
+                                        builder.dismiss();
+                                    }
+                                });
+                                final Button btnDecline = builder.getButton(DialogInterface.BUTTON_NEGATIVE);
+                                btnDecline.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Log.d("Clear", "Item");
+                                        builder.dismiss();
+                                    }
+                                });
+                            }
+                        });
+                        builder.show();
+
+                    }
+                    else {
                         final String room_id = table.getTableID();
                         final String status = table.getTableService();
                         JSONObject jsonObject = new JSONObject();
@@ -678,6 +791,7 @@ public class RoomActivity extends AppCompatActivity {
                                         } else {
                                             CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
                                         }
+                                        CategoryActivity.check_check = "null";
                                         startActivity(new Intent(RoomActivity.this, CategoryActivity.class));
                                         finish();
                                     }
@@ -696,10 +810,13 @@ public class RoomActivity extends AppCompatActivity {
                             }
                         });
                     }
+
+                }
                 //}
 
             });
         }
+
         @Override
         public int getItemCount() {
             return roomList.size();
@@ -711,11 +828,13 @@ public class RoomActivity extends AppCompatActivity {
         private int spanCount;
         private int spacing;
         private boolean includeEdge;
+
         public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
             this.spanCount = spanCount;
             this.spacing = spacing;
             this.includeEdge = includeEdge;
         }
+
         @Override
         public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
             int position = parent.getChildAdapterPosition(view); // item position

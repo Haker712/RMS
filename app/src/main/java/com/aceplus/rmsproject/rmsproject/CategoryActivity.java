@@ -71,6 +71,7 @@ import com.aceplus.rmsproject.rmsproject.utils.Download_forShow_tableID;
 import com.aceplus.rmsproject.rmsproject.utils.JsonForShowRoomId;
 import com.aceplus.rmsproject.rmsproject.utils.JsonForShowTableId;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
+import com.bumptech.glide.Glide;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -175,6 +176,8 @@ public class CategoryActivity extends ActionBarActivity {
 
     String Itemidfromdetail = null;
 
+    public static String check_check = "null";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -220,7 +223,12 @@ public class CategoryActivity extends ActionBarActivity {
                 Category category = new Category();
                 category.setId(cur.getString(cur.getColumnIndex("id")));
                 category.setName(cur.getString(cur.getColumnIndex("name")));
-                category.setImage(cur.getString(cur.getColumnIndex("image")));
+                try {
+                    category.setImage(cur.getString(cur.getColumnIndex("image")));
+                }catch (OutOfMemoryError outOfMemoryError){
+                    Runtime.getRuntime().gc();
+                    category.setImage(cur.getString(cur.getColumnIndex("image")));
+                }
                 category.setStatus(cur.getString(cur.getColumnIndex("status")));
                 category.setParent_id(cur.getString(cur.getColumnIndex("parent_id")));
                 category.setKitchen_id(cur.getString(cur.getColumnIndex("kitchen_id")));
@@ -234,8 +242,6 @@ public class CategoryActivity extends ActionBarActivity {
         }
         return categoryList;
     }
-
-
 
     private ArrayList<Category> cateDataFromDB(String id) {
         database.beginTransaction();
@@ -293,7 +299,13 @@ public class CategoryActivity extends ActionBarActivity {
                 String itemID = cur.getString(cur.getColumnIndex("id"));
                 item.setId(itemID);
                 item.setName(cur.getString(cur.getColumnIndex("set_menu_name")));
-                item.setImage(cur.getString(cur.getColumnIndex("image")));
+                try {
+                    item.setImage(cur.getString(cur.getColumnIndex("image")));
+                }catch (OutOfMemoryError outOfMemoryError){
+                    Runtime.getRuntime().gc();
+                    item.setImage(cur.getString(cur.getColumnIndex("image")));
+                }
+
                 item.setStatus(cur.getString(cur.getColumnIndex("status")));
                 item.setPrice(cur.getDouble(cur.getColumnIndex("set_menu_price")));
                 item.setCategory_id("set_menu");
@@ -362,6 +374,7 @@ public class CategoryActivity extends ActionBarActivity {
     }
 
     private ArrayList<Category> getItemForAuotSearch() {
+        searchTotallist.clear();
         database.beginTransaction();
         ArrayList<Category> itemArrayList = new ArrayList<>();
         Cursor cur = database.rawQuery("SELECT * FROM item", null);
@@ -370,7 +383,13 @@ public class CategoryActivity extends ActionBarActivity {
             String itemID = cur.getString(cur.getColumnIndex("id"));
             item.setId(itemID);
             item.setName(cur.getString(cur.getColumnIndex("name")));
-            item.setImage(cur.getString(cur.getColumnIndex("image")));
+            try {
+                item.setImage(cur.getString(cur.getColumnIndex("image")));
+            }
+            catch (OutOfMemoryError outOfMemoryError){
+                Runtime.getRuntime().gc();
+                item.setImage(cur.getString(cur.getColumnIndex("image")));
+            }
             item.setStatus(cur.getString(cur.getColumnIndex("status")));
             item.setPrice(cur.getDouble(cur.getColumnIndex("price")));
             item.setCategory_id(cur.getString(cur.getColumnIndex("category_id")));
@@ -1310,7 +1329,7 @@ public class CategoryActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 loadCategoryJson();
-
+                getItemForAuotSearch();
             }
         });
         saveBtn.setOnClickListener(new View.OnClickListener() {
@@ -1394,8 +1413,7 @@ public class CategoryActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
-            finish();
+            onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -2063,9 +2081,15 @@ public class CategoryActivity extends ActionBarActivity {
             categoryTxt.setText("Category");
 
             Category album = albumList.get(position);
-            byte[] ImageShow = Base64.decode(album.getImage(), Base64.DEFAULT);
-            Bitmap mBitmap = BitmapFactory.decodeByteArray(ImageShow, 0, ImageShow.length);
-            holder.thumbnail.setImageBitmap(mBitmap);
+            //byte[] ImageShow = Base64.decode(album.getImage(), Base64.DEFAULT);
+            //Bitmap mBitmap = BitmapFactory.decodeByteArray(ImageShow, 0, ImageShow.length);
+
+
+            Glide.with(mContext)
+                    .load(Base64.decode(album.getImage(), Base64.DEFAULT))
+                    .into(holder.thumbnail);
+
+            //holder.thumbnail.setImageBitmap(mBitmap);
             holder.title.setText(album.getName());
         }
         @Override
@@ -2162,9 +2186,12 @@ public class CategoryActivity extends ActionBarActivity {
             Log.e("ParentID", parent_ID);
             Category item = itemList.get(position);
             holder.title.setText(item.getName());
-            byte[] ImageShow = Base64.decode(item.getImage(), Base64.DEFAULT);
-            Bitmap mBitmap = BitmapFactory.decodeByteArray(ImageShow, 0, ImageShow.length);
-            holder.thumbnail.setImageBitmap(mBitmap);
+            //byte[] ImageShow = Base64.decode(item.getImage(), Base64.DEFAULT);
+            //Bitmap mBitmap = BitmapFactory.decodeByteArray(ImageShow, 0, ImageShow.length);
+            Glide.with(mContext)
+                    .load(Base64.decode(item.getImage(), Base64.DEFAULT))
+                    .into(holder.thumbnail);
+            //holder.thumbnail.setImageBitmap(mBitmap);
         }
         @Override
         public int getItemCount() {
@@ -2504,8 +2531,85 @@ public class CategoryActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
-        finish();
+        if (check_check.equals("table")) {
+            final JSONArray tableListJsonArray = new JSONArray();
+            JSONObject product = new JSONObject();
+            try {
+                product.put("booking_id", "");
+                product.put("status", "0");
+                product.put("table_id", TABLE_ID+ "");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            tableListJsonArray.put(product);
+            Log.e("TableList", tableListJsonArray.toString());
+            RequestInterface request = retrofit.create(RequestInterface.class);
+            Call<Success> call = request.postTableStatus(tableListJsonArray.toString());
+            call.enqueue(new Callback<Success>() {
+                @Override
+                public void onResponse(Call<Success> call, Response<Success> response) {
+                    try {
+                        Success jsonResponse = response.body();
+                        String message = jsonResponse.getMessage();
+                        if (message.equals("Success")) {
+                            Log.d("TableStatus", message);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Log.d("fail!!","");
+                    }
+                }
+                @Override
+                public void onFailure(Call<Success> call, Throwable t) {
+                    Log.d("TableStatuscatt", t.getMessage());
+                }
+            });
+            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
+            finish();
+        }
+        else if (check_check.equals("room")){
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("room_id", ROOM_ID + "");
+                jsonObject.put("status", "0");
+                jsonObject.put("booking_id", "null");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            Log.e("RoomStatusJson", jsonObject + "");
+            RequestInterface request = retrofit.create(RequestInterface.class);
+            Call<Success> call = request.postRoomStatus(jsonObject + "");
+            call.enqueue(new Callback<Success>() {
+                @Override
+                public void onResponse(Call<Success> call, Response<Success> response) {
+                    try {
+                        Success jsonResponse = response.body();
+                        String message = jsonResponse.getMessage();
+                        if (message.equals("Success")) {
+                            Log.d("TableStatus", message);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Log.d("fail!!","");
+                    }
+                }
+                @Override
+                public void onFailure(Call<Success> call, Throwable t) {
+                    Log.d("TableStatuscatt", t.getMessage());
+                }
+            });
+            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
+            finish();
+        }
+        else {
+            check_check = "null";
+            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
+            finish();
+        }
+
+
+
+
     }
 }
 
