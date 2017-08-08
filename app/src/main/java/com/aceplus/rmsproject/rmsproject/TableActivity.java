@@ -40,6 +40,7 @@ import android.widget.Toast;
 import com.aceplus.rmsproject.rmsproject.object.BRoom;
 import com.aceplus.rmsproject.rmsproject.object.BTable;
 import com.aceplus.rmsproject.rmsproject.object.BookingTable;
+import com.aceplus.rmsproject.rmsproject.object.Category;
 import com.aceplus.rmsproject.rmsproject.object.Download_Booking;
 import com.aceplus.rmsproject.rmsproject.object.Download_Table;
 import com.aceplus.rmsproject.rmsproject.object.Download_ordertable;
@@ -769,9 +770,7 @@ public class TableActivity extends ActionBarActivity {
                                         }
                                         CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
                                     }
-
-
-
+                                    CategoryActivity.check_check = "null";
                                     startActivity(new Intent(TableActivity.this, CategoryActivity.class));
                                     finish();
                                 }
@@ -784,55 +783,85 @@ public class TableActivity extends ActionBarActivity {
                         }
                     });
                 }
-                    else {
-                        final JSONArray tableListJsonArray = new JSONArray();
-                        JSONObject product = new JSONObject();
-                        try {
-                            product.put("booking_id", table.getBookingID()+"");
-                            product.put("status", "1");
-                            product.put("table_id", table.getTableID() + "");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        tableListJsonArray.put(product);
-                        Log.e("TableList", tableListJsonArray.toString());
-                        callDialog("Upload table data...");
-                        RequestInterface request = retrofit.create(RequestInterface.class);
-                        Call<Success> call = request.postTableStatus(tableListJsonArray.toString());
-                        call.enqueue(new Callback<Success>() {
-                            @Override
-                            public void onResponse(Call<Success> call, Response<Success> response) {
-                                try {
-                                    Success jsonResponse = response.body();
-                                    String message = jsonResponse.getMessage();
-                                    if (message.equals("Success")) {
-                                        Log.d("TableStatus", message);
-                                        mProgressDialog.dismiss();
-                                        CategoryActivity.TABLE_ID = table.getTableID();
-                                        ArrayList<String> tableNameList = new ArrayList<String>();
-                                        tableNameList.add(table.getTableID());
-                                        CategoryActivity.groupTableArrayList = tableNameList;
-                                        CategoryActivity.TAKE_AWAY = "table";
-                                        CategoryActivity.ROOM_ID = null;
-                                        CategoryActivity.ADD_INVOICE= "NULL";
-                                        CategoryActivity.VOUNCHER_ID = "NULL";
-                                        startActivity(new Intent(TableActivity.this, CategoryActivity.class));
-                                        finish();
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    mProgressDialog.dismiss();
-                                    callUploadDialog("Table status is null.");
+                    else /*if (table.getTableService().equals("0"))*/ {
+                        final AlertDialog builder = new AlertDialog.Builder(TableActivity.this, R.style.InvitationDialog)
+                                    .setPositiveButton(R.string.invitation_ok, null)
+                                    .setNegativeButton(R.string.invitation_cancel, null)
+                                    .create();
+                            //builder.setTitle(R.string.clear);
+                            builder.setMessage("Do you want to enter this table?");
+                            builder.setOnShowListener(new DialogInterface.OnShowListener() {
+                                @Override
+                                public void onShow(DialogInterface dialog) {
+                                    final Button btnAccept = builder.getButton(AlertDialog.BUTTON_POSITIVE);
+                                    btnAccept.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            final JSONArray tableListJsonArray = new JSONArray();
+                                            JSONObject product = new JSONObject();
+                                            try {
+                                                product.put("booking_id", table.getBookingID()+"");
+                                                product.put("status", "1");
+                                                product.put("table_id", table.getTableID() + "");
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                            tableListJsonArray.put(product);
+                                            Log.e("TableList", tableListJsonArray.toString());
+                                            callDialog("Upload table data...");
+                                            RequestInterface request = retrofit.create(RequestInterface.class);
+                                            Call<Success> call = request.postTableStatus(tableListJsonArray.toString());
+                                            call.enqueue(new Callback<Success>() {
+                                                @Override
+                                                public void onResponse(Call<Success> call, Response<Success> response) {
+                                                    try {
+                                                        Success jsonResponse = response.body();
+                                                        String message = jsonResponse.getMessage();
+                                                        if (message.equals("Success")) {
+                                                            Log.d("TableStatus", message);
+                                                            mProgressDialog.dismiss();
+                                                            CategoryActivity.TABLE_ID = table.getTableID();
+                                                            ArrayList<String> tableNameList = new ArrayList<String>();
+                                                            tableNameList.add(table.getTableID());
+                                                            CategoryActivity.groupTableArrayList = tableNameList;
+                                                            CategoryActivity.TAKE_AWAY = "table";
+                                                            CategoryActivity.ROOM_ID = null;
+                                                            CategoryActivity.ADD_INVOICE= "NULL";
+                                                            CategoryActivity.VOUNCHER_ID = "NULL";
+                                                            CategoryActivity.check_check = "table";
+                                                            startActivity(new Intent(TableActivity.this, CategoryActivity.class));
+                                                            finish();
+                                                        }
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
+                                                        mProgressDialog.dismiss();
+                                                        callUploadDialog("Table status is null.");
+                                                    }
+                                                }
+                                                @Override
+                                                public void onFailure(Call<Success> call, Throwable t) {
+                                                    Log.d("TableStatus", t.getMessage());
+                                                    mProgressDialog.dismiss();
+                                                    callUploadDialog("Please upload again!");
+                                                }
+                                            });
+                                            builder.dismiss();
+                                        }
+                                    });
+                                    final Button btnDecline = builder.getButton(DialogInterface.BUTTON_NEGATIVE);
+                                    btnDecline.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Log.d("Clear", "Item");
+                                            builder.dismiss();
+                                        }
+                                    });
                                 }
-                            }
-                            @Override
-                            public void onFailure(Call<Success> call, Throwable t) {
-                                Log.d("TableStatus", t.getMessage());
-                                mProgressDialog.dismiss();
-                                callUploadDialog("Please upload again!");
-                            }
-                        });
+                            });
+                            builder.show();
+
                     }
+
                 }});
             holder.backgroundLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override

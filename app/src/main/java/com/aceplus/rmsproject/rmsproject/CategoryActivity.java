@@ -176,6 +176,8 @@ public class CategoryActivity extends ActionBarActivity {
 
     String Itemidfromdetail = null;
 
+    public static String check_check = "null";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -1411,8 +1413,7 @@ public class CategoryActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
-            finish();
+            onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -2530,8 +2531,85 @@ public class CategoryActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
-        finish();
+        if (check_check.equals("table")) {
+            final JSONArray tableListJsonArray = new JSONArray();
+            JSONObject product = new JSONObject();
+            try {
+                product.put("booking_id", "");
+                product.put("status", "0");
+                product.put("table_id", TABLE_ID+ "");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            tableListJsonArray.put(product);
+            Log.e("TableList", tableListJsonArray.toString());
+            RequestInterface request = retrofit.create(RequestInterface.class);
+            Call<Success> call = request.postTableStatus(tableListJsonArray.toString());
+            call.enqueue(new Callback<Success>() {
+                @Override
+                public void onResponse(Call<Success> call, Response<Success> response) {
+                    try {
+                        Success jsonResponse = response.body();
+                        String message = jsonResponse.getMessage();
+                        if (message.equals("Success")) {
+                            Log.d("TableStatus", message);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Log.d("fail!!","");
+                    }
+                }
+                @Override
+                public void onFailure(Call<Success> call, Throwable t) {
+                    Log.d("TableStatuscatt", t.getMessage());
+                }
+            });
+            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
+            finish();
+        }
+        else if (check_check.equals("room")){
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("room_id", ROOM_ID + "");
+                jsonObject.put("status", "0");
+                jsonObject.put("booking_id", "null");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            Log.e("RoomStatusJson", jsonObject + "");
+            RequestInterface request = retrofit.create(RequestInterface.class);
+            Call<Success> call = request.postRoomStatus(jsonObject + "");
+            call.enqueue(new Callback<Success>() {
+                @Override
+                public void onResponse(Call<Success> call, Response<Success> response) {
+                    try {
+                        Success jsonResponse = response.body();
+                        String message = jsonResponse.getMessage();
+                        if (message.equals("Success")) {
+                            Log.d("TableStatus", message);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Log.d("fail!!","");
+                    }
+                }
+                @Override
+                public void onFailure(Call<Success> call, Throwable t) {
+                    Log.d("TableStatuscatt", t.getMessage());
+                }
+            });
+            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
+            finish();
+        }
+        else {
+            check_check = "null";
+            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
+            finish();
+        }
+
+
+
+
     }
 }
 
