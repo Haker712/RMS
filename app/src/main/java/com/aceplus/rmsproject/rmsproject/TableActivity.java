@@ -138,7 +138,7 @@ public class TableActivity extends ActionBarActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();
-            loadTableJson();
+        loadTableJson();
         registerIDs();
         catchEvents();
     }
@@ -170,7 +170,7 @@ public class TableActivity extends ActionBarActivity {
                     bookingTable.setBooking_time(curBooking.getString(curBooking.getColumnIndex("from_time")));
                     booking_time = curBooking.getString(curBooking.getColumnIndex("from_time"));
                 }
-                Log.e("TableIDBooking", table_id+","+booking_id+"," +booking_time+"");
+                Log.e("TableIDBooking", table_id + "," + booking_id + "," + booking_time + "");
             }
 
             curConfig = database.rawQuery("SELECT * FROM config", null);
@@ -215,7 +215,7 @@ public class TableActivity extends ActionBarActivity {
                     bookingTable.setBooking_time(curBooking.getString(curBooking.getColumnIndex("from_time")));
                     booking_time = curBooking.getString(curBooking.getColumnIndex("from_time"));
                 }
-                Log.e("TableIDBooking", table_id+","+booking_id+"," +booking_time+"");
+                Log.e("TableIDBooking", table_id + "," + booking_id + "," + booking_time + "");
             }
 
             curConfig = database.rawQuery("SELECT * FROM config", null);
@@ -248,7 +248,7 @@ public class TableActivity extends ActionBarActivity {
         try {
             Download_ordertable download_ordertable = call.execute().body();
             callinvoiceid = download_ordertable.getOrder_id();
-            Log.i("jflskdfjjslkdfj",download_ordertable.getOrder_id()+"");
+            Log.i("jflskdfjjslkdfj", download_ordertable.getOrder_id() + "");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -265,6 +265,7 @@ public class TableActivity extends ActionBarActivity {
                 group_invoiceee_id = download_ordertable.getOrder_id();
 
             }
+
             @Override
             public void onFailure(Call<Download_ordertable> call, Throwable t) {
             }
@@ -297,19 +298,19 @@ public class TableActivity extends ActionBarActivity {
             bookTable.setTable_id(bookingTable.getTable_id());
             bookTable.setRoom_id(bookingTable.getRoom_id());
             bookTable.setBooking_time(bookingTable.getBooking_time());
-            Log.e("TestBookingTime", bookingTable.getBooking_time()+"");
+            Log.e("TestBookingTime", bookingTable.getBooking_time() + "");
             bookTable.setBooking_service(bookingTable.getBooking_service());
             bookTable.setBooking_waiting(bookingTable.getBooking_waiting());
             bookTable.setBooking_warning(bookingTable.getBooking_warning());
             if (bookingTable.getTableStatus().equals("1")) {
-                Log.e("ServiceTableID", bookingTable.getTableID()+"");
+                Log.e("ServiceTableID", bookingTable.getTableID() + "");
                 bookTable.setTableService("1");
             } else if (bookingTable.getTableStatus().equals("0")) {
                 if (bookingTable.getBooking_time().equals("00:00:00")) {
                     bookTable.setBackgroundColor("");
                 } else {
                     try {
-                        Log.e("Booking_TableID", bookingTable.getTableID()+"");
+                        Log.e("Booking_TableID", bookingTable.getTableID() + "");
                         Date booking_time = timeFormat.parse(bookingTable.getBooking_time());
                         int booking_hour = booking_time.getHours();
                         int booking_minute = booking_time.getMinutes();
@@ -331,7 +332,7 @@ public class TableActivity extends ActionBarActivity {
                         int from_second = booking_second - warning_second;
                         fromTime = timeFormat.parse(from_hour + ":" + from_minute + ":" + from_second);
                         Date CurrentTime = timeFormat.parse(timeFormat.format(new Date()));
-                        Log.e("booking_time3", CurrentTime+""+fromTime + ","+ booking_time+","+toTime);
+                        Log.e("booking_time3", CurrentTime + "" + fromTime + "," + booking_time + "," + toTime);
                         if (CurrentTime.equals(fromTime) || CurrentTime.after(fromTime) && CurrentTime.before(booking_time)) {
                             bookTable.setTableService("2");
                             Log.e("TableService", "2");
@@ -368,29 +369,43 @@ public class TableActivity extends ActionBarActivity {
                 tableName.clear();
                 fortransfertableName.clear();
                 for (BookingTable table : getBookingArrayList) {
-                    tableName.add(table.getTable_no());
+                    if (table.getTableStatus().equals("1") || table.getTableStatus().equals(1)) {
+                        tableName.add(table.getTable_no());
+                    }
                 }
                 for (BookingTable table : getBookingArrayList) {
-                    if (table.getTableStatus().equals("0") || table.getTableStatus().equals(0) ){
+                    if (table.getTableStatus().equals("0") || table.getTableStatus().equals(0)) {
                         fortransfertableName.add(table.getTable_no());
                     }
                 }
                 final Spinner from_spinner = (Spinner) view.findViewById(R.id.from_spinner);
                 final Spinner to_spinner = (Spinner) view.findViewById(R.id.to_spinner);
-                ArrayAdapter<String> stringAdapter = new ArrayAdapter<String>(TableActivity.this,
-                        R.layout.spinner_text, tableName);
+                ArrayAdapter<String> stringAdapter = new ArrayAdapter<String>(TableActivity.this, R.layout.spinner_text, tableName);
                 stringAdapter.setDropDownViewResource(R.layout.spinner_dropdown_textview);
                 from_spinner.setAdapter(stringAdapter);
                 from_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view,
                                                int position, long id) {
-                        fromTable = getBookingArrayList.get(position).getTableID();
+                        String fromTableName = tableName.get(position);
+                        Toast.makeText(TableActivity.this, fromTableName, Toast.LENGTH_SHORT).show();
+                        for (int i = 0; i <  bookingTableArrayList.size(); i++) {
+
+                                Log.i("TableNames", bookingTableArrayList.get(i).getTable_no());
+                            if (fromTableName.equals( bookingTableArrayList.get(i).getTable_no())){
+                                Toast.makeText(TableActivity.this,bookingTableArrayList.get(i).getTableID(), Toast.LENGTH_SHORT).show();
+                                fromTable=bookingTableArrayList.get(i).getTableID();
+                            }
+
+                        }
+
                         fromPos = position;
                     }
+
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
                         // TODO Auto-generated method stub
+
 
                     }
                 });
@@ -402,9 +417,11 @@ public class TableActivity extends ActionBarActivity {
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         //getavailable table
 
-                        toTable =   get4transfertableArrayList.get(position).getTableID();
-                        toPos = position ;
+                        toTable = get4transfertableArrayList.get(position).getTableID();
+                        Log.i("toTable", toTable);
+                        toPos = position;
                     }
+
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
                         // TODO Auto-generated method stub
@@ -417,66 +434,70 @@ public class TableActivity extends ActionBarActivity {
                     @Override
                     public void onShow(DialogInterface dialog) {
                         final Button btnAccept = builder.getButton(AlertDialog.BUTTON_POSITIVE);
-                        btnAccept.setOnClickListener(new View.OnClickListener() {
-                            @SuppressLint("LongLogTag")
-                            @Override
-                            public void onClick(View v) {
-                                if (fromTable == null && toTable == null) {
-                                    Log.e("TableTransfer", "null");
-                                } else {
-                                    String arg[] = {fromTable};
-                                    ContentValues cv = new ContentValues();
-                                    cv.put("table_id", toTable);
-                                    bookingTableArrayList.get(fromPos).setTableService("0");
-                                    bookingTableArrayList.get(Integer.parseInt(toTable)-1).setTableService("1");
-                                    adapter.notifyDataSetChanged();
-                                    JSONObject tableTransferJson = new JSONObject();
-                                    try {
-                                        tableTransferJson.put("transfer_from_table_id", fromTable);
-                                        tableTransferJson.put("transfer_to_table_id", toTable);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                    Log.e("TransferTable", tableTransferJson.toString());
-                                    String invoiceIDDD;
-                                    invoiceIDDD = getTableInvoiceDataInDB(fromTable);
-                                    Log.i("invoiceIDDDinvoiceIDDDinvoiceIDDD",invoiceIDDD+"");
-                                    callDialog("Upload Transfer Table data...");   // transfer table method
-                                    RequestInterface request = retrofit.create(RequestInterface.class);
-                                    callc = request.postTableTransfer(invoiceIDDD,fromTable,toTable );
-                                    Log.i("fromTable",fromTable+"");
-                                    Log.i("toTable",toTable+"");
-                                    if (android.os.Build.VERSION.SDK_INT > 9) {
-                                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                                        StrictMode.setThreadPolicy(policy);
-                                    }
-                                            try {
-                                                Success jsonResponse = callc.execute().body();
-                                                String message = jsonResponse.getMessage();
-                                                if (message.equals("Success")) {
-                                                    Log.d("TableTransfer", message);
-                                                    mProgressDialog.dismiss();
-                                                    builder.dismiss();
-                                                }
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
-                                                builder.dismiss();
+                        if (tableName.size() == 0) {
+                            btnAccept.setEnabled(false);
+                        } else {
+                            btnAccept.setOnClickListener(new View.OnClickListener() {
+                                @SuppressLint("LongLogTag")
+                                @Override
+                                public void onClick(View v) {
+                                    if (fromTable == null && toTable == null) {
+                                        Log.e("TableTransfer", "null");
+                                    } else {
+                                        String arg[] = {fromTable};
+                                        ContentValues cv = new ContentValues();
+                                        cv.put("table_id", toTable);
+                                        bookingTableArrayList.get(fromPos).setTableService("0");
+                                        bookingTableArrayList.get(Integer.parseInt(toTable) - 1).setTableService("1");
+                                        adapter.notifyDataSetChanged();
+                                        JSONObject tableTransferJson = new JSONObject();
+                                        try {
+                                            tableTransferJson.put("transfer_from_table_id", fromTable);
+                                            tableTransferJson.put("transfer_to_table_id", toTable);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        Log.e("TransferTable", tableTransferJson.toString());
+                                        String invoiceIDDD;
+                                        invoiceIDDD = getTableInvoiceDataInDB(fromTable);
+                                        Log.i("invoiceIDDDinvoiceIDDDinvoiceIDDD", invoiceIDDD + "");
+                                        callDialog("Upload Transfer Table data...");   // transfer table method
+                                        RequestInterface request = retrofit.create(RequestInterface.class);
+                                        callc = request.postTableTransfer(invoiceIDDD, fromTable, toTable);
+                                        Log.i("fromTable", fromTable + "");
+                                        Log.i("toTable", toTable + "");
+                                        if (android.os.Build.VERSION.SDK_INT > 9) {
+                                            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                                            StrictMode.setThreadPolicy(policy);
+                                        }
+                                        try {
+                                            Success jsonResponse = callc.execute().body();
+                                            String message = jsonResponse.getMessage();
+                                            if (message.equals("Success")) {
+                                                Log.d("TableTransfer", message);
                                                 mProgressDialog.dismiss();
-                                                callUploadDialog("Table transfer is null.");
-                                                callUploadDialog("Please upload again!");
+                                                builder.dismiss();
                                             }
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                            builder.dismiss();
+                                            mProgressDialog.dismiss();
+                                            callUploadDialog("Table transfer is null.");
+                                            callUploadDialog("Please upload again!");
+                                        }
+                                    }
+                                    refreshTableJson();
                                 }
-
-                            }
-                        });
-                        final Button btnDecline = builder.getButton(DialogInterface.BUTTON_NEGATIVE);
-                        btnDecline.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Toast.makeText(TableActivity.this, "Cancel", Toast.LENGTH_LONG).show();
-                                builder.dismiss();
-                            }
-                        });
+                            });
+                            final Button btnDecline = builder.getButton(DialogInterface.BUTTON_NEGATIVE);
+                            btnDecline.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Toast.makeText(TableActivity.this, "Cancel", Toast.LENGTH_LONG).show();
+                                    builder.dismiss();
+                                }
+                            });
+                        }
                     }
                 });
                 builder.show();
@@ -492,16 +513,16 @@ public class TableActivity extends ActionBarActivity {
                         groupTableList.add(book.getTable_no());
                     }
                 }
-                if(groupTableList.size()>=2){
+                if (groupTableList.size() >= 2) {
                     getGroupTable();
-                }else {
+                } else {
                     callUploadDialog("You need to choose more than one table!");
                 }
             }
         });
     }
 
-    private void getGroupTable(){
+    private void getGroupTable() {
         final ArrayList<String> groupTableList = new ArrayList<String>();
         groupTableList.clear();
         for (BookingTable book : bookingTableArrayList) {
@@ -511,7 +532,7 @@ public class TableActivity extends ActionBarActivity {
         }
         final AlertDialog builder = new AlertDialog.Builder(TableActivity.this, R.style.InvitationDialog)
                 .setPositiveButton(R.string.invitation_order, null)
-               .setNeutralButton(R.string.invitation_cancel, null)
+                .setNeutralButton(R.string.invitation_cancel, null)
                 .create();
 
         LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -533,12 +554,12 @@ public class TableActivity extends ActionBarActivity {
                         for (BookingTable book : bookingTableArrayList) {
                             if (book.isTable_check() == true) {
                                 groupTableID = book.getTableID();
-                                Log.e("Booking_ID",  book.getTableID());
+                                Log.e("Booking_ID", book.getTableID());
                                 groupTableArrayList.add(book.getTableID());
                                 JSONObject product = new JSONObject();
                                 try {
                                     product.put("table_id", book.getTableID());
-                                    product.put("booking_id", book.getBookingID()+"");
+                                    product.put("booking_id", book.getBookingID() + "");
                                     product.put("status", "1");
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -557,29 +578,29 @@ public class TableActivity extends ActionBarActivity {
                             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                             StrictMode.setThreadPolicy(policy);
                         }
-                                try {
-                                    Success jsonResponse = call.execute().body();
-                                    String message = jsonResponse.getMessage();
-                                    if (message.equals("Success")) {
-                                        Log.d("TableStatus", message);
-                                        mProgressDialog.dismiss();
-                                        CategoryActivity.TABLE_ID = groupTableID;
-                                        Log.e("GroupTableID", groupTableID);
-                                        CategoryActivity.groupTableArrayList = groupTableArrayList;
-                                        CategoryActivity.TAKE_AWAY = "table";
-                                        CategoryActivity.ROOM_ID = null;
+                        try {
+                            Success jsonResponse = call.execute().body();
+                            String message = jsonResponse.getMessage();
+                            if (message.equals("Success")) {
+                                Log.d("TableStatus", message);
+                                mProgressDialog.dismiss();
+                                CategoryActivity.TABLE_ID = groupTableID;
+                                Log.e("GroupTableID", groupTableID);
+                                CategoryActivity.groupTableArrayList = groupTableArrayList;
+                                CategoryActivity.TAKE_AWAY = "table";
+                                CategoryActivity.ROOM_ID = null;
 
-                                        CategoryActivity.VOUNCHER_ID = null;
-                                        CategoryActivity.ADD_INVOICE = "NULL";
-                                              builder.dismiss();
-                                        startActivity(new Intent(TableActivity.this, CategoryActivity.class));
-                                        finish();
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    mProgressDialog.dismiss();
-                                    callUploadDialog("Group Table is null.");
-                                }
+                                CategoryActivity.VOUNCHER_ID = null;
+                                CategoryActivity.ADD_INVOICE = "NULL";
+                                builder.dismiss();
+                                startActivity(new Intent(TableActivity.this, CategoryActivity.class));
+                                finish();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            mProgressDialog.dismiss();
+                            callUploadDialog("Group Table is null.");
+                        }
                     }
                 });
                 final Button btnDecline = builder.getButton(DialogInterface.BUTTON_NEUTRAL);
@@ -606,10 +627,12 @@ public class TableActivity extends ActionBarActivity {
         private int PosCheck = 0;
         private boolean onBind;
         String Checking;
+
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public TextView tableTxt;
             public CheckBox groupCheck;
             public RelativeLayout backgroundLayout;
+
             public MyViewHolder(View view) {
                 super(view);
                 tableTxt = (TextView) view.findViewById(R.id.table_txt);
@@ -649,79 +672,76 @@ public class TableActivity extends ActionBarActivity {
             }
             Log.e("TableService", table.getTableService());
             Checking = table.getTableService();
-                      Log.d("BackgroundColor", table.getBackgroundColor());
-                holder.groupCheck.setOnClickListener(new CompoundButton.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(table.getTableService() == "1")
-                        {
-                            try {
-                                final android.support.v7.app.AlertDialog builder = new android.support.v7.app.AlertDialog.Builder(TableActivity.this, R.style.InvitationDialog)
-                                        .setPositiveButton(R.string.invitation_ok, null)
-                                        .create();
-                                builder.setTitle(R.string.alert);
-                                builder.setMessage("Can't group this table");
-                                builder.setOnShowListener(new DialogInterface.OnShowListener() {
-                                    @Override
-                                    public void onShow(DialogInterface dialog) {
-                                        final Button btnAccept = builder.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
-                                        btnAccept.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                builder.dismiss();
-                                                holder.groupCheck.setChecked(false);
-                                            }
-                                        });
-                                    }
-                                });
-                                builder.show();
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                     }
-                    }
-                });
-                holder.groupCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                        @Override
-                        public void onCheckedChanged (CompoundButton buttonView,boolean isChecked){
-                            if(table.getTableService() == "1")
-                            {
-                                onBind = false;
-                            }
-                            else {
-                                table.setTable_check(isChecked);
-                                try {
-                                    adapter.notifyItemChanged(position);
-                                } catch (Exception e) {
-                                    Log.e("onCheckChanged", e.getMessage());
+            Log.d("BackgroundColor", table.getBackgroundColor());
+            holder.groupCheck.setOnClickListener(new CompoundButton.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (table.getTableService() == "1") {
+                        try {
+                            final android.support.v7.app.AlertDialog builder = new android.support.v7.app.AlertDialog.Builder(TableActivity.this, R.style.InvitationDialog)
+                                    .setPositiveButton(R.string.invitation_ok, null)
+                                    .create();
+                            builder.setTitle(R.string.alert);
+                            builder.setMessage("Can't group this table");
+                            builder.setOnShowListener(new DialogInterface.OnShowListener() {
+                                @Override
+                                public void onShow(DialogInterface dialog) {
+                                    final Button btnAccept = builder.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
+                                    btnAccept.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            builder.dismiss();
+                                            holder.groupCheck.setChecked(false);
+                                        }
+                                    });
                                 }
-                            }
-                    }
+                            });
+                            builder.show();
 
-                });
-                holder.groupCheck.setChecked(table.isTable_check());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+            holder.groupCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (table.getTableService() == "1") {
+                        onBind = false;
+                    } else {
+                        table.setTable_check(isChecked);
+                        try {
+                            adapter.notifyItemChanged(position);
+                        } catch (Exception e) {
+                            Log.e("onCheckChanged", e.getMessage());
+                        }
+                    }
+                }
+
+            });
+            holder.groupCheck.setChecked(table.isTable_check());
             holder.backgroundLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {  // when you enter the table !
-                    if (table.getTableService().equals("1")){
-                    final JSONArray tableListJsonArray = new JSONArray();
-                    JSONObject product = new JSONObject();
-                    try {
-                        product.put("booking_id", table.getBookingID()+"");
-                        product.put("status", "1");
-                        product.put("table_id", table.getTableID() + "");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    tableListJsonArray.put(product);
-                    Log.e("TableList", tableListJsonArray.toString());
-                    callDialog("Upload table data...");
-                    RequestInterface request = retrofit.create(RequestInterface.class);
-                    Call<Success> call = request.postTableStatus(tableListJsonArray.toString());
-                    call.enqueue(new Callback<Success>() {
-                        @Override
-                        public void onResponse(Call<Success> call, Response<Success> response) {
+                    if (table.getTableService().equals("1")) {
+                        final JSONArray tableListJsonArray = new JSONArray();
+                        JSONObject product = new JSONObject();
+                        try {
+                            product.put("booking_id", table.getBookingID() + "");
+                            product.put("status", "1");
+                            product.put("table_id", table.getTableID() + "");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        tableListJsonArray.put(product);
+                        Log.e("TableList", tableListJsonArray.toString());
+                        callDialog("Upload table data...");
+                        RequestInterface request = retrofit.create(RequestInterface.class);
+                        Call<Success> call = request.postTableStatus(tableListJsonArray.toString());
+                        call.enqueue(new Callback<Success>() {
+                            @Override
+                            public void onResponse(Call<Success> call, Response<Success> response) {
                                 Success jsonResponse = response.body();
                                 String message = jsonResponse.getMessage();
                                 if (message.equals("Success")) {
@@ -742,17 +762,16 @@ public class TableActivity extends ActionBarActivity {
                                     try {
                                         Download_ordertable download_ordertable = calltable3.execute().body();
                                         invoiceee_id = download_ordertable.getOrder_id();
-                                        Log.i("jflskdfjjslkdfj",download_ordertable.getOrder_id()+"");
+                                        Log.i("jflskdfjjslkdfj", download_ordertable.getOrder_id() + "");
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
                                     String invoice_id = invoiceee_id;
-                                    Log.i("invoiceee_id", invoiceee_id+"");
-                                    if(invoiceee_id.equals(null)   ){
+                                    Log.i("invoiceee_id", invoiceee_id + "");
+                                    if (invoiceee_id.equals(null)) {
                                         CategoryActivity.ADD_INVOICE = "NULL";
                                         CategoryActivity.VOUNCHER_ID = "NULL";
-                                    }
-                                    else {
+                                    } else {
                                         CategoryActivity.VOUNCHER_ID = "NULL";
                                         if (invoice_id == null || invoice_id.equals("null")) {
                                             String group_invoice_id = getGroupTableInvoiceDataInDB(table.getTableID());
@@ -765,30 +784,29 @@ public class TableActivity extends ActionBarActivity {
                                             }
                                         } else {
                                             CategoryActivity.VOUNCHER_ID = invoice_id;
-                                            Log.i("CategoryActivity.VOUNCHER_IDfromtable",CategoryActivity.VOUNCHER_ID+"");
+                                            Log.i("CategoryActivity.VOUNCHER_IDfromtable", CategoryActivity.VOUNCHER_ID + "");
                                         }
                                         CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
                                     }
 
 
-
                                     startActivity(new Intent(TableActivity.this, CategoryActivity.class));
                                     finish();
                                 }
-                        }
-                        @Override
-                        public void onFailure(Call<Success> call, Throwable t) {
-                            Log.d("TableStatus", t.getMessage());
-                            mProgressDialog.dismiss();
-                            callUploadDialog("Please upload again!");
-                        }
-                    });
-                }
-                    else {
+                            }
+
+                            @Override
+                            public void onFailure(Call<Success> call, Throwable t) {
+                                Log.d("TableStatus", t.getMessage());
+                                mProgressDialog.dismiss();
+                                callUploadDialog("Please upload again!");
+                            }
+                        });
+                    } else {
                         final JSONArray tableListJsonArray = new JSONArray();
                         JSONObject product = new JSONObject();
                         try {
-                            product.put("booking_id", table.getBookingID()+"");
+                            product.put("booking_id", table.getBookingID() + "");
                             product.put("status", "1");
                             product.put("table_id", table.getTableID() + "");
                         } catch (JSONException e) {
@@ -814,7 +832,7 @@ public class TableActivity extends ActionBarActivity {
                                         CategoryActivity.groupTableArrayList = tableNameList;
                                         CategoryActivity.TAKE_AWAY = "table";
                                         CategoryActivity.ROOM_ID = null;
-                                        CategoryActivity.ADD_INVOICE= "NULL";
+                                        CategoryActivity.ADD_INVOICE = "NULL";
                                         CategoryActivity.VOUNCHER_ID = "NULL";
                                         startActivity(new Intent(TableActivity.this, CategoryActivity.class));
                                         finish();
@@ -825,6 +843,7 @@ public class TableActivity extends ActionBarActivity {
                                     callUploadDialog("Table status is null.");
                                 }
                             }
+
                             @Override
                             public void onFailure(Call<Success> call, Throwable t) {
                                 Log.d("TableStatus", t.getMessage());
@@ -833,7 +852,8 @@ public class TableActivity extends ActionBarActivity {
                             }
                         });
                     }
-                }});
+                }
+            });
             holder.backgroundLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -842,6 +862,7 @@ public class TableActivity extends ActionBarActivity {
                 }
             });
         }
+
         @Override
         public int getItemCount() {
             return tableList.size();
@@ -852,11 +873,13 @@ public class TableActivity extends ActionBarActivity {
         private int spanCount;
         private int spacing;
         private boolean includeEdge;
+
         public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
             this.spanCount = spanCount;
             this.spacing = spacing;
             this.includeEdge = includeEdge;
         }
+
         @Override
         public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
             int position = parent.getChildAdapterPosition(view); // item position
@@ -936,6 +959,7 @@ public class TableActivity extends ActionBarActivity {
                     callUploadDialog("Table data is null.");
                 }
             }
+
             @Override
             public void onFailure(Call<JSONResponseTable> call, Throwable t) {
                 Log.d("ErrorTable", t.getMessage());
@@ -972,6 +996,7 @@ public class TableActivity extends ActionBarActivity {
                     callUploadDialog("Table data is null.");
                 }
             }
+
             @Override
             public void onFailure(Call<JSONResponseTable> call, Throwable t) {
                 Log.d("ErrorTable", t.getMessage());
@@ -980,7 +1005,7 @@ public class TableActivity extends ActionBarActivity {
         });
     }
 
-    private String getActivateKeyFromDB(){
+    private String getActivateKeyFromDB() {
         database.beginTransaction();
         String backend_activate_key = null;
         Cursor cur = database.rawQuery("SELECT * FROM activate_key", null);
@@ -1033,9 +1058,10 @@ public class TableActivity extends ActionBarActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                     mProgressDialog.dismiss();
-                   callUploadDialog("Booking data is null.");
+                    callUploadDialog("Booking data is null.");
                 }
             }
+
             @Override
             public void onFailure(Call<JSONResponseBooking> call, Throwable t) {
                 Log.d("ErrorTable", t.getMessage());
