@@ -2531,7 +2531,7 @@ public class CategoryActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        if (check_check.equals("table")) {
+        /*if (check_check.equals("table")) {
             final JSONArray tableListJsonArray = new JSONArray();
             JSONObject product = new JSONObject();
             try {
@@ -2605,9 +2605,10 @@ public class CategoryActivity extends ActionBarActivity {
             check_check = "null";
             startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
             finish();
-        }
+        }*/
 
-
+        startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
+        finish();
 
 
     }
