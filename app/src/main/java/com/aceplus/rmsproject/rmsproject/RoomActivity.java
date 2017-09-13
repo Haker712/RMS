@@ -456,7 +456,10 @@ public class RoomActivity extends AppCompatActivity {
                 roomName.clear();
                 fortransferroomName.clear();
                 for (Room room : getRoomData()) {
-                    roomName.add(room.getRoom_name());
+                    if (room.getStatus().equals("1") || room.getStatus().equals(1)) {
+                        roomName.add(room.getRoom_name());
+                    }
+
                 }
                 for (Room room : getRoomData()) {
                     if (room.getStatus().equals("0") || room.getStatus().equals(0)) {
@@ -472,7 +475,23 @@ public class RoomActivity extends AppCompatActivity {
                 from_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        fromRoom = getRoomData().get(position).getId();
+
+                        //fromRoom = getRoomData().get(position).getRoom_name();
+
+                        String fromRoomName = roomName.get(position);
+                        Toast.makeText(RoomActivity.this, fromRoomName, Toast.LENGTH_SHORT).show();
+                        for (int i = 0; i < getRoomData().size(); i++) {
+
+                            if (fromRoomName.equals(getRoomData().get(i).getRoom_name())) {
+
+
+                                Log.i("AllRoomName", getRoomData().get(i).getId());
+                                fromRoom = getRoomData().get(i).getId();
+                                Toast.makeText(RoomActivity.this, fromRoom, Toast.LENGTH_SHORT).show();
+
+                            }
+
+                        }
                         fromPos = position;
                     }
 
@@ -508,13 +527,15 @@ public class RoomActivity extends AppCompatActivity {
                                 String arg[] = {fromRoom};
                                 ContentValues cv = new ContentValues();
                                 cv.put("room_id", toRoom);
-                                bookingTableArrayList.get(fromPos).setTableService("0");
-                                bookingTableArrayList.get(toPos - 1).setTableService("1");
-                                adapter.notifyDataSetChanged();
+//                                bookingTableArrayList.get(fromPos).setTableService("0");
+//                                bookingTableArrayList.get(toPos - 1).setTableService("1");
+//                                adapter.notifyDataSetChanged();
                                 JSONObject jsonObject = new JSONObject();
                                 try {
                                     jsonObject.put("transfer_from_room_id", fromRoom);
+                                    Log.i("FromRoomId",fromRoom);
                                     jsonObject.put("transfer_to_room_id", toRoom);
+                                    Toast.makeText(RoomActivity.this, toRoom, Toast.LENGTH_SHORT).show();
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -543,6 +564,7 @@ public class RoomActivity extends AppCompatActivity {
                                             mProgressDialog.dismiss();
                                             callUploadDialog("Room transfer is null.");
                                         }
+                                        loadRoomJson();
                                     }
 
                                     @Override
@@ -734,8 +756,7 @@ public class RoomActivity extends AppCompatActivity {
                         });
                         builder.show();
 
-                    }
-                    else {
+                    } else {
                         final String room_id = table.getTableID();
                         final String status = table.getTableService();
                         JSONObject jsonObject = new JSONObject();

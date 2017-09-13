@@ -41,14 +41,17 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aceplus.rmsproject.rmsproject.object.AddOn;
 import com.aceplus.rmsproject.rmsproject.object.Category;
 import com.aceplus.rmsproject.rmsproject.object.Category_Item;
+import com.aceplus.rmsproject.rmsproject.object.ContimentforItemSelect;
 import com.aceplus.rmsproject.rmsproject.object.Download_AddOn;
 import com.aceplus.rmsproject.rmsproject.object.Download_Category;
+import com.aceplus.rmsproject.rmsproject.object.Download_Contiment;
 import com.aceplus.rmsproject.rmsproject.object.Download_Discount;
 import com.aceplus.rmsproject.rmsproject.object.Download_ForInvoiceDetail;
 import com.aceplus.rmsproject.rmsproject.object.Download_ForInvoiceExtraDetail;
@@ -58,6 +61,7 @@ import com.aceplus.rmsproject.rmsproject.object.Download_SetItem;
 import com.aceplus.rmsproject.rmsproject.object.Download_SetMenu;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseAddOn;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseCategory;
+import com.aceplus.rmsproject.rmsproject.object.JSONResponseContiment;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseDiscount;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseItem;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseSetItem;
@@ -165,6 +169,7 @@ public class CategoryActivity extends ActionBarActivity {
     private Retrofit retrofit;
     private ArrayList<Download_Category> download_categoryArrayList;
     private ArrayList<Download_Item> download_itemArrayList;
+    private ArrayList<Download_Contiment> download_contimentArrayList;
     private ArrayList<Download_AddOn> download_addOnArrayList;
     private ArrayList<Download_SetMenu> download_setMenuArrayList;
     private ArrayList<Download_SetItem> download_setItemArrayList;
@@ -177,6 +182,20 @@ public class CategoryActivity extends ActionBarActivity {
     String Itemidfromdetail = null;
 
     public static String check_check = "null";
+
+    /***
+     * PhoneLinAung 11.9.17
+     */
+
+    ContimentforItemSelect contimet = new ContimentforItemSelect();
+    ArrayList<ContimentforItemSelect> contimentforItemSelectList = new ArrayList<>();
+    List<String> contimentnameList = new ArrayList<>();
+
+    String contiment_name;
+    int contiment_id;
+    int selected_Contiment_id;
+    String group_id;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -225,7 +244,7 @@ public class CategoryActivity extends ActionBarActivity {
                 category.setName(cur.getString(cur.getColumnIndex("name")));
                 try {
                     category.setImage(cur.getString(cur.getColumnIndex("image")));
-                }catch (OutOfMemoryError outOfMemoryError){
+                } catch (OutOfMemoryError outOfMemoryError) {
                     Runtime.getRuntime().gc();
                     category.setImage(cur.getString(cur.getColumnIndex("image")));
                 }
@@ -263,27 +282,79 @@ public class CategoryActivity extends ActionBarActivity {
         return categoryList;
     }
 
+//    private ArrayList<Category> itemDataFromDB(String category_id) { // getting item from database
+//        database.beginTransaction();
+//        ArrayList<Category> itemArrayList = new ArrayList<>();
+//        Cursor cur = database.rawQuery("SELECT * FROM item WHERE category_id = \"" + category_id + "\" && has_contiment = '" + 0 + "' ", null);
+//        while (cur.moveToNext()) {
+//            Category item = new Category();
+//            String itemID = cur.getString(cur.getColumnIndex("id"));
+//            item.setId(itemID);
+//            item.setName(cur.getString(cur.getColumnIndex("name")));
+//            item.setImage(cur.getString(cur.getColumnIndex("image")));
+//            item.setStatus(cur.getString(cur.getColumnIndex("status")));
+//            item.setPrice(cur.getDouble(cur.getColumnIndex("price")));
+//            item.setCategory_id(cur.getString(cur.getColumnIndex("category_id")));
+//            Cursor curDiscount = database.rawQuery("SELECT * FROM discount WHERE item_id = \"" + itemID + "\"", null);
+//            while (curDiscount.moveToNext()) {
+//                item.setDiscount(curDiscount.getDouble(curDiscount.getColumnIndex("amount")));
+//                item.setDiscount_type(curDiscount.getString(curDiscount.getColumnIndex("type")));
+//            }
+//            itemArrayList.add(item);
+//        }
+//        cur.close();
+//        database.setTransactionSuccessful();
+//        database.endTransaction();
+//        return itemArrayList;
+//    }
+
     private ArrayList<Category> itemDataFromDB(String category_id) { // getting item from database
         database.beginTransaction();
         ArrayList<Category> itemArrayList = new ArrayList<>();
-        Cursor cur = database.rawQuery("SELECT * FROM item WHERE category_id = \"" + category_id + "\"", null);
-        while (cur.moveToNext()) {
+        Cursor cur1 = database.rawQuery("SELECT * FROM item WHERE category_id = \"" + category_id + "\" and has_contiment = " + 1 + " and isdefault=" + 1, null);
+        try {
+            while (cur1.moveToNext()) {
+                Category item = new Category();
+                String itemID = cur1.getString(cur1.getColumnIndex("id"));
+                item.setId(itemID);
+                item.setName(cur1.getString(cur1.getColumnIndex("name")));
+                item.setImage(cur1.getString(cur1.getColumnIndex("image")));
+                item.setStatus(cur1.getString(cur1.getColumnIndex("status")));
+                item.setPrice(cur1.getDouble(cur1.getColumnIndex("price")));
+                item.setCategory_id(cur1.getString(cur1.getColumnIndex("category_id")));
+                Cursor curDiscount = database.rawQuery("SELECT * FROM discount WHERE item_id = \"" + itemID + "\"", null);
+                while (curDiscount.moveToNext()) {
+                    item.setDiscount(curDiscount.getDouble(curDiscount.getColumnIndex("amount")));
+                    item.setDiscount_type(curDiscount.getString(curDiscount.getColumnIndex("type")));
+                }
+                itemArrayList.add(item);
+                Log.i("ItemArraySize", itemArrayList.size() + "");
+            }
+        } catch (Exception e) {
+            Log.e("SQL ERROR -> ", e.getMessage());
+        }
+        cur1.close();
+
+        Cursor cur2 = database.rawQuery("SELECT * FROM item WHERE category_id = \"" + category_id + "\" and has_contiment = " + 0, null);
+        while (cur2.moveToNext()) {
             Category item = new Category();
-            String itemID = cur.getString(cur.getColumnIndex("id"));
+            String itemID = cur2.getString(cur2.getColumnIndex("id"));
             item.setId(itemID);
-            item.setName(cur.getString(cur.getColumnIndex("name")));
-            item.setImage(cur.getString(cur.getColumnIndex("image")));
-            item.setStatus(cur.getString(cur.getColumnIndex("status")));
-            item.setPrice(cur.getDouble(cur.getColumnIndex("price")));
-            item.setCategory_id(cur.getString(cur.getColumnIndex("category_id")));
+            item.setName(cur2.getString(cur2.getColumnIndex("name")));
+            item.setImage(cur2.getString(cur2.getColumnIndex("image")));
+            item.setStatus(cur2.getString(cur2.getColumnIndex("status")));
+            item.setPrice(cur2.getDouble(cur2.getColumnIndex("price")));
+            item.setCategory_id(cur2.getString(cur2.getColumnIndex("category_id")));
             Cursor curDiscount = database.rawQuery("SELECT * FROM discount WHERE item_id = \"" + itemID + "\"", null);
             while (curDiscount.moveToNext()) {
                 item.setDiscount(curDiscount.getDouble(curDiscount.getColumnIndex("amount")));
                 item.setDiscount_type(curDiscount.getString(curDiscount.getColumnIndex("type")));
             }
             itemArrayList.add(item);
+            Log.i("ItemArraySize1", itemArrayList.size() + "");
         }
-        cur.close();
+
+        cur2.close();
         database.setTransactionSuccessful();
         database.endTransaction();
         return itemArrayList;
@@ -301,7 +372,7 @@ public class CategoryActivity extends ActionBarActivity {
                 item.setName(cur.getString(cur.getColumnIndex("set_menu_name")));
                 try {
                     item.setImage(cur.getString(cur.getColumnIndex("image")));
-                }catch (OutOfMemoryError outOfMemoryError){
+                } catch (OutOfMemoryError outOfMemoryError) {
                     Runtime.getRuntime().gc();
                     item.setImage(cur.getString(cur.getColumnIndex("image")));
                 }
@@ -347,7 +418,7 @@ public class CategoryActivity extends ActionBarActivity {
         database.endTransaction();
     }
 
-    private void getPromotionDataInDBforsetmenu (String setmenu_id) {
+    private void getPromotionDataInDBforsetmenu(String setmenu_id) {
         database.beginTransaction();
         String promotionID = null;
         Cursor cur = database.rawQuery("SELECT * FROM promotionItem WHERE setmenu_id = \"" + setmenu_id + "\"", null);
@@ -385,8 +456,7 @@ public class CategoryActivity extends ActionBarActivity {
             item.setName(cur.getString(cur.getColumnIndex("name")));
             try {
                 item.setImage(cur.getString(cur.getColumnIndex("image")));
-            }
-            catch (OutOfMemoryError outOfMemoryError){
+            } catch (OutOfMemoryError outOfMemoryError) {
                 Runtime.getRuntime().gc();
                 item.setImage(cur.getString(cur.getColumnIndex("image")));
             }
@@ -481,14 +551,15 @@ public class CategoryActivity extends ActionBarActivity {
             public void onResponse(Call<JsonForShowTableId> call, Response<JsonForShowTableId> response) {
                 JsonForShowTableId jsonForShowTableId = response.body();
                 download_forShow_tableIDs = jsonForShowTableId.getForShow_tableID();
-                for (Download_forShow_tableID download_forShow_tableID : download_forShow_tableIDs){
+                for (Download_forShow_tableID download_forShow_tableID : download_forShow_tableIDs) {
                     TABLE_ID = download_forShow_tableID.getTable_id();
                 }
             }
+
             @SuppressLint("LongLogTag")
             @Override
             public void onFailure(Call<JsonForShowTableId> call, Throwable t) {
-                    Log.i("Error At Inserting TableID","?!?!?!?!?!?!?");
+                Log.i("Error At Inserting TableID", "?!?!?!?!?!?!?");
             }
         });
         RequestInterface requestInterfaceforroom = retrofit.create(RequestInterface.class);
@@ -498,13 +569,14 @@ public class CategoryActivity extends ActionBarActivity {
             public void onResponse(Call<JsonForShowRoomId> call, Response<JsonForShowRoomId> response) {
                 JsonForShowRoomId jsonForShowRoomId = response.body();
                 download_forShow_roomIDs = jsonForShowRoomId.getForShow_roomID();
-                for (Download_forShow_roomID download_forShow_roomID : download_forShow_roomIDs){
+                for (Download_forShow_roomID download_forShow_roomID : download_forShow_roomIDs) {
                     ROOM_ID = download_forShow_roomID.getRoom_id();
                 }
             }
+
             @Override
             public void onFailure(Call<JsonForShowRoomId> call, Throwable t) {
-                Log.i("Error At Inserting RoomID","?!?!?!?!?!?!?");
+                Log.i("Error At Inserting RoomID", "?!?!?!?!?!?!?");
             }
         });
         RequestInterface requestInterfacefororder = retrofit.create(RequestInterface.class);
@@ -517,14 +589,14 @@ public class CategoryActivity extends ActionBarActivity {
         try {
             jsonResponseforInvoiceDetail = callfororder.execute().body();
             ArrayList<Download_ForInvoiceDetail> Download_ForInvoiceDetail = jsonResponseforInvoiceDetail.getDownload_forInvoiceDetailArrayList();
-            for (Download_ForInvoiceDetail download_forInvoiceDetail : Download_ForInvoiceDetail){
+            for (Download_ForInvoiceDetail download_forInvoiceDetail : Download_ForInvoiceDetail) {
                 String takeiddd = download_forInvoiceDetail.getTakeId();
                 ArrayList<Download_ForInvoiveItemDetail> Download_ForInvoiceItemDetailArrayList = download_forInvoiceDetail.getForInvoiveItemDetail();
                 categoryItemList.clear();
-                for(Download_ForInvoiveItemDetail download_forInvoiveItemDetail : Download_ForInvoiceItemDetailArrayList){
-                    Log.i("itemdetailArrayListsiezzze",Download_ForInvoiceItemDetailArrayList.size()+"");
+                for (Download_ForInvoiveItemDetail download_forInvoiveItemDetail : Download_ForInvoiceItemDetailArrayList) {
+                    Log.i("itemdetailArrayListsiezzze", Download_ForInvoiceItemDetailArrayList.size() + "");
                     Category_Item category_item = new Category_Item();
-                    if (Integer.parseInt(download_forInvoiveItemDetail.getItemId())== 0) {
+                    if (Integer.parseInt(download_forInvoiveItemDetail.getItemId()) == 0) {
                         category_item.setSetid(download_forInvoiveItemDetail.getSetmenuId());
                         SetMenuName = getSetMenuName(download_forInvoiveItemDetail.getSetmenuId());
                         category_item.setItemName(SetMenuName);
@@ -537,7 +609,7 @@ public class CategoryActivity extends ActionBarActivity {
                         category_item.setSetid(null);
                     }
                     category_item.setTakeid(takeiddd);
-                    if(takeiddd.equals("1") ){
+                    if (takeiddd.equals("1")) {
                         TAKE_AWAY = "take";
                     }
                     category_item.setTakeAway(settakeitemID(download_forInvoiveItemDetail.getTake_item()));
@@ -581,15 +653,15 @@ public class CategoryActivity extends ActionBarActivity {
                             }
                             addOnArrayList.add(newAddOn);
                         }
-                   }
+                    }
                     category_item.setCategoryId(category_id);
                     category_item.setAddOnArrayList(addOnArrayList);
-                        categoryItemList.add(category_item);
+                    categoryItemList.add(category_item);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
-            Log.i("Error At getvoucherdetail","!?!?!?!?!?!");
+            Log.i("Error At getvoucherdetail", "!?!?!?!?!?!");
         }
     }
 
@@ -658,7 +730,7 @@ public class CategoryActivity extends ActionBarActivity {
             taxAmt = cur.getDouble(cur.getColumnIndex("tax"));
             serviceAmt = cur.getDouble(cur.getColumnIndex("service"));
             roomchargeAmt = cur.getDouble(cur.getColumnIndex("room_charge"));
-           // Log.i("roomchargeAmtroomchargeAmt",roomchargeAmt+"");
+            // Log.i("roomchargeAmtroomchargeAmt",roomchargeAmt+"");
         }
         cur.close();
         database.setTransactionSuccessful();
@@ -700,13 +772,13 @@ public class CategoryActivity extends ActionBarActivity {
                 }
                 try {
                     if (category_item.getSetid() == "null" || category_item.getSetid() == null) {
-                        detail_object.put("item_id",category_item.getId());
+                        detail_object.put("item_id", category_item.getId());
                         detail_object.put("set_id", "null");
                         JSONArray setItemArray = new JSONArray();
                         detail_object.put("set_item", setItemArray);
                         Log.e("ITEM_ID >>>>", category_item.getId() + "");
                     } else {
-                        detail_object.put("set_id",category_item.getSetid() );
+                        detail_object.put("set_id", category_item.getSetid());
                         detail_object.put("item_id", "null");
                         JSONArray setItemJsonArray = new JSONArray();
                         ArrayList<SetItem> setItemArrayList = new ArrayList<>();
@@ -728,7 +800,7 @@ public class CategoryActivity extends ActionBarActivity {
                         detail_object.put("set_item", setItemJsonArray);
                         Log.e("SetID", category_item.getSetid() + "");
                     }
-                    detail_object.put("take_item", gettakeitemID(category_item.getTakeAway()) );
+                    detail_object.put("take_item", gettakeitemID(category_item.getTakeAway()));
                     detail_object.put("order_detail_id", VOUNCHER_ID + order_detail_id);
                     detail_object.put("discount_amount", category_item.getDiscount() + "");
                     detail_object.put("promotion_id", category_item.getPromotion_id() + "");
@@ -759,18 +831,17 @@ public class CategoryActivity extends ActionBarActivity {
             orderjsonObject.put("total_price", tvalue);
             orderjsonObject.put("extra_price", totalExtraAmt);
             orderjsonObject.put("discount_amount", totalDisAmt);
-            if (ROOM_ID != null /*|| !ROOM_ID.equals("")*/){
+            if (ROOM_ID != null /*|| !ROOM_ID.equals("")*/) {
 
-                totalcharge =(serviceamont + roomchargeAmt);
-                orderjsonObject.put("service_amount",totalcharge );
-                Log.i("totalcharge111",totalcharge+"");
-            }
-            else {
+                totalcharge = (serviceamont + roomchargeAmt);
+                orderjsonObject.put("service_amount", totalcharge);
+                Log.i("totalcharge111", totalcharge + "");
+            } else {
                 totalcharge = serviceamont;
                 orderjsonObject.put("service_amount", serviceamont);
             }
             orderjsonObject.put("tax_amount", taxamount);
-            netcharge = (tvalue+totalcharge+taxamount);
+            netcharge = (tvalue + totalcharge + taxamount);
 
             orderjsonObject.put("net_price", netcharge);
             orderjsonObject.put("order_detail", orderDetailJsonArray);
@@ -801,6 +872,7 @@ public class CategoryActivity extends ActionBarActivity {
                     callUploadDialog("Vouncher add reply null.");
                 }
             }
+
             @Override
             public void onFailure(Call<Success> call, Throwable t) {
                 Log.d("Login", t.getMessage());
@@ -821,7 +893,7 @@ public class CategoryActivity extends ActionBarActivity {
         cv.put("net_amount", Double.parseDouble(tnetPriceTxt.getText().toString().trim().replaceAll(",", "")));
         cv.put("total_extra", totalExtraAmt);
         cv.put("order_time", todayDate);
-       for (int i = 0; i < categoryItemList.size(); i++) {
+        for (int i = 0; i < categoryItemList.size(); i++) {
             Category_Item category_item = categoryItemList.get(i);
             if (category_item.getItem_check().equals("1")) {
                 String order_detail_id = String.valueOf(i + 1);
@@ -851,7 +923,7 @@ public class CategoryActivity extends ActionBarActivity {
                         contentValues.put("extra_id", addOn.getId());
                         contentValues.put("quantity", "1");
                         contentValues.put("amount", addOn.getPrice());
-                       }
+                    }
                 }
                 content.put("exception", category_item.getUserRemark());
                 content.put("discount_id", category_item.getDiscount_id());
@@ -884,8 +956,6 @@ public class CategoryActivity extends ActionBarActivity {
         database.endTransaction();
         return backend_activate_key;
     }
-
-
 
     private void loadCategoryJson() {
         callDialog("Updating category data....");
@@ -937,6 +1007,7 @@ public class CategoryActivity extends ActionBarActivity {
                     callUploadDialog("Category data reply null!");
                 }
             }
+
             @Override
             public void onFailure(Call<JSONResponseCategory> call, Throwable t) {
                 mProgressDialog.dismiss();
@@ -967,6 +1038,10 @@ public class CategoryActivity extends ActionBarActivity {
                         cv.put("price", download_item.getPrice());
                         cv.put("status", download_item.getStatus());
                         cv.put("category_id", download_item.getCategory_id());
+                        cv.put("contiment_id", download_item.getContiment_id());
+                        cv.put("group_id", download_item.getGroup_id());
+                        cv.put("isdefault", download_item.getIsdefault());
+                        cv.put("has_contiment", download_item.getHas_contiment());
                         database.insert("item", null, cv);
                     }
                     database.setTransactionSuccessful();
@@ -978,6 +1053,7 @@ public class CategoryActivity extends ActionBarActivity {
                     callUploadDialog("Item data is null!");
                 }
             }
+
             @Override
             public void onFailure(Call<JSONResponseItem> call, Throwable t) {
                 mProgressDialog.dismiss();
@@ -985,6 +1061,51 @@ public class CategoryActivity extends ActionBarActivity {
                 Log.d("ErrorItem", t.getMessage());
             }
         });
+    }
+
+    private void loadContimentJson() {
+
+        callDialog("Updating contiment data....");
+        RequestInterface request = retrofit.create(RequestInterface.class);
+        Call<JSONResponseContiment> call = request.getContiment(getActivateKeyFromDB());
+        call.enqueue(new Callback<JSONResponseContiment>() {
+            @Override
+            public void onResponse(Call<JSONResponseContiment> call, Response<JSONResponseContiment> response) {
+
+                try {
+
+                    JSONResponseContiment jsonResponse = response.body();
+                    mProgressDialog.dismiss();
+                    deleteTableVersion("contiment");
+                    download_contimentArrayList = new ArrayList<>(jsonResponse.getContiments());
+                    database.beginTransaction();
+                    for (Download_Contiment download_contiment : download_contimentArrayList) {
+
+                        ContentValues cv = new ContentValues();
+                        cv.put("id", download_contiment.getId());
+                        cv.put("name", download_contiment.getName());
+                        database.insert("contiment", null, cv);
+
+                    }
+                    database.setTransactionSuccessful();
+                    database.endTransaction();
+
+                } catch (Exception e) {
+
+                    e.printStackTrace();
+                    mProgressDialog.dismiss();
+                    callUploadDialog("Contiment data is null!");
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<JSONResponseContiment> call, Throwable t) {
+
+            }
+        });
+
     }
 
     private void loadSetMenuJson() {
@@ -1018,6 +1139,7 @@ public class CategoryActivity extends ActionBarActivity {
                     callUploadDialog("Setmenu is null.");
                 }
             }
+
             @Override
             public void onFailure(Call<JSONResponseSetMenu> call, Throwable t) {
                 mProgressDialog.dismiss();
@@ -1056,6 +1178,7 @@ public class CategoryActivity extends ActionBarActivity {
                     callUploadDialog("Setmenu is null.");
                 }
             }
+
             @Override
             public void onFailure(Call<JSONResponseSetItem> call, Throwable t) {
                 mProgressDialog.dismiss();
@@ -1097,6 +1220,7 @@ public class CategoryActivity extends ActionBarActivity {
                 }
 
             }
+
             @Override
             public void onFailure(Call<JSONResponseAddOn> call, Throwable t) {
                 mProgressDialog.dismiss();
@@ -1128,6 +1252,7 @@ public class CategoryActivity extends ActionBarActivity {
                     }
                     database.setTransactionSuccessful();
                     database.endTransaction();
+                    loadContimentJson();
                 } catch (Exception e) {
                     e.printStackTrace();
                     mProgressDialog.dismiss();
@@ -1135,6 +1260,7 @@ public class CategoryActivity extends ActionBarActivity {
                 }
 
             }
+
             @Override
             public void onFailure(Call<JSONResponseDiscount> call, Throwable t) {
                 mProgressDialog.dismiss();
@@ -1166,7 +1292,7 @@ public class CategoryActivity extends ActionBarActivity {
                 .client(client)
                 .build();
         Log.e("VoucherID", VOUNCHER_ID + "");
-        if(VOUNCHER_ID != null) {
+        if (VOUNCHER_ID != null) {
             getVouncherDetailData();
         }
         getConfigData();
@@ -1189,17 +1315,16 @@ public class CategoryActivity extends ActionBarActivity {
                     if (itemName.equals(parent.getItemAtPosition(position).toString())) {
                         Category_Item category_item = new Category_Item();
                         category_item.setId(searchList.getId());
-                        if (searchList.getCategory_id().equals("set_menu")){
+                        if (searchList.getCategory_id().equals("set_menu")) {
                             category_item.setSetid(searchList.getId());
                         }
                         category_item.setItemName(searchList.getName());
                         category_item.setQuantity(searchList.getQuantity());
                         category_item.setPrice(searchList.getPrice());
                         category_item.setStatusid("1");
-                        if(TAKE_AWAY == "take") {
+                        if (TAKE_AWAY == "take") {
                             category_item.setTakeid("1");
-                        }
-                        else {
+                        } else {
                             category_item.setTakeid("0");
                         }
                         category_item.setDiscount(searchList.getDiscount());
@@ -1218,11 +1343,10 @@ public class CategoryActivity extends ActionBarActivity {
                         category_item.setDiscount_id(searchList.getDiscount_id());
                         category_item.setExtraPrice(searchList.getExtraPrice());
                         category_item.setAmount(searchList.getAmount());
-                        if (TAKE_AWAY == "take"){
+                        if (TAKE_AWAY == "take") {
                             category_item.setTakeAway(true);
                             category_item.setOrder_type_id("2");
-                        }
-                        else {
+                        } else {
                             category_item.setTakeAway(false);
                             category_item.setOrder_type_id("1");
                         }
@@ -1371,11 +1495,13 @@ public class CategoryActivity extends ActionBarActivity {
         private int spanCount;
         private int spacing;
         private boolean includeEdge;
+
         public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
             this.spanCount = spanCount;
             this.spacing = spacing;
             this.includeEdge = includeEdge;
         }
+
         @Override
         public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
             int position = parent.getChildAdapterPosition(view); // item position
@@ -1420,16 +1546,18 @@ public class CategoryActivity extends ActionBarActivity {
 
     private class CategoryItemAdapter extends ArrayAdapter<Category_Item> {
         public final Activity context;
+
         public CategoryItemAdapter(Activity context) {
             super(context, R.layout.category_list_item, categoryItemList);
-            Log.i("categoryItemList",categoryItemList.size()+"");
+            Log.i("categoryItemList", categoryItemList.size() + "");
             this.context = context;
         }
+
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
             LayoutInflater layoutInflater = context.getLayoutInflater();
             View view = layoutInflater.inflate(R.layout.category_list_item, null, true);
-            TextView itemNameTxt = (TextView) view.findViewById(R.id.item_name_txt);
+            final TextView itemNameTxt = (TextView) view.findViewById(R.id.item_name_txt);
             Button quantityBtn = (Button) view.findViewById(R.id.quantity_btn);
             TextView priceTxt = (TextView) view.findViewById(R.id.price_txt);
             TextView discountTxt = (TextView) view.findViewById(R.id.discount_txt);
@@ -1442,7 +1570,126 @@ public class CategoryActivity extends ActionBarActivity {
             final Category_Item categoryItem = categoryItemList.get(position);
             String takeiddd = categoryItem.getTakeid();
             String statusiddd = categoryItem.getStatusid();
-            if (TAKE_AWAY == "table" || TAKE_AWAY == "room"){     // for from room and table including new invoice and exiting invoice
+
+            /***
+             * PhoneLinAung 11.9.17 Start
+             */
+            itemNameTxt.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    contimentforItemSelectList.clear();
+
+                    String item_id = categoryItemList.get(position).getId();
+
+                    Cursor cursor = database.rawQuery("SELECT * FROM item where id='" + item_id + "'", null);
+
+                    while (cursor.moveToNext()){
+
+                        int has_contiment=cursor.getInt(cursor.getColumnIndex("has_contiment"));
+
+                        if (has_contiment==1){
+
+                            group_id = cursor.getString(cursor.getColumnIndex("group_id"));
+
+                            Cursor cursor1 = database.rawQuery("SELECT * FROM item WHERE group_id='" + group_id + "'", null);
+
+                            while (cursor1.moveToNext()) {
+                                contimet = new ContimentforItemSelect();
+                                String name = cursor1.getString(cursor1.getColumnIndex("name"));
+                                contiment_id = cursor1.getInt(cursor1.getColumnIndex("contiment_id"));
+
+                                Cursor cursor2 = database.rawQuery("SELECT * FROM contiment where id=" + contiment_id, null);
+
+                                while (cursor2.moveToNext()) {
+
+                                    contiment_name = cursor2.getString(cursor2.getColumnIndex("name"));
+
+                                }
+                                contimet.setContiment_id(contiment_id);
+                                contimet.setContiment_name(contiment_name);
+                                contimentforItemSelectList.add(contimet);
+                            }
+
+                            Toast.makeText(CategoryActivity.this, categoryItem.getItemName(), Toast.LENGTH_SHORT).show();
+                            final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
+                                    .setPositiveButton(R.string.invitation_ok, null)
+                                    .setNegativeButton(R.string.invitation_cancel, null)
+                                    .create();
+                            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                            final View view1 = layoutInflater.inflate(R.layout.category_contiment_dialog, null);
+
+                            contimentnameList.clear();
+                            for (ContimentforItemSelect c : contimentforItemSelectList) {
+
+                                contimentnameList.add(c.getContiment_name());
+
+                            }
+                            final Spinner contimentSpinner = (Spinner) view1.findViewById(R.id.contimentSpinner);
+                            ArrayAdapter<String> stringAdapter = new ArrayAdapter<String>(CategoryActivity.this, android.R.layout.simple_spinner_item, contimentnameList);
+                            stringAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            contimentSpinner.setAdapter(stringAdapter);
+                            builder.setView(view1);
+                            builder.setTitle(categoryItem.getItemName());
+                            builder.setMessage("Choose ContimentforItemSelect");
+                            builder.show();
+
+                            contimentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                                    String selected_ContimentName = contimentnameList.get(i);
+                                    Toast.makeText(CategoryActivity.this, selected_ContimentName, Toast.LENGTH_SHORT).show();
+
+                                    // itemNameTxt.setText(selected_ContimentName + categoryItem.getItemName());
+
+                                    for (i = 0; i < contimentnameList.size(); i++) {
+
+                                        if (selected_ContimentName.equals(contimentforItemSelectList.get(i).getContiment_name())) {
+
+                                            selected_Contiment_id = contimentforItemSelectList.get(i).getContiment_id();
+
+                                            Cursor cursor = database.rawQuery("SELECT * FROM item where contiment_id='" + selected_Contiment_id + "' and group_id='" + group_id + "'", null);
+
+                                            while (cursor.moveToNext()) {
+
+                                                String selected_item_id = cursor.getString(cursor.getColumnIndex("id"));
+                                                categoryItem.setId(selected_item_id);
+                                                String selectd_itemname = cursor.getString(cursor.getColumnIndex("name"));
+                                                itemNameTxt.setText(selected_ContimentName+" "+selectd_itemname);
+
+                                            }
+
+                                        }
+
+                                    }
+
+
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                                }
+                            });
+
+
+                        }else {
+
+                            Toast.makeText(CategoryActivity.this, "This item has no contiment", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                    }
+
+                }
+            });
+
+            /***
+             * PhoneLinAung 12.9.17 End
+             */
+
+            if (TAKE_AWAY == "table" || TAKE_AWAY == "room") {     // for from room and table including new invoice and exiting invoice
                 if ((statusiddd == "6" || statusiddd.equals("6")) || (statusiddd == "7" || statusiddd.equals("7"))) {
                     itemNameTxt.setText(categoryItem.getItemName());
                     itemNameTxt.setPaintFlags(itemNameTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
@@ -1458,14 +1705,13 @@ public class CategoryActivity extends ActionBarActivity {
                     amountTxt.setPaintFlags(amountTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
                     takeAwayCheck.setEnabled(false);
 
-                }
-                else {
+                } else {
                     itemNameTxt.setText(categoryItem.getItemName());
                     quantityBtn.setText(categoryItem.getQuantity() + "");
                     priceTxt.setText(commaSepFormat.format(categoryItem.getPrice()));
                     discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
                 }
-                if ( ADD_INVOICE.equals("NULL") || ADD_INVOICE == null ){
+                if (ADD_INVOICE.equals("NULL") || ADD_INVOICE == null) {
                     clearBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -1528,11 +1774,9 @@ public class CategoryActivity extends ActionBarActivity {
                     });
 
 
-                }
-
-                else if (ADD_INVOICE == "EDITING_INVOICE" || ADD_INVOICE.equals("EDITING_INVOICE") || ADD_INVOICE.equals("status1") ) {
+                } else if (ADD_INVOICE == "EDITING_INVOICE" || ADD_INVOICE.equals("EDITING_INVOICE") || ADD_INVOICE.equals("status1")) {
                     clearBtn.setEnabled(false);
-                    clearBtn.setColorFilter(Color.argb(220,220,220,220));
+                    clearBtn.setColorFilter(Color.argb(220, 220, 220, 220));
                     clearBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -1569,10 +1813,10 @@ public class CategoryActivity extends ActionBarActivity {
                 double teValue = 0;
                 double tdValue = 0;
                 for (Category_Item catItem : categoryItemList) {
-                    Log.i("ggggggggg>>>>>>>>",catItem.getStatusid()+"");
+                    Log.i("ggggggggg>>>>>>>>", catItem.getStatusid() + "");
                     if ((catItem.getStatusid() == "6" || catItem.getStatusid().equals("6")) || (catItem.getStatusid() == "7" || catItem.getStatusid().equals("7"))) {
-                        Log.i("ggwp","ggggggggg>>>>>>>>");
-                    } else if(catItem.getStatusid().equals("1") || catItem.getStatusid().equals("2") || catItem.getStatusid().equals("3") || catItem.getStatusid().equals("4") || catItem.getStatusid().equals("5") ) {
+                        Log.i("ggwp", "ggggggggg>>>>>>>>");
+                    } else if (catItem.getStatusid().equals("1") || catItem.getStatusid().equals("2") || catItem.getStatusid().equals("3") || catItem.getStatusid().equals("4") || catItem.getStatusid().equals("5")) {
                         totalValue += catItem.getTotalAmount();
                         teValue += catItem.getTotalExtraPrice();
                         tdValue += catItem.getTotalDiscount();
@@ -1612,11 +1856,10 @@ public class CategoryActivity extends ActionBarActivity {
                                         } else {
                                             int qty = Integer.parseInt(qtyEdit.getText().toString());
                                             String idid;
-                                            if (categoryItem.getId().equals(null)){
+                                            if (categoryItem.getId().equals(null)) {
                                                 idid = categoryItem.getSetid();
                                                 getPromotionDataInDBforsetmenu(idid);
-                                            }
-                                            else {
+                                            } else {
                                                 idid = categoryItem.getId();
                                                 getPromotionDataInDB(/*categoryItem.getId()*/ idid);
                                             }
@@ -1645,10 +1888,9 @@ public class CategoryActivity extends ActionBarActivity {
                                                 }
                                             }
                                             Log.e("ItemID", categoryItem.getId());
-                                            if (qty == 0){
+                                            if (qty == 0) {
                                                 qtyEdit.setError("Quantity is required.");
-                                            }
-                                            else{
+                                            } else {
                                                 categoryItem.setQuantity(qty);
                                             }
 
@@ -1715,9 +1957,8 @@ public class CategoryActivity extends ActionBarActivity {
                     }
                 });
                 //ADD_INVOICE = null;
-            }
-            else {
-                 Log.i("takeaway!!!!!",TAKE_AWAY+"");      // for from  take away including new invoice and exiting invoice
+            } else {
+                Log.i("takeaway!!!!!", TAKE_AWAY + "");      // for from  take away including new invoice and exiting invoice
                 if ((statusiddd == "6" || statusiddd.equals("6")) || (statusiddd == "7" || statusiddd.equals("7"))) {
                     itemNameTxt.setText(categoryItem.getItemName());
                     itemNameTxt.setPaintFlags(itemNameTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
@@ -1732,7 +1973,7 @@ public class CategoryActivity extends ActionBarActivity {
                     amountTxt.setText(commaSepFormat.format(0));
                     amountTxt.setPaintFlags(amountTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
                     clearBtn.setEnabled(false);
-                    clearBtn.setColorFilter(Color.argb(220,220,220,220));
+                    clearBtn.setColorFilter(Color.argb(220, 220, 220, 220));
                     clearBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -1746,9 +1987,9 @@ public class CategoryActivity extends ActionBarActivity {
                     quantityBtn.setText(categoryItem.getQuantity() + "");
                     priceTxt.setText(commaSepFormat.format(categoryItem.getPrice()));
                     discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
-                    if (ADD_INVOICE == "EDITING_INVOICE" ){
+                    if (ADD_INVOICE == "EDITING_INVOICE") {
                         clearBtn.setEnabled(false);
-                        clearBtn.setColorFilter(Color.argb(220,220,220,220));
+                        clearBtn.setColorFilter(Color.argb(220, 220, 220, 220));
                         clearBtn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -1756,8 +1997,7 @@ public class CategoryActivity extends ActionBarActivity {
                                 Log.e("Can't Cancel NOW !", "Can't Cancel NOW !Can't Cancel NOW !");
                             }
                         });
-                    }
-                    else if (ADD_INVOICE == "NULL" || ADD_INVOICE == null){
+                    } else if (ADD_INVOICE == "NULL" || ADD_INVOICE == null) {
                         clearBtn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -1849,10 +2089,10 @@ public class CategoryActivity extends ActionBarActivity {
                     double teValue = 0;
                     double tdValue = 0;
                     for (Category_Item catItem : categoryItemList) {
-                        Log.i("ggggggggg>>>>>>>>",catItem.getStatusid()+"");
+                        Log.i("ggggggggg>>>>>>>>", catItem.getStatusid() + "");
                         if ((catItem.getStatusid() == "6" || catItem.getStatusid().equals("6")) || (catItem.getStatusid() == "7" || catItem.getStatusid().equals("7"))) {
-                                Log.i("ggwp","ggggggggg>>>>>>>>");
-                        } else if(catItem.getStatusid().equals("1") || catItem.getStatusid().equals("2") || catItem.getStatusid().equals("3") || catItem.getStatusid().equals("4") || catItem.getStatusid().equals("5") ) {
+                            Log.i("ggwp", "ggggggggg>>>>>>>>");
+                        } else if (catItem.getStatusid().equals("1") || catItem.getStatusid().equals("2") || catItem.getStatusid().equals("3") || catItem.getStatusid().equals("4") || catItem.getStatusid().equals("5")) {
                             totalValue += catItem.getTotalAmount();
                             teValue += catItem.getTotalExtraPrice();
                             tdValue += catItem.getTotalDiscount();
@@ -1916,10 +2156,9 @@ public class CategoryActivity extends ActionBarActivity {
                                                     }
                                                 }
                                                 //Log.e("ItemID", categoryItem.getId());
-                                                if  (qty == 0){
+                                                if (qty == 0) {
                                                     qtyEdit.setError("Quantity is required.");
-                                                }
-                                                else {
+                                                } else {
                                                     categoryItem.setQuantity(qty);
                                                 }
                                                 Log.d("Quantity", "You have entered: " + qty);
@@ -1993,11 +2232,13 @@ public class CategoryActivity extends ActionBarActivity {
     private class AddOnAdapter extends ArrayAdapter<AddOn> {
         public final Activity context;
         ArrayList<AddOn> addonarraylist;
+
         public AddOnAdapter(Activity context, ArrayList<AddOn> addonarraylist) {
             super(context, R.layout.list_view_checkbox, addonarraylist);
             this.context = context;
             this.addonarraylist = addonarraylist;
         }
+
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater layoutInflater = context.getLayoutInflater();
@@ -2023,13 +2264,16 @@ public class CategoryActivity extends ActionBarActivity {
     public class CategoryArrayAdapter extends RecyclerView.Adapter<CategoryArrayAdapter.MyViewHolder> {
         private Context mContext;
         private List<Category> albumList;
+
         public CategoryArrayAdapter(Context mContext, List<Category> albumList) {
             this.mContext = mContext;
             this.albumList = albumList;
         }
+
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public TextView title;
             public ImageView thumbnail;
+
             public MyViewHolder(View view) {
                 super(view);
                 title = (TextView) view.findViewById(R.id.title);
@@ -2037,6 +2281,9 @@ public class CategoryActivity extends ActionBarActivity {
                 thumbnail.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
+                        Toast.makeText(mContext, "Here1", Toast.LENGTH_SHORT).show();
+
                         ID = albumList.get(getPosition()).getId();
                         parent_ID = albumList.get(getPosition()).getParent_id();
                         next_ID = ID;
@@ -2092,6 +2339,7 @@ public class CategoryActivity extends ActionBarActivity {
             //holder.thumbnail.setImageBitmap(mBitmap);
             holder.title.setText(album.getName());
         }
+
         @Override
         public int getItemCount() {
             return albumList.size();
@@ -2101,9 +2349,11 @@ public class CategoryActivity extends ActionBarActivity {
     public class ItemArrayAdapter extends RecyclerView.Adapter<ItemArrayAdapter.MyViewHolder> {
         private Context mContext;
         private List<Category> itemList;
+
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public TextView title, count;
             public ImageView thumbnail, overflow;
+
             public MyViewHolder(View view) {
                 super(view);
                 title = (TextView) view.findViewById(R.id.title);
@@ -2112,12 +2362,15 @@ public class CategoryActivity extends ActionBarActivity {
                     @SuppressLint("LongLogTag")
                     @Override
                     public void onClick(View v) {
+
+                        Toast.makeText(mContext, "Here2", Toast.LENGTH_SHORT).show();
+
                         categoryTxt.setText("Item");
                         Category_Item category_item = new Category_Item();
                         category_item.setId(itemList.get(getPosition()).getId());
-                        Log.i("category_item.category_item.setId",category_item.getId()+"");
+                        Log.i("category_item.category_item.setId", category_item.getId() + "");
                         category_item.setItemName(itemList.get(getPosition()).getName());
-                        Log.i("category_item.setItemName",category_item.getItemName()+"");
+                        Log.i("category_item.setItemName", category_item.getItemName() + "");
                         category_item.setQuantity(itemList.get(getPosition()).getQuantity());
                         category_item.setPrice(itemList.get(getPosition()).getPrice());
                         String discountType = itemList.get(getPosition()).getDiscount_type();
@@ -2147,26 +2400,27 @@ public class CategoryActivity extends ActionBarActivity {
                             category_item.setTakeid("0");
                         }
                         category_item.setCategoryId(itemList.get(getPosition()).getCategory_id());
-                        if(category_item.getCategoryId().equals("set_menu"))    {
+                        if (category_item.getCategoryId().equals("set_menu")) {
                             category_item.setSetid(itemList.get(getPosition()).getId());
-                        }
-                        else {
+                        } else {
                             category_item.setSetid("null");
                         }
                         category_item.setStatusid("1");
                         String value = getAddOnID(itemList.get(getPosition()).getCategory_id());
                         category_item.setAddOnArrayList(getAddonData(value));
                         categoryItemList.add(category_item);
-                        Log.i("category_itemcategory_itemfromadapter",category_item+"");
+                        Log.i("category_itemcategory_itemfromadapter", category_item + "");
                         categoryItemAdapter.notifyDataSetChanged();
                     }
                 });
             }
         }
+
         public ItemArrayAdapter(Context mContext, List<Category> itemList) {
             this.mContext = mContext;
             this.itemList = itemList;
         }
+
         @Override
         public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(parent.getContext())
@@ -2174,6 +2428,7 @@ public class CategoryActivity extends ActionBarActivity {
 
             return new MyViewHolder(itemView);
         }
+
         @Override
         public void onBindViewHolder(final MyViewHolder holder, int position) {
             categoryTxt.setText("Item");
@@ -2193,6 +2448,7 @@ public class CategoryActivity extends ActionBarActivity {
                     .into(holder.thumbnail);
             //holder.thumbnail.setImageBitmap(mBitmap);
         }
+
         @Override
         public int getItemCount() {
             return itemList.size();
@@ -2222,92 +2478,92 @@ public class CategoryActivity extends ActionBarActivity {
             Log.e("ItemQuantity", quantity + "");
 
             //for (int i = 0; i < quantity; i++) {
-                JSONObject detail_object = new JSONObject();
-                String orderType = null;
+            JSONObject detail_object = new JSONObject();
+            String orderType = null;
 
-                if (category_item.isTakeAway() == true) {
-                    orderType = "2";
-                } else {
-                    orderType = "1";
-                }
+            if (category_item.isTakeAway() == true) {
+                orderType = "2";
+            } else {
+                orderType = "1";
+            }
 
-                try {
-                    if (category_item.getCategoryId().equals("set_menu")) {
-                        detail_object.put("set_id", category_item.getId());
-                        detail_object.put("item_id", "null");
-                        JSONArray setItemJsonArray = new JSONArray();
-                        ArrayList<SetItem> setItemArrayList = new ArrayList<>();
+            try {
+                if (category_item.getCategoryId().equals("set_menu")) {
+                    detail_object.put("set_id", category_item.getId());
+                    detail_object.put("item_id", "null");
+                    JSONArray setItemJsonArray = new JSONArray();
+                    ArrayList<SetItem> setItemArrayList = new ArrayList<>();
 
-                        setItemArrayList = getseitemdata(category_item.getId());
-                        Log.i("testttttttttt>>>>>", setItemArrayList.size() + "");
-                        for (SetItem setItem : setItemArrayList) {
-                            if (setItemArrayList != null) {
+                    setItemArrayList = getseitemdata(category_item.getId());
+                    Log.i("testttttttttt>>>>>", setItemArrayList.size() + "");
+                    for (SetItem setItem : setItemArrayList) {
+                        if (setItemArrayList != null) {
 
-                                JSONObject setitemJsonObject = new JSONObject();
-                                try {
-                                    setitemJsonObject.put("id", setItem.getId());
-                                    setitemJsonObject.put("item_id", setItem.getItem_id());
-                                    setitemJsonObject.put("item_id", setItem.getItem_id());
-                                    setitemJsonObject.put("set_menu_id", setItem.getSet_menu_id());
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                setItemJsonArray.put(setitemJsonObject);
-                            }
-                        }
-                        detail_object.put("set_item", setItemJsonArray);
-
-                        Log.e("SetID", category_item.getId() + "");
-                    } else {
-                        detail_object.put("item_id", category_item.getId());
-                        detail_object.put("set_id", "null");
-                        JSONArray setItemArray = new JSONArray();
-                        detail_object.put("set_item", setItemArray);
-                        Log.e("ITEM_ID >>>>", category_item.getId() + "");
-                    }
-                    detail_object.put("order_detail_id", order_id + String.valueOf(invoiceDetailID));
-                    double discount = category_item.getDiscount();
-                    double price = category_item.getPrice();
-                    double extraPrice = category_item.getExtraPrice();
-                    double quantityy = category_item.getQuantity();
-                    double totalAmt = ((price + extraPrice) - discount) * quantityy;
-
-                    detail_object.put("take_item",gettakeitemID(category_item.getTakeAway()) );
-                    detail_object.put("discount_amount", discount + "");
-                    detail_object.put("promotion_id", category_item.getPromotion_id() + "");
-                    detail_object.put("price", price);
-
-                    detail_object.put("quantity", category_item.getQuantity());
-                    detail_object.put("amount", totalAmt);
-                    detail_object.put("order_type_id", orderType);
-                    detail_object.put("status", "1");
-                    detail_object.put("exception", category_item.getUserRemark() + "");
-                    Log.e("AddonSize", category_item.getAddOnArrayList().size() + "");
-                    JSONArray orderExtraJsonArray = new JSONArray();
-                    for (AddOn addOn : category_item.getAddOnArrayList()) {
-                        if (addOn.isSelected() == true) {
-
-                            JSONObject extra_object = new JSONObject();
+                            JSONObject setitemJsonObject = new JSONObject();
                             try {
-                                extra_object.put("extra_id", addOn.getId());
-                                //kslllllll//
-                                extra_object.put("category_id", addOn.getCategory_id());
-                                //
-                                extra_object.put("quantity", "1");
-                                extra_object.put("amount", addOn.getPrice());
+                                setitemJsonObject.put("id", setItem.getId());
+                                setitemJsonObject.put("item_id", setItem.getItem_id());
+                                setitemJsonObject.put("item_id", setItem.getItem_id());
+                                setitemJsonObject.put("set_menu_id", setItem.getSet_menu_id());
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            orderExtraJsonArray.put(extra_object);
+                            setItemJsonArray.put(setitemJsonObject);
                         }
                     }
-                    detail_object.put("extra", orderExtraJsonArray);
+                    detail_object.put("set_item", setItemJsonArray);
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    Log.e("SetID", category_item.getId() + "");
+                } else {
+                    detail_object.put("item_id", category_item.getId());
+                    detail_object.put("set_id", "null");
+                    JSONArray setItemArray = new JSONArray();
+                    detail_object.put("set_item", setItemArray);
+                    Log.e("ITEM_ID >>>>", category_item.getId() + "");
                 }
-                orderDetailJsonArray.put(detail_object);
-                invoiceDetailID++;
+                detail_object.put("order_detail_id", order_id + String.valueOf(invoiceDetailID));
+                double discount = category_item.getDiscount();
+                double price = category_item.getPrice();
+                double extraPrice = category_item.getExtraPrice();
+                double quantityy = category_item.getQuantity();
+                double totalAmt = ((price + extraPrice) - discount) * quantityy;
+
+                detail_object.put("take_item", gettakeitemID(category_item.getTakeAway()));
+                detail_object.put("discount_amount", discount + "");
+                detail_object.put("promotion_id", category_item.getPromotion_id() + "");
+                detail_object.put("price", price);
+
+                detail_object.put("quantity", category_item.getQuantity());
+                detail_object.put("amount", totalAmt);
+                detail_object.put("order_type_id", orderType);
+                detail_object.put("status", "1");
+                detail_object.put("exception", category_item.getUserRemark() + "");
+                Log.e("AddonSize", category_item.getAddOnArrayList().size() + "");
+                JSONArray orderExtraJsonArray = new JSONArray();
+                for (AddOn addOn : category_item.getAddOnArrayList()) {
+                    if (addOn.isSelected() == true) {
+
+                        JSONObject extra_object = new JSONObject();
+                        try {
+                            extra_object.put("extra_id", addOn.getId());
+                            //kslllllll//
+                            extra_object.put("category_id", addOn.getCategory_id());
+                            //
+                            extra_object.put("quantity", "1");
+                            extra_object.put("amount", addOn.getPrice());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        orderExtraJsonArray.put(extra_object);
+                    }
+                }
+                detail_object.put("extra", orderExtraJsonArray);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            orderDetailJsonArray.put(detail_object);
+            invoiceDetailID++;
             //}
         }
         Log.d("OrderList", makeOrderID());
@@ -2344,6 +2600,7 @@ public class CategoryActivity extends ActionBarActivity {
             double totalcharge = 0;
             double netcharge;
             orderjsonObject.put("order_id", order_id);
+            orderjsonObject.put("order_status", 1);
             orderjsonObject.put("user_id", WAITER_ID);
             orderjsonObject.put("order_table", tableArray);
             orderjsonObject.put("order_room", roomArray);
@@ -2356,24 +2613,24 @@ public class CategoryActivity extends ActionBarActivity {
             orderjsonObject.put("total_price", tvalue);
             orderjsonObject.put("extra_price", totalExtraAmt);
             orderjsonObject.put("discount_amount", totalDisAmt);
-            if (ROOM_ID != null /*|| !ROOM_ID.equals("")*/){
+            if (ROOM_ID != null /*|| !ROOM_ID.equals("")*/) {
 
-                totalcharge =(service_value + roomchargeAmt);
-                orderjsonObject.put("service_amount",totalcharge );
-                Log.i("totalcharge111",totalcharge+"");
-            }
-            else {
+                totalcharge = (service_value + roomchargeAmt);
+                orderjsonObject.put("service_amount", totalcharge);
+                Log.i("totalcharge111", totalcharge + "");
+            } else {
                 totalcharge = service_value;
                 orderjsonObject.put("service_amount", totalcharge);
             }
             orderjsonObject.put("tax_amount", tax_value);
             orderjsonObject.put("order_detail", orderDetailJsonArray);
-            netcharge = (tvalue+totalcharge+tax_value);
+            netcharge = (tvalue + totalcharge + tax_value);
             orderjsonObject.put("net_price", netcharge);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         jsonArray.put(orderjsonObject);
+        Log.i("orderjsonObject", orderjsonObject + "");
         Log.e("OrderJson", jsonArray + "");
 
         callDialog("Uploading order data....");
@@ -2507,23 +2764,21 @@ public class CategoryActivity extends ActionBarActivity {
         database.endTransaction();
     }
 
-    private Integer gettakeitemID(Boolean takeID ){
+    private Integer gettakeitemID(Boolean takeID) {
         Integer TakeItemID;
-        if (takeID == true){
+        if (takeID == true) {
             TakeItemID = 1;
-        }
-        else {
+        } else {
             TakeItemID = 0;
         }
         return TakeItemID;
     }
 
-    private Boolean settakeitemID(Integer takeID ){
+    private Boolean settakeitemID(Integer takeID) {
         Boolean TakeItemID;
-        if (takeID == 1){
+        if (takeID == 1) {
             TakeItemID = true;
-        }
-        else {
+        } else {
             TakeItemID = false;
         }
         return TakeItemID;
@@ -2537,7 +2792,7 @@ public class CategoryActivity extends ActionBarActivity {
             try {
                 product.put("booking_id", "");
                 product.put("status", "0");
-                product.put("table_id", TABLE_ID+ "");
+                product.put("table_id", TABLE_ID + "");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -2556,9 +2811,10 @@ public class CategoryActivity extends ActionBarActivity {
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Log.d("fail!!","");
+                        Log.d("fail!!", "");
                     }
                 }
+
                 @Override
                 public void onFailure(Call<Success> call, Throwable t) {
                     Log.d("TableStatuscatt", t.getMessage());
@@ -2566,8 +2822,7 @@ public class CategoryActivity extends ActionBarActivity {
             });
             startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
             finish();
-        }
-        else if (check_check.equals("room")){
+        } else if (check_check.equals("room")) {
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put("room_id", ROOM_ID + "");
@@ -2590,9 +2845,10 @@ public class CategoryActivity extends ActionBarActivity {
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Log.d("fail!!","");
+                        Log.d("fail!!", "");
                     }
                 }
+
                 @Override
                 public void onFailure(Call<Success> call, Throwable t) {
                     Log.d("TableStatuscatt", t.getMessage());
@@ -2600,14 +2856,11 @@ public class CategoryActivity extends ActionBarActivity {
             });
             startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
             finish();
-        }
-        else {
+        } else {
             check_check = "null";
             startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
             finish();
         }
-
-
 
 
     }

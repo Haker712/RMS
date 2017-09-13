@@ -99,13 +99,14 @@ public class MainActivity extends Activity {
     //public static String URL = "http://192.168.11.180:8080";
     //public static String URL = "http://192.168.11.57:8900";
     //public static String URL = "http://192.168.195.1:8900";
-    //public static String URL = "http://192.168.11.201:8080";
+    public static String URL = "http://192.168.11.201:8080";
+    //public static String URL = "http://192.168.7.176:8080";
 
-    //public static String URL = "http://192.168.137.1:8080";
+  //  public static String URL = "http://192.168.137.1:8080";
 
 
-   //public static String URL = "http://10.42.0.1:8080";
-    public static String URL = "http://192.168.7.175:8080";
+   // public static String URL = "http://10.42.0.1:8080";
+    // public static String URL = "http://192.168.7.175:8080";
 
     SharedPreferences sharedpreferences;
     public static final String LOGIN_PREFERENCES = "Login";
@@ -142,8 +143,7 @@ public class MainActivity extends Activity {
                     Toast.makeText(MainActivity.this, "Successfully", Toast.LENGTH_LONG).show();
                 }
             });
-        } else
-        {
+        } else {
             activateLayout.setVisibility(View.GONE);
             loginLayout.setVisibility(View.VISIBLE);
             nameTxt.setText("User Login");
@@ -265,7 +265,7 @@ public class MainActivity extends Activity {
                 if (hasCategoryDataInDb()) {
                     callDialog("User Login....");
                     RequestInterface request = retrofit.create(RequestInterface.class);
-                     Call<Login> call = request.createTask("Phyoe Lay", "11111111", getActivateKeyFromDB());
+                    Call<Login> call = request.createTask("Phyoe Lay", "admin123", getActivateKeyFromDB());
                     //Call<Login> call = request.createTask(usernameEdit.getText().toString(), passwordEdit.getText().toString() , getActivateKeyFromDB());
                     call.enqueue(new Callback<Login>() {
                         @Override
@@ -316,6 +316,7 @@ public class MainActivity extends Activity {
                                 callUploadDialog("Login data is null.");
                             }
                         }
+
                         @Override
                         public void onFailure(Call<Login> call, Throwable t) {
                             progressDialog.dismiss();
@@ -402,6 +403,7 @@ public class MainActivity extends Activity {
                     callUploadDialog("Table data is null.");
                 }
             }
+
             @Override
             public void onFailure(Call<JSONResponseTableVersion> call, Throwable t) {
                 if (value == 0) {
@@ -705,6 +707,7 @@ public class MainActivity extends Activity {
                     callUploadDialog(response.message());
                 }
             }
+
             @Override
             public void onFailure(Call<JsonResponseSyncs> call, Throwable t) {
                 Log.d("Login", t.getMessage());
@@ -746,6 +749,7 @@ public class MainActivity extends Activity {
                     callUploadDialog("Discount data is null.");
                 }
             }
+
             @Override
             public void onFailure(Call<JSONResponseDiscount> call, Throwable t) {
                 progressDialog.dismiss();

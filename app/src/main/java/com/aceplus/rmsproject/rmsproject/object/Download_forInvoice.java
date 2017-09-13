@@ -29,6 +29,9 @@ public class Download_forInvoice {
     @SerializedName("all_total_amount")
     @Expose
     private String allTotalAmount;
+    @SerializedName("status")
+    @Expose
+    private String status;
 
     public String getId() {
         return id;
@@ -84,5 +87,13 @@ public class Download_forInvoice {
 
     public String getTotal_extra_price() {
         return total_extra_price;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

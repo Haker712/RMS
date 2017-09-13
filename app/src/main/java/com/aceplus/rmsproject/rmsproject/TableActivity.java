@@ -390,12 +390,12 @@ public class TableActivity extends ActionBarActivity {
                                                int position, long id) {
                         String fromTableName = tableName.get(position);
                         Toast.makeText(TableActivity.this, fromTableName, Toast.LENGTH_SHORT).show();
-                        for (int i = 0; i <  bookingTableArrayList.size(); i++) {
+                        for (int i = 0; i < bookingTableArrayList.size(); i++) {
 
-                                Log.i("TableNames", bookingTableArrayList.get(i).getTable_no());
-                            if (fromTableName.equals( bookingTableArrayList.get(i).getTable_no())){
-                                Toast.makeText(TableActivity.this,bookingTableArrayList.get(i).getTableID(), Toast.LENGTH_SHORT).show();
-                                fromTable=bookingTableArrayList.get(i).getTableID();
+                            Log.i("TableNames", bookingTableArrayList.get(i).getTable_no());
+                            if (fromTableName.equals(bookingTableArrayList.get(i).getTable_no())) {
+                                Toast.makeText(TableActivity.this, bookingTableArrayList.get(i).getTableID(), Toast.LENGTH_SHORT).show();
+                                fromTable = bookingTableArrayList.get(i).getTableID();
                             }
 
                         }
@@ -448,9 +448,11 @@ public class TableActivity extends ActionBarActivity {
                                         String arg[] = {fromTable};
                                         ContentValues cv = new ContentValues();
                                         cv.put("table_id", toTable);
-                                        bookingTableArrayList.get(fromPos).setTableService("0");
-                                        bookingTableArrayList.get(Integer.parseInt(toTable) - 1).setTableService("1");
-                                        adapter.notifyDataSetChanged();
+//                                        bookingTableArrayList.get(fromPos).setTableService("0");
+//                                        Log.i("TableServiceStatus",bookingTableArrayList.get(fromPos).getTableService());
+//                                        bookingTableArrayList.get(Integer.parseInt(toTable) - 1).setTableService("1");
+//                                        Log.i("TableServiceStatus",bookingTableArrayList.get(Integer.parseInt(toTable) - 1).getTableService());
+//                                        adapter.notifyDataSetChanged();
                                         JSONObject tableTransferJson = new JSONObject();
                                         try {
                                             tableTransferJson.put("transfer_from_table_id", fromTable);
@@ -555,7 +557,7 @@ public class TableActivity extends ActionBarActivity {
                         for (BookingTable book : bookingTableArrayList) {
                             if (book.isTable_check() == true) {
                                 groupTableID = book.getTableID();
-                                Log.e("Booking_ID", book.getTableID());
+                                Log.e("Booking_ID", groupTableID);
                                 groupTableArrayList.add(book.getTableID());
                                 JSONObject product = new JSONObject();
                                 try {
@@ -708,6 +710,14 @@ public class TableActivity extends ActionBarActivity {
             holder.groupCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    table.setTable_check(isChecked);
+                    try {
+                        adapter.notifyItemChanged(position);
+                    } catch (Exception e) {
+                        Log.e("onCheckChanged", e.getMessage());
+                    }
+
+
                     if (table.getTableService() == "1") {
                         onBind = false;
                     } else {
@@ -725,6 +735,7 @@ public class TableActivity extends ActionBarActivity {
             holder.backgroundLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {  // when you enter the table !
+
                     if (table.getTableService().equals("1")) {
                         final JSONArray tableListJsonArray = new JSONArray();
                         JSONObject product = new JSONObject();

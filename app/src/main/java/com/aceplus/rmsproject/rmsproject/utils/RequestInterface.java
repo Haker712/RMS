@@ -7,6 +7,7 @@ import com.aceplus.rmsproject.rmsproject.object.JSONResponseAddOn;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseBooking;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseCategory;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseConfig;
+import com.aceplus.rmsproject.rmsproject.object.JSONResponseContiment;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseDiscount;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseItem;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseKitchen;
@@ -45,6 +46,11 @@ public interface RequestInterface {
     @FormUrlEncoded
     @POST("api/v1/item")
     Call<JSONResponseItem> getItem(@Field("site_activation_key") String activate_key);
+
+
+    @FormUrlEncoded
+    @POST("api/v1/continent")
+    Call<JSONResponseContiment> getContiment(@Field("site_activation_key") String activate_key);
 
     @FormUrlEncoded
     @POST("api/v1/room")

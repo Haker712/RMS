@@ -157,6 +157,7 @@ public class InvoiceActivity extends AppCompatActivity {
                 }
 
             });
+
             @SuppressLint("LongLogTag")
             @Override
             public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
@@ -166,9 +167,11 @@ public class InvoiceActivity extends AppCompatActivity {
                 }
                 return false;
             }
+
             @Override
             public void onTouchEvent(RecyclerView rv, MotionEvent e) {
             }
+
             @Override
             public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
             }
@@ -190,8 +193,8 @@ public class InvoiceActivity extends AppCompatActivity {
                     for (Download_forInvoice download_forInvoice : download_forInvoiceArrayList) {
                         Invoice invoice = new Invoice();
                         invoice.setVouncherID(download_forInvoice.getId());
-                        DataForRoomTable  = getRoomOrTable(invoice.getVouncherID());
-                        Log.i("DataForRoomTable",DataForRoomTable+"ffff");
+                        DataForRoomTable = getRoomOrTable(invoice.getVouncherID());
+                        Log.i("DataForRoomTable", DataForRoomTable + "ffff");
                         invoice.setRoonOrTable(DataForRoomTable);
                         Log.i("invoicesize>>>>>>>", invoice.getVouncherID() + "");
                         invoice.setTake_id(download_forInvoice.getTakeId());
@@ -200,6 +203,7 @@ public class InvoiceActivity extends AppCompatActivity {
                         invoice.setExtraAmount(download_forInvoice.getTotal_extra_price());
                         invoice.setTotalAmount(download_forInvoice.getTotalPrice());
                         invoice.setNetAmount(download_forInvoice.getAllTotalAmount());
+                        invoice.setStatus(Integer.parseInt(download_forInvoice.getStatus()));
                         forInvoice.add(invoice);
                     }
                     Log.i("invoicesize>>>>>>>", forInvoice.size() + "");
@@ -210,6 +214,7 @@ public class InvoiceActivity extends AppCompatActivity {
                     callUploadDialog(" Data Are Null! ");
                 }
             }
+
             @SuppressLint("LongLogTag")
             @Override
             public void onFailure(Call<JsonResponseforInvoice> call, Throwable t) {
@@ -221,23 +226,23 @@ public class InvoiceActivity extends AppCompatActivity {
         return forInvoice;
     }
 
-    private String getRoomOrTable (String VoucherID){       //checking  order from room or table or take away !
+    private String getRoomOrTable(String VoucherID) {       //checking  order from room or table or take away !
         String RoomOrTable = null;
         String Room = null;
         String Table = null;
         Table = gettableIDD(VoucherID);
-        Log.i("table?!?!?!?!?!",Table+"");
+        Log.i("table?!?!?!?!?!", Table + "");
         Room = getroomIDD(VoucherID);
-        Log.i("Room?!?!?!?!?!",Room+"");
-        if (Room.equals(null) || Room == null || Room.equals("")){
+        Log.i("Room?!?!?!?!?!", Room + "");
+        if (Room.equals(null) || Room == null || Room.equals("")) {
             RoomOrTable = Table;
-        }else {
+        } else {
             RoomOrTable = Room;
         }
         return RoomOrTable;
     }
 
-    private String gettableIDD (String orderID){
+    private String gettableIDD(String orderID) {
         String tableeeID = "";
         RequestInterface requestInterface = retrofit.create(RequestInterface.class);
         Call<JsonForShowTableId> call = requestInterface.getforshowOrderTable(getActivateKeyFromDB(), orderID);
@@ -252,15 +257,14 @@ public class InvoiceActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         download_orderTableArrayList = jsonForShowTableId.getForShow_tableID();
-        for (int i = 0; i < download_orderTableArrayList.size(); i++){
+        for (int i = 0; i < download_orderTableArrayList.size(); i++) {
             Download_forShow_tableID download_forShow_tableID = download_orderTableArrayList.get(i);
             if (download_orderTableArrayList.size() == 1) {
                 tableeeID += "TABLE " + download_forShow_tableID.getTable_id();
             } else {
-                if (i == download_orderTableArrayList.size()-1) {
+                if (i == download_orderTableArrayList.size() - 1) {
                     tableeeID += "TABLE " + download_forShow_tableID.getTable_id();
-                }
-                else {
+                } else {
                     tableeeID += "TABLE " + download_forShow_tableID.getTable_id();
                     tableeeID += ",";
                 }
@@ -269,7 +273,7 @@ public class InvoiceActivity extends AppCompatActivity {
         return tableeeID;
     }
 
-    private String getroomIDD  (String orderID){
+    private String getroomIDD(String orderID) {
         String roommmID = "";
         RequestInterface requestInterfaces = retrofit.create(RequestInterface.class);
         Call<JsonForShowRoomId> calls = requestInterfaces.getforshowOrderRoom(getActivateKeyFromDB(), orderID);
@@ -277,15 +281,15 @@ public class InvoiceActivity extends AppCompatActivity {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
-        JsonForShowRoomId  jsonForShowRoomId = null;
+        JsonForShowRoomId jsonForShowRoomId = null;
         try {
             jsonForShowRoomId = calls.execute().body();
         } catch (IOException e) {
             e.printStackTrace();
         }
         download_orderRoomArrayList = jsonForShowRoomId.getForShow_roomID();
-        for (Download_forShow_roomID download_forShow_roomID : download_orderRoomArrayList){
-            roommmID =  "ROOM " + (download_forShow_roomID.getRoom_id());
+        for (Download_forShow_roomID download_forShow_roomID : download_orderRoomArrayList) {
+            roommmID = "ROOM " + (download_forShow_roomID.getRoom_id());
         }
         InvoiceDetailActivity.RommCharge = "";
         InvoiceDetailActivity.RommCharge = roommmID;
@@ -333,13 +337,12 @@ public class InvoiceActivity extends AppCompatActivity {
                         invDetail.setItemName(Name);
 
                         ArrayList<Download_ForInvoiceSetItemDetail> download_forInvoiceSetItemDetailArrayList = download_forInvoiveItemDetail.getOrderSetMenus();
-                        if(download_forInvoiceSetItemDetailArrayList.size() == 0){
+                        if (download_forInvoiceSetItemDetailArrayList.size() == 0) {
                             invDetail.setInvoiceDetailProductSetItemArrayList(null);
-                        }
-                        else {
+                        } else {
                             ArrayList<InvoiceDetailProductSetItem> invoiceDetailProductSetItemArrayList = new ArrayList<InvoiceDetailProductSetItem>();
 
-                            for (Download_ForInvoiceSetItemDetail download_forInvoiceSetItemDetail : download_forInvoiceSetItemDetailArrayList){
+                            for (Download_ForInvoiceSetItemDetail download_forInvoiceSetItemDetail : download_forInvoiceSetItemDetailArrayList) {
                                 InvoiceDetailProductSetItem invoiceDetailProductSetItem = new InvoiceDetailProductSetItem();
                                 invoiceDetailProductSetItem.setItemId(download_forInvoiceSetItemDetail.getItemId());
                                 invoiceDetailProductSetItem.setSetMenuId(download_forInvoiceSetItemDetail.getSetmenuId());
@@ -365,16 +368,15 @@ public class InvoiceActivity extends AppCompatActivity {
                             invDetail.setExtraPrice(String.valueOf(Double.valueOf(0)));
                         } else {
                             for (Download_ForInvoiceExtraDetail download_forInvoiceExtraDetail : download_forInvoiceExtraDetailsArrayList) {
-                                Log.i("ExtraAmount_size>>>>>>>>>>>>",download_forInvoiceExtraDetailsArrayList.size()+"");
-                                if (download_forInvoiceExtraDetailsArrayList.size() > 1){
-                                    Log.i("extraamount>-------",download_forInvoiceExtraDetail.getAmount()+"");
+                                Log.i("ExtraAmount_size>>>>>>>>>>>>", download_forInvoiceExtraDetailsArrayList.size() + "");
+                                if (download_forInvoiceExtraDetailsArrayList.size() > 1) {
+                                    Log.i("extraamount>-------", download_forInvoiceExtraDetail.getAmount() + "");
                                     ExtraAmount += download_forInvoiceExtraDetail.getAmount();
-                                }
-                                else {
+                                } else {
                                     ExtraAmount = download_forInvoiceExtraDetail.getAmount();
                                 }
-                                Log.i("ExtraAmount>>>>>>>>>>>>",download_forInvoiceExtraDetail.getAmount()+"");
-                             }
+                                Log.i("ExtraAmount>>>>>>>>>>>>", download_forInvoiceExtraDetail.getAmount() + "");
+                            }
                         }
                         invDetail.setExtraPrice(String.valueOf(ExtraAmount));
 
@@ -396,26 +398,26 @@ public class InvoiceActivity extends AppCompatActivity {
                 String TableID = null;
                 String RoomID = null;
                 String RoomOrTable22 = null;
-                TableID =  gettableIDD(invoiceIDDD);
+                TableID = gettableIDD(invoiceIDDD);
                 RoomID = getroomIDD(invoiceIDDD);
-                if (RoomID.equals(null) || RoomID == null || RoomID.equals("")){
+                if (RoomID.equals(null) || RoomID == null || RoomID.equals("")) {
                     RoomOrTable22 = TableID;
-                }else {
+                } else {
                     RoomOrTable22 = RoomID;
                 }
                 if (RoomOrTable22 != null) {
                     InvoiceDetailActivity.tableNo = RoomOrTable22;
-                }
-                else {
+                } else {
                     InvoiceDetailActivity.tableNo = "TAKE AWAY";
                 }
                 InvoiceDetailActivity.totalAmount = invoice.getTotalAmount();
                 InvoiceDetailActivity.totalDiscount = invoice.getDiscountAmount();
                 InvoiceDetailActivity.totalExtra = invoice.getExtraAmount();
-                Log.i("extrapriceamount",invoice.getExtraAmount()+"");
+                Log.i("extrapriceamount", invoice.getExtraAmount() + "");
                 InvoiceDetailActivity.netAmount = invoice.getNetAmount();
                 startActivity(new Intent(InvoiceActivity.this, InvoiceDetailActivity.class));
             }
+
             @Override
             public void onFailure(Call<JsonResponseforInvoiceDetail> call, Throwable t) {
 
@@ -444,6 +446,7 @@ public class InvoiceActivity extends AppCompatActivity {
 
     public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.ViewHolder> {   // view methods
         private ArrayList<Invoice> invoiceList;
+
         public InvoiceAdapter(ArrayList<Invoice> invoiceList) {
             this.invoiceList = invoiceList;
             Log.i("onbindviewinvoice", invoiceList + "");
@@ -491,21 +494,30 @@ public class InvoiceActivity extends AppCompatActivity {
         public void onBindViewHolder(final InvoiceAdapter.ViewHolder viewHolder, int position) {
             Invoice invoice = invoiceList.get(position);
             viewHolder.vouncherTxt.setText(invoice.getVouncherID());
-               if (invoice.getRoonOrTable() == "" ){
+
+//            Log.i("Status",invoice.getStatus()+"");
+            if (invoice.getStatus() == 1) {
+
+                if (invoice.getRoonOrTable() == "") {
                     viewHolder.tableTxt.setText("TAKE AWAY");
-                }
-            else {
+                } else {
                     viewHolder.tableTxt.setText(invoice.getRoonOrTable());
                 }
-            viewHolder.dateTxt.setText(invoice.getDate());
-            viewHolder.totalTxt.setText(invoice.getTotalAmount());
-            viewHolder.discountTxt.setText(invoice.getDiscountAmount());
-            viewHolder.netTxt.setText(invoice.getNetAmount());
+                viewHolder.dateTxt.setText(invoice.getDate());
+                viewHolder.totalTxt.setText(invoice.getTotalAmount());
+                viewHolder.discountTxt.setText(invoice.getDiscountAmount());
+                viewHolder.netTxt.setText(invoice.getNetAmount());
+
+            }
+
+
         }
+
         @Override
         public int getItemCount() {
             return invoiceList.size();
         }
+
         public class ViewHolder extends RecyclerView.ViewHolder {
             private TextView vouncherTxt;
             private TextView tableTxt;
@@ -513,6 +525,7 @@ public class InvoiceActivity extends AppCompatActivity {
             private TextView totalTxt;
             private TextView discountTxt;
             private TextView netTxt;
+
             public ViewHolder(View view) {
                 super(view);
                 vouncherTxt = (TextView) view.findViewById(R.id.vouncher_id_txt);
