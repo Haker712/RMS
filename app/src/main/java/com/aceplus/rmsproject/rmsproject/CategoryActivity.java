@@ -76,6 +76,7 @@ import com.aceplus.rmsproject.rmsproject.utils.JsonForShowRoomId;
 import com.aceplus.rmsproject.rmsproject.utils.JsonForShowTableId;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -196,6 +197,8 @@ public class CategoryActivity extends ActionBarActivity {
     int selected_Contiment_id;
     String group_id;
 
+    String itemname;
+    String con_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -676,10 +679,37 @@ public class CategoryActivity extends ActionBarActivity {
 
     private String getItemName(String item_id_forName) {
         String NameStr = "";
-        Cursor cursor = database.rawQuery("SELECT * FROM item WHERE id = '" + item_id_forName + "' ", null);
-        while (cursor.moveToNext()) {
-            NameStr = cursor.getString(cursor.getColumnIndex("name"));
+//        Cursor cursor = database.rawQuery("SELECT * FROM item WHERE id = '" + item_id_forName + "' ", null);
+//        while (cursor.moveToNext()) {
+//            NameStr = cursor.getString(cursor.getColumnIndex("name"));
+//        }
+
+        Cursor cursor = database.rawQuery("SELECT * FROM item where id='" + item_id_forName + "' and has_contiment =" + 1, null);
+
+        if (cursor.getCount() > 0) {
+
+            while (cursor.moveToNext()) {
+
+                int con_id = cursor.getInt(cursor.getColumnIndex("contiment_id"));
+                itemname = cursor.getString(cursor.getColumnIndex("name"));
+                Cursor cursor1 = database.rawQuery("SELECT * FROM contiment where id=" + con_id, null);
+
+                while (cursor1.moveToNext()) {
+
+                    con_name = cursor1.getString(cursor1.getColumnIndex("name"));
+
+                }
+
+            }
+
+            NameStr = con_name + " " + itemname;
+
+        } else {
+
+            NameStr = itemname;
+
         }
+
         return NameStr;
     }
 
@@ -982,7 +1012,7 @@ public class CategoryActivity extends ActionBarActivity {
                     setMenuCV.put("status", "");
                     setMenuCV.put("parent_id", "0");
                     setMenuCV.put("kitchen_id", "0");
-                    setMenuCV.put("image", imageEncoded);
+                    setMenuCV.put("image", "setmenu.jpg");
                     database.insert("category", null, setMenuCV);
                     for (Download_Category download_category : download_categoryArrayList) {
                         ContentValues cv = new ContentValues();
@@ -991,7 +1021,7 @@ public class CategoryActivity extends ActionBarActivity {
                         cv.put("status", download_category.getStatus());
                         cv.put("parent_id", download_category.getParent_id());
                         cv.put("kitchen_id", download_category.getKitchen_id());
-                        cv.put("image", download_category.getMobile_image());
+                        cv.put("image", download_category.getImage());
                         database.insert("category", null, cv);
                     }
                     database.setTransactionSuccessful();
@@ -1034,7 +1064,7 @@ public class CategoryActivity extends ActionBarActivity {
                         ContentValues cv = new ContentValues();
                         cv.put("id", download_item.getId());
                         cv.put("name", download_item.getName());
-                        cv.put("image", download_item.getMobile_image());
+                        cv.put("image", download_item.getImage());
                         cv.put("price", download_item.getPrice());
                         cv.put("status", download_item.getStatus());
                         cv.put("category_id", download_item.getCategory_id());
@@ -1126,7 +1156,7 @@ public class CategoryActivity extends ActionBarActivity {
                         cv.put("id", download_setMenu.getId());
                         cv.put("set_menu_name", download_setMenu.getSet_menus_name());
                         cv.put("set_menu_price", download_setMenu.getSet_menus_price());
-                        cv.put("image", download_setMenu.getMobile_image());
+                        cv.put("image", download_setMenu.getImage());
                         cv.put("status", download_setMenu.getStatus());
                         database.insert("setMenu", null, cv);
                     }
@@ -1584,11 +1614,11 @@ public class CategoryActivity extends ActionBarActivity {
 
                     Cursor cursor = database.rawQuery("SELECT * FROM item where id='" + item_id + "'", null);
 
-                    while (cursor.moveToNext()){
+                    while (cursor.moveToNext()) {
 
-                        int has_contiment=cursor.getInt(cursor.getColumnIndex("has_contiment"));
+                        int has_contiment = cursor.getInt(cursor.getColumnIndex("has_contiment"));
 
-                        if (has_contiment==1){
+                        if (has_contiment == 1) {
 
                             group_id = cursor.getString(cursor.getColumnIndex("group_id"));
 
@@ -1656,7 +1686,8 @@ public class CategoryActivity extends ActionBarActivity {
                                                 String selected_item_id = cursor.getString(cursor.getColumnIndex("id"));
                                                 categoryItem.setId(selected_item_id);
                                                 String selectd_itemname = cursor.getString(cursor.getColumnIndex("name"));
-                                                itemNameTxt.setText(selected_ContimentName+" "+selectd_itemname);
+                                                itemNameTxt.setText(selected_ContimentName + " " + selectd_itemname);
+                                                categoryItemList.get(position).setItemName(selected_ContimentName + " " + selectd_itemname);
 
                                             }
 
@@ -1674,7 +1705,7 @@ public class CategoryActivity extends ActionBarActivity {
                             });
 
 
-                        }else {
+                        } else {
 
                             Toast.makeText(CategoryActivity.this, "This item has no contiment", Toast.LENGTH_SHORT).show();
 
@@ -2333,8 +2364,11 @@ public class CategoryActivity extends ActionBarActivity {
 
 
             Glide.with(mContext)
-                    .load(Base64.decode(album.getImage(), Base64.DEFAULT))
+                    .load(MainActivity.IMG_URL_PREFIX+album.getImage())
+                    .placeholder(R.drawable.default_pic)
+                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
                     .into(holder.thumbnail);
+
 
             //holder.thumbnail.setImageBitmap(mBitmap);
             holder.title.setText(album.getName());
@@ -2444,7 +2478,8 @@ public class CategoryActivity extends ActionBarActivity {
             //byte[] ImageShow = Base64.decode(item.getImage(), Base64.DEFAULT);
             //Bitmap mBitmap = BitmapFactory.decodeByteArray(ImageShow, 0, ImageShow.length);
             Glide.with(mContext)
-                    .load(Base64.decode(item.getImage(), Base64.DEFAULT))
+                    .load(MainActivity.IMG_URL_PREFIX+item.getImage())
+                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
                     .into(holder.thumbnail);
             //holder.thumbnail.setImageBitmap(mBitmap);
         }

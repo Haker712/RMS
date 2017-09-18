@@ -12,5 +12,5 @@
         /> <!-- focused -->
     <item
         android:drawable="@drawable/btn_normal"
-        /> <!-- default -->
+        /> <!-- default_pic -->
 </selector>

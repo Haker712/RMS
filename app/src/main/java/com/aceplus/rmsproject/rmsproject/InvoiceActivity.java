@@ -44,6 +44,7 @@ import com.aceplus.rmsproject.rmsproject.object.order_table;
 import com.aceplus.rmsproject.rmsproject.utils.Database;
 import com.aceplus.rmsproject.rmsproject.utils.Download_forShow_roomID;
 import com.aceplus.rmsproject.rmsproject.utils.Download_forShow_tableID;
+import com.aceplus.rmsproject.rmsproject.utils.GetDevID;
 import com.aceplus.rmsproject.rmsproject.utils.JsonForShowRoomId;
 import com.aceplus.rmsproject.rmsproject.utils.JsonForShowTableId;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
@@ -87,6 +88,8 @@ public class InvoiceActivity extends AppCompatActivity {
     String orderIDforBindView;
     String DataForRoomTable;
     Handler handler = null;
+
+    String con_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -312,7 +315,7 @@ public class InvoiceActivity extends AppCompatActivity {
         String vouncherID = invoice.getVouncherID();
         Log.i("voucherID>>>>hak>>>", vouncherID);
         RequestInterface requestInterface = retrofit.create(RequestInterface.class);
-        Call<JsonResponseforInvoiceDetail> call = requestInterface.getforInvoiceDetail("roXfvF8FeyLY", vouncherID);
+        Call<JsonResponseforInvoiceDetail> call = requestInterface.getforInvoiceDetail(GetDevID.getActivateKeyFromDB(this), vouncherID);
         call.enqueue(new Callback<JsonResponseforInvoiceDetail>() {
             @SuppressLint("LongLogTag")
             @Override
@@ -329,7 +332,33 @@ public class InvoiceActivity extends AppCompatActivity {
                         final String Name;
                         if (Integer.parseInt(download_forInvoiveItemDetail.getSetmenuId()) == 0) {
                             String Itemid = download_forInvoiveItemDetail.getItemId();
-                            Name = getItemName(Itemid);
+
+                            Cursor cursor=database.rawQuery("SELECT * FROM item where id='"+Itemid+"' and has_contiment ="+1,null);
+
+                            if (cursor.getCount()>0) {
+
+                                while (cursor.moveToNext()) {
+
+                                    int con_id = cursor.getInt(cursor.getColumnIndex("contiment_id"));
+
+                                    Cursor cursor1 = database.rawQuery("SELECT * FROM contiment where id=" + con_id, null);
+
+                                    while (cursor1.moveToNext()) {
+
+                                        con_name = cursor1.getString(cursor1.getColumnIndex("name"));
+
+                                    }
+
+                                }
+                                String item_name = getItemName(Itemid);
+                                Name = con_name + " " + item_name;
+
+                            }else {
+
+                                Name=getItemName(Itemid);
+
+                            }
+
                         } else {
                             String SetMenuid = download_forInvoiveItemDetail.getSetmenuId();
                             Name = getSetMenuName(SetMenuid);
@@ -420,7 +449,7 @@ public class InvoiceActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<JsonResponseforInvoiceDetail> call, Throwable t) {
-
+                Toast.makeText(InvoiceActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
         return detailProductArrayList;
@@ -483,7 +512,7 @@ public class InvoiceActivity extends AppCompatActivity {
                     InvoiceDetailActivity.totalDiscount = invoice.getDiscountAmount();
                     InvoiceDetailActivity.totalExtra = invoice.getExtraAmount();
                     InvoiceDetailActivity.netAmount = invoice.getNetAmount();
-                    Toast.makeText(InvoiceActivity.this, "", Toast.LENGTH_SHORT).show();
+                    //startActivity(new Intent(InvoiceActivity.this, InvoiceDetailActivity.class));
                     Log.i("detailProductArrayList>CallIntent>>>", String.valueOf(detailProductArrayList.size()));
                 }
             });

@@ -21,6 +21,7 @@ public class Category {
     double amount = 0;
     boolean takeAway=false;
 
+
     public String getDiscount_type() {
         return discount_type;
     }
