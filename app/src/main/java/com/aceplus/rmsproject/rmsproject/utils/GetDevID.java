@@ -26,6 +26,7 @@ public class GetDevID
 		cur.close();
 		database.setTransactionSuccessful();
 		database.endTransaction();
+		database.close();
 		return backend_activate_key;
 	}
 

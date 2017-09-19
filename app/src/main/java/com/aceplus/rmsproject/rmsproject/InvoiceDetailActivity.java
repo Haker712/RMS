@@ -131,6 +131,12 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     private ArrayList<Download_forShow_roomID> download_orderRoomArrayList = new ArrayList<>();
     Boolean paidavailable = true;
 
+    /***
+     * PhoneLinAung 19.9.17 Start
+     */
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -175,11 +181,24 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         catchEvents();
     }
 
+    /***
+     * PhoneLinAung 19.9.17 Start
+     */
+
+    public void getInvoiceDetailProductlistFromInvoiceActivity(){
+
+    }
+
+    public void getInvoiceDetailObjectFromInvoiceActivity(){
+
+    }
+
+
+
     // This is where get data from invoice.activity
     @SuppressLint("LongLogTag")
     private void setAdapter() {
         invoiceDetailAdapter = new InvoiceDetailAdapter(InvoiceDetailActivity.this, InvoiceActivity.detailProductArrayList);
-        Log.i("detailProductArrayList>>>>", String.valueOf(InvoiceActivity.detailProductArrayList.size()));
         productListView = (ListView) findViewById(R.id.list_view);
         productListView.setAdapter(invoiceDetailAdapter);
         invoiceDetailAdapter.notifyDataSetChanged();
@@ -206,7 +225,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         refundTxt = (TextView) findViewById(R.id.refund_txt);
         addBtn = (Button) findViewById(R.id.add_btn);
         paidBtn = (Button) findViewById(R.id.paid_btn);
-        printBtn = (Button) findViewById(R.id.print_btn);
+      //  printBtn = (Button) findViewById(R.id.print_btn);
     }
 
     private void callUploadDialog(String message) {
@@ -403,34 +422,34 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                   }
         );
 
-        printBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                       /* PrintActivity.print_datetime = null;
-                        PrintActivity.print_voucherID = null;
-                        PrintActivity.print_tableNo = null;
-                        PrintActivity.print_staffName = null;
-                        PrintActivity.print_tax = null;
-                        PrintActivity.print_service = null;
-                        PrintActivity.print_totalAmount = null;
-                        PrintActivity.print_netAmount = null;*/
-//here!!
-
-
-                Intent intent = new Intent(InvoiceDetailActivity.this, PrintActivity.class);
-                intent.putExtra("voucherID", vouncherID);
-                intent.putExtra("datetime", date);
-                intent.putExtra("tableNo", tableNo);
-                intent.putExtra("staffName", userID);
-                intent.putExtra("totalAmt", totalAmount);
-                intent.putExtra("netAmt", netAmount);
-                intent.putExtra("taxAmt", taxTxt.getText().toString().trim().replace(",", ""));
-                intent.putExtra("serviceAmt", serviceTxt.getText().toString().trim().replace(",", ""));
-                //intent.putCharSequenceArrayListExtra("json", );
-
-                startActivity(intent);
-            }
-        });
+//        printBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                       /* PrintActivity.print_datetime = null;
+//                        PrintActivity.print_voucherID = null;
+//                        PrintActivity.print_tableNo = null;
+//                        PrintActivity.print_staffName = null;
+//                        PrintActivity.print_tax = null;
+//                        PrintActivity.print_service = null;
+//                        PrintActivity.print_totalAmount = null;
+//                        PrintActivity.print_netAmount = null;*/
+////here!!
+//
+//
+//                Intent intent = new Intent(InvoiceDetailActivity.this, PrintActivity.class);
+//                intent.putExtra("voucherID", vouncherID);
+//                intent.putExtra("datetime", date);
+//                intent.putExtra("tableNo", tableNo);
+//                intent.putExtra("staffName", userID);
+//                intent.putExtra("totalAmt", totalAmount);
+//                intent.putExtra("netAmt", netAmount);
+//                intent.putExtra("taxAmt", taxTxt.getText().toString().trim().replace(",", ""));
+//                intent.putExtra("serviceAmt", serviceTxt.getText().toString().trim().replace(",", ""));
+//                //intent.putCharSequenceArrayListExtra("json", );
+//
+//                startActivity(intent);
+//            }
+//        });
 
         paidBtn.setOnClickListener(new View.OnClickListener()
 

@@ -513,6 +513,9 @@ public class InvoiceActivity extends AppCompatActivity {
                     InvoiceDetailActivity.totalExtra = invoice.getExtraAmount();
                     InvoiceDetailActivity.netAmount = invoice.getNetAmount();
                     //startActivity(new Intent(InvoiceActivity.this, InvoiceDetailActivity.class));
+
+
+
                     Log.i("detailProductArrayList>CallIntent>>>", String.valueOf(detailProductArrayList.size()));
                 }
             });
@@ -599,10 +602,16 @@ public class InvoiceActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            startActivity(new Intent(InvoiceActivity.this, HomePageActivity.class));
-            finish();
+            onBackPressed();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(InvoiceActivity.this, HomePageActivity.class));
+        finish();
     }
 }
