@@ -706,7 +706,15 @@ public class CategoryActivity extends ActionBarActivity {
 
         } else {
 
-            NameStr = itemname;
+            Cursor cursor_noContiment=database.rawQuery("SELECT * FROM item where id='" + item_id_forName + "' and has_contiment =" + 0, null);
+
+            while (cursor_noContiment.moveToNext()){
+
+                itemname = cursor_noContiment.getString(cursor_noContiment.getColumnIndex("name"));
+                NameStr = itemname;
+            }
+
+
 
         }
 

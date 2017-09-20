@@ -54,7 +54,7 @@ public class PrintActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         registerIDs();
-        setAdapter();
+       // setAdapter();
         catchEvents();
     }
 
@@ -91,21 +91,21 @@ public class PrintActivity extends ActionBarActivity {
         netamttxt.setText((String) extras.get("netAmt"));
     }
 
-    private void setAdapter() {
-        ArrayList<InvoiceDetailProduct> printProductsArrayList;
-        printProductsArrayList = InvoiceActivity.detailProductArrayList;
-        for (int i = 0; i < printProductsArrayList.size(); i++){
-            if (printProductsArrayList.get(i).getStatus().equals("6") || printProductsArrayList.get(i).getStatus().equals("7")){
-            }
-            else {
-                printProductArrayList.add(printProductsArrayList.get(i));
-            }
-        }
-        PrintDetailAdapter = new PrintActivity.printDetailAdapter(PrintActivity.this, printProductArrayList);
-        productListView = (ListView) findViewById(R.id.print_list_view);
-        productListView.setAdapter(PrintDetailAdapter);
-        PrintDetailAdapter.notifyDataSetChanged();
-    }
+//    private void setAdapter() {
+//        ArrayList<InvoiceDetailProduct> printProductsArrayList;
+//        printProductsArrayList = InvoiceActivity.detailProductArrayList;
+//        for (int i = 0; i < printProductsArrayList.size(); i++){
+//            if (printProductsArrayList.get(i).getStatus().equals("6") || printProductsArrayList.get(i).getStatus().equals("7")){
+//            }
+//            else {
+//                printProductArrayList.add(printProductsArrayList.get(i));
+//            }
+//        }
+//        PrintDetailAdapter = new PrintActivity.printDetailAdapter(PrintActivity.this, printProductArrayList);
+//        productListView = (ListView) findViewById(R.id.print_list_view);
+//        productListView.setAdapter(PrintDetailAdapter);
+//        PrintDetailAdapter.notifyDataSetChanged();
+//    }
 
     private class printDetailAdapter extends ArrayAdapter<InvoiceDetailProduct>{
         public Activity contextt;
