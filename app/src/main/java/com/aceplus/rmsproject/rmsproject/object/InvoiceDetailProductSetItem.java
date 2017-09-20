@@ -1,10 +1,12 @@
 package com.aceplus.rmsproject.rmsproject.object;
 
+import java.io.Serializable;
+
 /**
  * Created by PhyoKyawSwar on 7/6/17.
  */
 
-public class InvoiceDetailProductSetItem /*extends ArrayList<InvoiceDetailProductSetItem>*/ {
+public class InvoiceDetailProductSetItem implements Serializable {
 
     String ItemId;
     String StatusId;

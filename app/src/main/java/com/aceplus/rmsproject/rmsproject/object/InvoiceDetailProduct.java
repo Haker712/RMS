@@ -3,12 +3,13 @@ package com.aceplus.rmsproject.rmsproject.object;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by kyawminlwin on 8/8/16.
  */
-public class InvoiceDetailProduct implements Parcelable {
+public class InvoiceDetailProduct implements Serializable {
     String id;
     String itemName;
     String price;
@@ -132,13 +133,13 @@ public class InvoiceDetailProduct implements Parcelable {
     }
 
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-
-    }
+//    @Override
+//    public int describeContents() {
+//        return 0;
+//    }
+//
+//    @Override
+//    public void writeToParcel(Parcel dest, int flags) {
+//
+//    }
 }

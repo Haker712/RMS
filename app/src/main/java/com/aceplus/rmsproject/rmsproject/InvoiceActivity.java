@@ -50,8 +50,11 @@ import com.aceplus.rmsproject.rmsproject.utils.JsonForShowTableId;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -75,7 +78,8 @@ public class InvoiceActivity extends AppCompatActivity {
     ArrayList<Invoice> invoiceArrayList = new ArrayList<>();
     private ArrayList<Download_forShow_tableID> download_orderTableArrayList = new ArrayList<>();
     private ArrayList<Download_forShow_roomID> download_orderRoomArrayList = new ArrayList<>();
-    public static ArrayList<InvoiceDetailProduct> detailProductArrayList = new ArrayList<>();
+    // public static ArrayList<InvoiceDetailProduct> detailProductArrayList = new ArrayList<>();
+    public ArrayList<InvoiceDetailProduct> detailProductArrayList = new ArrayList<>();
     private ArrayList<Download_OrderStatus> download_orderStatusArrayList;
     private ArrayList<Order_Complete> completeArrayList = new ArrayList<>();
     private ArrayList<Download_forInvoice> download_forInvoiceArrayList;
@@ -88,7 +92,7 @@ public class InvoiceActivity extends AppCompatActivity {
     String orderIDforBindView;
     String DataForRoomTable;
     Handler handler = null;
-
+    HashMap<String, String> detailDataMap;
     String con_name;
 
     @Override
@@ -149,6 +153,7 @@ public class InvoiceActivity extends AppCompatActivity {
                 mProgressDialog.dismiss();
             }
         };
+        detailDataMap = new HashMap<>();
         getInvoiceData();
         recyclerView.setAdapter(adapter);
         recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
@@ -294,8 +299,10 @@ public class InvoiceActivity extends AppCompatActivity {
         for (Download_forShow_roomID download_forShow_roomID : download_orderRoomArrayList) {
             roommmID = "ROOM " + (download_forShow_roomID.getRoom_id());
         }
-        InvoiceDetailActivity.RommCharge = "";
-        InvoiceDetailActivity.RommCharge = roommmID;
+
+        detailDataMap.put("RommCharge",roommmID);
+        //InvoiceDetailActivity.RommCharge = "";
+        //InvoiceDetailActivity.RommCharge = roommmID;
         return roommmID;
     }
 
@@ -320,11 +327,13 @@ public class InvoiceActivity extends AppCompatActivity {
             @SuppressLint("LongLogTag")
             @Override
             public void onResponse(Call<JsonResponseforInvoiceDetail> call, Response<JsonResponseforInvoiceDetail> response) {
+
                 detailProductArrayList.clear();
                 JsonResponseforInvoiceDetail jsonResponseforInvoiceDetail = response.body();
                 ArrayList<Download_ForInvoiceDetail> Download_ForInvoiveDetailArrayList = jsonResponseforInvoiceDetail.getDownload_forInvoiceDetailArrayList();
                 for (Download_ForInvoiceDetail download_forInvoiceDetail : Download_ForInvoiveDetailArrayList) {
-                    InvoiceDetailActivity.userID = download_forInvoiceDetail.getUserId();
+                    detailDataMap.put("userId", download_forInvoiceDetail.getUserId());
+                    //InvoiceDetailActivity.userID = download_forInvoiceDetail.getUserId();
                     ArrayList<Download_ForInvoiveItemDetail> Download_ForInoviceItemDetailArrayList = download_forInvoiceDetail.getForInvoiveItemDetail();
                     for (Download_ForInvoiveItemDetail download_forInvoiveItemDetail : Download_ForInoviceItemDetailArrayList) {
                         InvoiceDetailProduct invDetail = new InvoiceDetailProduct();
@@ -333,9 +342,9 @@ public class InvoiceActivity extends AppCompatActivity {
                         if (Integer.parseInt(download_forInvoiveItemDetail.getSetmenuId()) == 0) {
                             String Itemid = download_forInvoiveItemDetail.getItemId();
 
-                            Cursor cursor=database.rawQuery("SELECT * FROM item where id='"+Itemid+"' and has_contiment ="+1,null);
+                            Cursor cursor = database.rawQuery("SELECT * FROM item where id='" + Itemid + "' and has_contiment =" + 1, null);
 
-                            if (cursor.getCount()>0) {
+                            if (cursor.getCount() > 0) {
 
                                 while (cursor.moveToNext()) {
 
@@ -353,9 +362,9 @@ public class InvoiceActivity extends AppCompatActivity {
                                 String item_name = getItemName(Itemid);
                                 Name = con_name + " " + item_name;
 
-                            }else {
+                            } else {
 
-                                Name=getItemName(Itemid);
+                                Name = getItemName(Itemid);
 
                             }
 
@@ -420,9 +429,9 @@ public class InvoiceActivity extends AppCompatActivity {
                     }
                 }
                 Log.i("detailProductArrayList>>Response>>", String.valueOf(detailProductArrayList.size()));
-                InvoiceDetailActivity.vouncherID = invoice.getVouncherID();
+                //InvoiceDetailActivity.vouncherID = invoice.getVouncherID();
 
-                InvoiceDetailActivity.date = invoice.getDate();
+                //InvoiceDetailActivity.date = invoice.getDate();
                 String invoiceIDDD = invoice.getVouncherID();
                 String TableID = null;
                 String RoomID = null;
@@ -435,16 +444,26 @@ public class InvoiceActivity extends AppCompatActivity {
                     RoomOrTable22 = RoomID;
                 }
                 if (RoomOrTable22 != null) {
-                    InvoiceDetailActivity.tableNo = RoomOrTable22;
+                    //InvoiceDetailActivity.tableNo = RoomOrTable22;
                 } else {
-                    InvoiceDetailActivity.tableNo = "TAKE AWAY";
+                    //InvoiceDetailActivity.tableNo = "TAKE AWAY";
                 }
-                InvoiceDetailActivity.totalAmount = invoice.getTotalAmount();
-                InvoiceDetailActivity.totalDiscount = invoice.getDiscountAmount();
-                InvoiceDetailActivity.totalExtra = invoice.getExtraAmount();
+                //InvoiceDetailActivity.totalAmount = invoice.getTotalAmount();
+                //InvoiceDetailActivity.totalDiscount = invoice.getDiscountAmount();
+                //InvoiceDetailActivity.totalExtra = invoice.getExtraAmount();
                 Log.i("extrapriceamount", invoice.getExtraAmount() + "");
-                InvoiceDetailActivity.netAmount = invoice.getNetAmount();
-                startActivity(new Intent(InvoiceActivity.this, InvoiceDetailActivity.class));
+                //InvoiceDetailActivity.netAmount = invoice.getNetAmount();
+                //   startActivity(new Intent(InvoiceActivity.this, InvoiceDetailActivity.class));
+
+                Intent intent = new Intent(InvoiceActivity.this, InvoiceDetailActivity.class);
+                Bundle args = new Bundle();
+                args.putSerializable("ARRAYLIST", detailProductArrayList);
+                args.putSerializable("Map", detailDataMap);
+                intent.putExtra("BUNDLE", args);
+                startActivity(intent);
+                finish();
+
+
             }
 
             @Override
@@ -491,32 +510,43 @@ public class InvoiceActivity extends AppCompatActivity {
                     Toast.makeText(InvoiceActivity.this, "Please Wait !", Toast.LENGTH_SHORT).show();
                     int position = recyclerView.getChildAdapterPosition(view);
                     Invoice invoice = forInvoice.get(position);
-                    detailProductArrayList = getInvDetailProduct(invoice);
-                    InvoiceDetailActivity.vouncherID = invoice.getVouncherID();
-                    InvoiceDetailActivity.userID = invoice.getUser_id();
-                    InvoiceDetailActivity.date = invoice.getDate();
-                    InvoiceDetailActivity.tableNo = "TAKE AWAY";
+
+                    detailDataMap.put("vouncherID", invoice.getVouncherID());
+                    detailDataMap.put("date", invoice.getDate());
+                    detailDataMap.put("tableNo", "TAKE AWAY");
+
+//                    InvoiceDetailActivity.vouncherID = invoice.getVouncherID();
+//                    InvoiceDetailActivity.userID = invoice.getUser_id();
+//                    InvoiceDetailActivity.date = invoice.getDate();
+//                    InvoiceDetailActivity.tableNo = "TAKE AWAY";
                     if (order_table.getTable_id() == null) {
                         Log.d("InvTableID", "no" + tableID);
                     } else {
-                        InvoiceDetailActivity.tableNo = order_table.getTable_id();
-                        InvoiceDetailActivity.TABLE_ID = order_table.getTable_id();
+                        detailDataMap.put("tableNo", order_table.getTable_id());
+                        detailDataMap.put("TABLE_ID", order_table.getTable_id());
+//                        InvoiceDetailActivity.tableNo = order_table.getTable_id();
+//                        InvoiceDetailActivity.TABLE_ID = order_table.getTable_id();
                     }
                     if (order_room.getRoom_id() == null) {
                         Log.d("InvTableID", "no" + tableID);
                     } else {
-                        InvoiceDetailActivity.tableNo = order_room.getRoom_id();
-                        InvoiceDetailActivity.ROOM_ID = order_room.getRoom_id();
+                        detailDataMap.put("tableNo", order_room.getRoom_id());
+                        detailDataMap.put("ROOM_ID", order_room.getRoom_id());
+//                        InvoiceDetailActivity.tableNo = order_room.getRoom_id();
+//                        InvoiceDetailActivity.ROOM_ID = order_room.getRoom_id();
                     }
-                    InvoiceDetailActivity.totalAmount = invoice.getTotalAmount();
-                    InvoiceDetailActivity.totalDiscount = invoice.getDiscountAmount();
-                    InvoiceDetailActivity.totalExtra = invoice.getExtraAmount();
-                    InvoiceDetailActivity.netAmount = invoice.getNetAmount();
-                    //startActivity(new Intent(InvoiceActivity.this, InvoiceDetailActivity.class));
+                    detailDataMap.put("totalAmount", invoice.getTotalAmount());
+                    detailDataMap.put("totalDiscount", invoice.getDiscountAmount());
+                    detailDataMap.put("totalExtra", invoice.getExtraAmount());
+                    detailDataMap.put("netAmount", invoice.getNetAmount());
 
-
+//                    InvoiceDetailActivity.totalAmount = invoice.getTotalAmount();
+//                    InvoiceDetailActivity.totalDiscount = invoice.getDiscountAmount();
+//                    InvoiceDetailActivity.totalExtra = invoice.getExtraAmount();
+//                    InvoiceDetailActivity.netAmount = invoice.getNetAmount();
 
                     Log.i("detailProductArrayList>CallIntent>>>", String.valueOf(detailProductArrayList.size()));
+                    detailProductArrayList = getInvDetailProduct(invoice);
                 }
             });
             return new ViewHolder(view);
