@@ -1,6 +1,7 @@
 package com.aceplus.rmsproject.rmsproject;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -12,6 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
@@ -105,6 +107,7 @@ public class TableActivity extends ActionBarActivity {
     String invoiceee_id = null;
     String group_invoiceee_id = null;
     AtomicBoolean ContinueThread;
+    Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +115,7 @@ public class TableActivity extends ActionBarActivity {
         setContentView(R.layout.activity_table);
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
+        activity = this;
         database = new Database(this).getDataBase();
         ContinueThread = new AtomicBoolean(false);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -145,7 +149,7 @@ public class TableActivity extends ActionBarActivity {
     }
 
     private void getTableData() {  // data from database !!
-        database.beginTransaction();
+        //database.beginTransaction();
         getBookingArrayList.clear();
         get4transfertableArrayList.clear();
         Cursor cur;
@@ -153,83 +157,109 @@ public class TableActivity extends ActionBarActivity {
         Cursor curBTable = null;
         Cursor curConfig = null;
         cur = database.rawQuery("SELECT * FROM tableList", null);
-        while (cur.moveToNext()) {
-            BookingTable bookingTable = new BookingTable();
-            String table_id = cur.getString(cur.getColumnIndex("id"));
-            bookingTable.setTableID(table_id);
-            bookingTable.setTable_no(cur.getString(cur.getColumnIndex("table_no")));
-            bookingTable.setTableStatus(cur.getString(cur.getColumnIndex("status")));
-            bookingTable.setTable_check(false);
-            curBTable = database.rawQuery("SELECT * FROM booking_table WHERE table_id = \"" + table_id + "\"", null);
-            while (curBTable.moveToNext()) {
-                bookingTable.setTable_id(curBTable.getString(curBTable.getColumnIndex("table_id")));
-                String booking_id = curBTable.getString(curBTable.getColumnIndex("booking_id"));
-                String booking_time = null;
-                curBooking = database.rawQuery("SELECT * FROM booking WHERE id = \"" + booking_id + "\"", null);
-                while (curBooking.moveToNext()) {
-                    bookingTable.setBookingID(curBooking.getString(curBooking.getColumnIndex("id")));
-                    bookingTable.setBooking_time(curBooking.getString(curBooking.getColumnIndex("from_time")));
-                    booking_time = curBooking.getString(curBooking.getColumnIndex("from_time"));
+
+        try {
+            while (cur.moveToNext()) {
+                BookingTable bookingTable = new BookingTable();
+                String table_id = cur.getString(cur.getColumnIndex("id"));
+                bookingTable.setTableID(table_id);
+                bookingTable.setTable_no(cur.getString(cur.getColumnIndex("table_no")));
+                bookingTable.setTableStatus(cur.getString(cur.getColumnIndex("status")));
+                bookingTable.setTable_check(false);
+                curBTable = database.rawQuery("SELECT * FROM booking_table WHERE table_id = \"" + table_id + "\"", null);
+                while (curBTable.moveToNext()) {
+                    bookingTable.setTable_id(curBTable.getString(curBTable.getColumnIndex("table_id")));
+                    String booking_id = curBTable.getString(curBTable.getColumnIndex("booking_id"));
+                    String booking_time = null;
+                    curBooking = database.rawQuery("SELECT * FROM booking WHERE id = \"" + booking_id + "\"", null);
+                    while (curBooking.moveToNext()) {
+                        bookingTable.setBookingID(curBooking.getString(curBooking.getColumnIndex("id")));
+                        bookingTable.setBooking_time(curBooking.getString(curBooking.getColumnIndex("from_time")));
+                        booking_time = curBooking.getString(curBooking.getColumnIndex("from_time"));
+                    }
+                    curBooking.close();
+                    Log.e("TableIDBooking", table_id + "," + booking_id + "," + booking_time + "");
                 }
-                Log.e("TableIDBooking", table_id + "," + booking_id + "," + booking_time + "");
+                curBTable.close();
+
+                curConfig = database.rawQuery("SELECT * FROM config", null);
+                while (curConfig.moveToNext()) {
+                    bookingTable.setBooking_waiting(curConfig.getString(curConfig.getColumnIndex("booking_waiting_time")));
+                    bookingTable.setBooking_service(curConfig.getString(curConfig.getColumnIndex("booking_service_time")));
+                    bookingTable.setBooking_warning(curConfig.getString(curConfig.getColumnIndex("booking_warning_time")));
+                }
+                curConfig.close();
+                getBookingArrayList.add(bookingTable);
             }
 
-            curConfig = database.rawQuery("SELECT * FROM config", null);
-            while (curConfig.moveToNext()) {
-                bookingTable.setBooking_waiting(curConfig.getString(curConfig.getColumnIndex("booking_waiting_time")));
-                bookingTable.setBooking_service(curConfig.getString(curConfig.getColumnIndex("booking_service_time")));
-                bookingTable.setBooking_warning(curConfig.getString(curConfig.getColumnIndex("booking_warning_time")));
-            }
-            getBookingArrayList.add(bookingTable);
+            cur.close();
+        } catch (Exception e) {
+            Log.e("Get table err", e.getMessage());
+        }/* finally {
+            cur.close();
+            curBooking.close();
+            curBTable.close();
+            curConfig.close();
+        }*/
 
-
-        }
-        cur.close();
-        database.setTransactionSuccessful();
-        database.endTransaction();
+        //database.setTransactionSuccessful();
+        //database.endTransaction();
         getTransferTableData();
     }
 
     private void getTransferTableData() {
-        database.beginTransaction();
+        //database.beginTransaction();
         get4transfertableArrayList.clear();
         Cursor cur;
         Cursor curBooking = null;
         Cursor curBTable = null;
         Cursor curConfig = null;
         cur = database.rawQuery("SELECT * FROM tableList WHERE status = '0'", null);
-        while (cur.moveToNext()) {
-            BookingTable bookingTable = new BookingTable();
-            String table_id = cur.getString(cur.getColumnIndex("id"));
-            bookingTable.setTableID(table_id);
-            bookingTable.setTable_no(cur.getString(cur.getColumnIndex("table_no")));
-            bookingTable.setTableStatus(cur.getString(cur.getColumnIndex("status")));
-            bookingTable.setTable_check(false);
-            curBTable = database.rawQuery("SELECT * FROM booking_table WHERE table_id = \"" + table_id + "\"", null);
-            while (curBTable.moveToNext()) {
-                bookingTable.setTable_id(curBTable.getString(curBTable.getColumnIndex("table_id")));
-                String booking_id = curBTable.getString(curBTable.getColumnIndex("booking_id"));
-                String booking_time = null;
-                curBooking = database.rawQuery("SELECT * FROM booking WHERE id = \"" + booking_id + "\"", null);
-                while (curBooking.moveToNext()) {
-                    bookingTable.setBookingID(curBooking.getString(curBooking.getColumnIndex("id")));
-                    bookingTable.setBooking_time(curBooking.getString(curBooking.getColumnIndex("from_time")));
-                    booking_time = curBooking.getString(curBooking.getColumnIndex("from_time"));
+        try {
+            while (cur.moveToNext()) {
+                BookingTable bookingTable = new BookingTable();
+                String table_id = cur.getString(cur.getColumnIndex("id"));
+                bookingTable.setTableID(table_id);
+                bookingTable.setTable_no(cur.getString(cur.getColumnIndex("table_no")));
+                bookingTable.setTableStatus(cur.getString(cur.getColumnIndex("status")));
+                bookingTable.setTable_check(false);
+                curBTable = database.rawQuery("SELECT * FROM booking_table WHERE table_id = \"" + table_id + "\"", null);
+                while (curBTable.moveToNext()) {
+                    bookingTable.setTable_id(curBTable.getString(curBTable.getColumnIndex("table_id")));
+                    String booking_id = curBTable.getString(curBTable.getColumnIndex("booking_id"));
+                    String booking_time = null;
+                    curBooking = database.rawQuery("SELECT * FROM booking WHERE id = \"" + booking_id + "\"", null);
+                    while (curBooking.moveToNext()) {
+                        bookingTable.setBookingID(curBooking.getString(curBooking.getColumnIndex("id")));
+                        bookingTable.setBooking_time(curBooking.getString(curBooking.getColumnIndex("from_time")));
+                        booking_time = curBooking.getString(curBooking.getColumnIndex("from_time"));
+                    }
+                    curBooking.close();
+                    Log.e("TableIDBooking", table_id + "," + booking_id + "," + booking_time + "");
                 }
-                Log.e("TableIDBooking", table_id + "," + booking_id + "," + booking_time + "");
-            }
+                curBTable.close();
 
-            curConfig = database.rawQuery("SELECT * FROM config", null);
-            while (curConfig.moveToNext()) {
-                bookingTable.setBooking_waiting(curConfig.getString(curConfig.getColumnIndex("booking_waiting_time")));
-                bookingTable.setBooking_service(curConfig.getString(curConfig.getColumnIndex("booking_service_time")));
-                bookingTable.setBooking_warning(curConfig.getString(curConfig.getColumnIndex("booking_warning_time")));
+                curConfig = database.rawQuery("SELECT * FROM config", null);
+                while (curConfig.moveToNext()) {
+                    bookingTable.setBooking_waiting(curConfig.getString(curConfig.getColumnIndex("booking_waiting_time")));
+                    bookingTable.setBooking_service(curConfig.getString(curConfig.getColumnIndex("booking_service_time")));
+                    bookingTable.setBooking_warning(curConfig.getString(curConfig.getColumnIndex("booking_warning_time")));
+                }
+                curConfig.close();
+                get4transfertableArrayList.add(bookingTable);
             }
-            get4transfertableArrayList.add(bookingTable);
-        }
-        cur.close();
-        database.setTransactionSuccessful();
-        database.endTransaction();
+            cur.close();
+        }catch (Exception e) {
+
+        }/* finally {
+            cur.close();
+            curBooking.close();
+            curBTable.close();
+            curConfig.close();
+        }*/
+
+        //database.setTransactionSuccessful();
+        //database.endTransaction();
     }
 
     private void registerIDs() {
@@ -384,51 +414,58 @@ public class TableActivity extends ActionBarActivity {
                 ArrayAdapter<String> stringAdapter = new ArrayAdapter<String>(TableActivity.this, R.layout.spinner_text, tableName);
                 stringAdapter.setDropDownViewResource(R.layout.spinner_dropdown_textview);
                 from_spinner.setAdapter(stringAdapter);
-                from_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view,
-                                               int position, long id) {
-                        String fromTableName = tableName.get(position);
-                        Toast.makeText(TableActivity.this, fromTableName, Toast.LENGTH_SHORT).show();
-                        for (int i = 0; i < bookingTableArrayList.size(); i++) {
 
-                            Log.i("TableNames", bookingTableArrayList.get(i).getTable_no());
-                            if (fromTableName.equals(bookingTableArrayList.get(i).getTable_no())) {
-                                Toast.makeText(TableActivity.this, bookingTableArrayList.get(i).getTableID(), Toast.LENGTH_SHORT).show();
-                                fromTable = bookingTableArrayList.get(i).getTableID();
+                if(tableName != null && tableName.size() > 0) {
+                    from_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view,
+                                                   int position, long id) {
+                            String fromTableName = tableName.get(position);
+                            Toast.makeText(TableActivity.this, fromTableName, Toast.LENGTH_SHORT).show();
+                            for (int i = 0; i < bookingTableArrayList.size(); i++) {
+
+                                Log.i("TableNames", bookingTableArrayList.get(i).getTable_no());
+                                if (fromTableName.equals(bookingTableArrayList.get(i).getTable_no())) {
+                                    Toast.makeText(TableActivity.this, bookingTableArrayList.get(i).getTableID(), Toast.LENGTH_SHORT).show();
+                                    fromTable = bookingTableArrayList.get(i).getTableID();
+                                }
+
                             }
 
+                            fromPos = position;
                         }
 
-                        fromPos = position;
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                        // TODO Auto-generated method stub
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+                            // TODO Auto-generated method stub
 
 
-                    }
-                });
+                        }
+                    });
+                }
+
                 ArrayAdapter<String> toArrayAdapter = new ArrayAdapter<String>(TableActivity.this, R.layout.spinner_text, fortransfertableName);
                 toArrayAdapter.setDropDownViewResource(R.layout.spinner_dropdown_textview);
                 to_spinner.setAdapter(toArrayAdapter);
-                to_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        //getavailable table
 
-                        toTable = get4transfertableArrayList.get(position).getTableID();
-                        Log.i("toTable", toTable);
-                        toPos = position;
-                    }
+                if(fortransfertableName != null && fortransfertableName.size() > 0 && get4transfertableArrayList != null && get4transfertableArrayList.size() > 0) {
+                    to_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                            //getavailable table
 
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                        // TODO Auto-generated method stub
+                            toTable = get4transfertableArrayList.get(position).getTableID();
+                            Log.i("toTable", toTable);
+                            toPos = position;
+                        }
 
-                    }
-                });
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+                            // TODO Auto-generated method stub
+
+                        }
+                    });
+                }
                 builder.setView(view);
                 builder.setTitle(R.string.table_transfer);
                 builder.setOnShowListener(new DialogInterface.OnShowListener() {
@@ -1017,15 +1054,22 @@ public class TableActivity extends ActionBarActivity {
     }
 
     private String getActivateKeyFromDB() {
-        database.beginTransaction();
+        Cursor cur = null;
         String backend_activate_key = null;
-        Cursor cur = database.rawQuery("SELECT * FROM activate_key", null);
-        while (cur.moveToNext()) {
-            backend_activate_key = cur.getString(cur.getColumnIndex("backend_activation_key"));
+        try {
+            database.beginTransaction();
+            cur = database.rawQuery("SELECT * FROM activate_key", null);
+            while (cur.moveToNext()) {
+                backend_activate_key = cur.getString(cur.getColumnIndex("backend_activation_key"));
+            }
+            cur.close();
+            database.setTransactionSuccessful();
+            database.endTransaction();
+        } catch (Exception e) {
+            callUploadDialog("DB error");
+        } finally {
+            cur.close();
         }
-        cur.close();
-        database.setTransactionSuccessful();
-        database.endTransaction();
         return backend_activate_key;
     }
 
@@ -1082,29 +1126,36 @@ public class TableActivity extends ActionBarActivity {
         });
     }
 
-    private void callUploadDialog(String message) {
-        try {
-            final android.support.v7.app.AlertDialog builder = new android.support.v7.app.AlertDialog.Builder(TableActivity.this, R.style.InvitationDialog)
-                    .setPositiveButton(R.string.invitation_ok, null)
-                    .create();
-            builder.setTitle(R.string.alert);
-            builder.setMessage(message);
-            builder.setOnShowListener(new DialogInterface.OnShowListener() {
-                @Override
-                public void onShow(DialogInterface dialog) {
-                    final Button btnAccept = builder.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
-                    btnAccept.setOnClickListener(new View.OnClickListener() {
+    private void callUploadDialog(final String message) {
+        Handler handler = new Handler();
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (activity.isFinishing()) {
+                    return;
+                } else {
+                    final android.support.v7.app.AlertDialog builder = new android.support.v7.app.AlertDialog.Builder(TableActivity.this, R.style.InvitationDialog)
+                            .setPositiveButton(R.string.invitation_ok, null)
+                            .create();
+                    builder.setTitle(R.string.alert);
+                    builder.setMessage(message);
+                    builder.setOnShowListener(new DialogInterface.OnShowListener() {
                         @Override
-                        public void onClick(View v) {
-                            builder.dismiss();
+                        public void onShow(DialogInterface dialog) {
+                            final Button btnAccept = builder.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
+                            btnAccept.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    builder.dismiss();
+                                }
+                            });
                         }
                     });
+                    builder.show();
                 }
-            });
-            builder.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            }
+        });
     }
 
     @Override

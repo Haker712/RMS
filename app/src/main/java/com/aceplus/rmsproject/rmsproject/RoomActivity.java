@@ -146,7 +146,6 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private ArrayList<Room> getRoomData() {
-        database.beginTransaction();
         ArrayList<Room> roomArrayList = new ArrayList<>();
         Cursor cur = database.rawQuery("SELECT * FROM room", null);
         while (cur.moveToNext()) {
@@ -157,13 +156,12 @@ public class RoomActivity extends AppCompatActivity {
             roomArrayList.add(room);
         }
         cur.close();
-        database.setTransactionSuccessful();
-        database.endTransaction();
+
         return roomArrayList;
     }
 
     private ArrayList<Room> gettransferRoomData() {
-        database.beginTransaction();
+
         ArrayList<Room> roomArrayList = new ArrayList<>();
         Cursor cur = database.rawQuery("SELECT * FROM room WHERE status = '0'", null);
         while (cur.moveToNext()) {
@@ -174,8 +172,7 @@ public class RoomActivity extends AppCompatActivity {
             roomArrayList.add(room);
         }
         cur.close();
-        database.setTransactionSuccessful();
-        database.endTransaction();
+
         return roomArrayList;
     }
 
@@ -186,8 +183,8 @@ public class RoomActivity extends AppCompatActivity {
         database.endTransaction();
     }
 
-    private void getRoomDataInDB() {
-        database.beginTransaction();
+    private void getRoomDataInDB()  {
+
         getRoomArrayList.clear();
         Cursor cur;
         Cursor curBooking = null;
@@ -212,18 +209,20 @@ public class RoomActivity extends AppCompatActivity {
                     bookingTable.setBooking_time(curBooking.getString(curBooking.getColumnIndex("from_time")));
                     Log.e("RoomBookingTime", curBooking.getString(curBooking.getColumnIndex("from_time")) + "");
                 }
+                curBooking.close();
             }
+            curBRoom.close();
             curConfig = database.rawQuery("SELECT * FROM config", null);
             while (curConfig.moveToNext()) {
                 bookingTable.setBooking_waiting(curConfig.getString(curConfig.getColumnIndex("booking_waiting_time")));
                 bookingTable.setBooking_service(curConfig.getString(curConfig.getColumnIndex("booking_service_time")));
                 bookingTable.setBooking_warning(curConfig.getString(curConfig.getColumnIndex("booking_warning_time")));
             }
+            curConfig.close();
             getRoomArrayList.add(bookingTable);
         }
         cur.close();
-        database.setTransactionSuccessful();
-        database.endTransaction();
+
     }
 
     private void registerIDs() {
@@ -533,7 +532,7 @@ public class RoomActivity extends AppCompatActivity {
                                 JSONObject jsonObject = new JSONObject();
                                 try {
                                     jsonObject.put("transfer_from_room_id", fromRoom);
-                                    Log.i("FromRoomId",fromRoom);
+                                    Log.i("FromRoomId", fromRoom);
                                     jsonObject.put("transfer_to_room_id", toRoom);
                                     Toast.makeText(RoomActivity.this, toRoom, Toast.LENGTH_SHORT).show();
                                 } catch (JSONException e) {
