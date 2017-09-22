@@ -706,14 +706,13 @@ public class CategoryActivity extends ActionBarActivity {
 
         } else {
 
-            Cursor cursor_noContiment=database.rawQuery("SELECT * FROM item where id='" + item_id_forName + "' and has_contiment =" + 0, null);
+            Cursor cursor_noContiment = database.rawQuery("SELECT * FROM item where id='" + item_id_forName + "' and has_contiment =" + 0, null);
 
-            while (cursor_noContiment.moveToNext()){
+            while (cursor_noContiment.moveToNext()) {
 
                 itemname = cursor_noContiment.getString(cursor_noContiment.getColumnIndex("name"));
                 NameStr = itemname;
             }
-
 
 
         }
@@ -1593,17 +1592,18 @@ public class CategoryActivity extends ActionBarActivity {
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
-            LayoutInflater layoutInflater = context.getLayoutInflater();
-            View view = layoutInflater.inflate(R.layout.category_list_item, null, true);
-            final TextView itemNameTxt = (TextView) view.findViewById(R.id.item_name_txt);
-            Button quantityBtn = (Button) view.findViewById(R.id.quantity_btn);
-            TextView priceTxt = (TextView) view.findViewById(R.id.price_txt);
-            TextView discountTxt = (TextView) view.findViewById(R.id.discount_txt);
-            Button extraBtn = (Button) view.findViewById(R.id.extra_btn);
-            TextView extraPriceTxt = (TextView) view.findViewById(R.id.extra_price_txt);
-            TextView amountTxt = (TextView) view.findViewById(R.id.amount_txt);
-            final CheckBox takeAwayCheck = (CheckBox) view.findViewById(R.id.take_away_check);
-            ImageView clearBtn = (ImageView) view.findViewById(R.id.clear_btn);
+            View view = convertView;
+            final CategoryItemViewHolder viewHolder;
+
+            if(view == null) {
+                LayoutInflater layoutInflater = context.getLayoutInflater();
+                view = layoutInflater.inflate(R.layout.category_list_item, null, true);
+                viewHolder = new CategoryItemViewHolder(view);
+                view.setTag(viewHolder);
+            } else {
+                viewHolder = (CategoryItemViewHolder) view.getTag();
+            }
+
             categoryTxt.setText("Item");
             final Category_Item categoryItem = categoryItemList.get(position);
             String takeiddd = categoryItem.getTakeid();
@@ -1612,7 +1612,7 @@ public class CategoryActivity extends ActionBarActivity {
             /***
              * PhoneLinAung 11.9.17 Start
              */
-            itemNameTxt.setOnClickListener(new View.OnClickListener() {
+            viewHolder.itemNameTxt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
@@ -1694,7 +1694,7 @@ public class CategoryActivity extends ActionBarActivity {
                                                 String selected_item_id = cursor.getString(cursor.getColumnIndex("id"));
                                                 categoryItem.setId(selected_item_id);
                                                 String selectd_itemname = cursor.getString(cursor.getColumnIndex("name"));
-                                                itemNameTxt.setText(selected_ContimentName + " " + selectd_itemname);
+                                                viewHolder.itemNameTxt.setText(selected_ContimentName + " " + selectd_itemname);
                                                 categoryItemList.get(position).setItemName(selected_ContimentName + " " + selectd_itemname);
 
                                             }
@@ -1730,28 +1730,28 @@ public class CategoryActivity extends ActionBarActivity {
 
             if (TAKE_AWAY == "table" || TAKE_AWAY == "room") {     // for from room and table including new invoice and exiting invoice
                 if ((statusiddd == "6" || statusiddd.equals("6")) || (statusiddd == "7" || statusiddd.equals("7"))) {
-                    itemNameTxt.setText(categoryItem.getItemName());
-                    itemNameTxt.setPaintFlags(itemNameTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
-                    quantityBtn.setText(categoryItem.getQuantity() + "");
-                    quantityBtn.setPaintFlags(quantityBtn.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
-                    priceTxt.setText(commaSepFormat.format(0));
-                    priceTxt.setPaintFlags(priceTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
-                    discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
-                    discountTxt.setPaintFlags(discountTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
-                    extraPriceTxt.setText(commaSepFormat.format(0));
-                    extraPriceTxt.setPaintFlags(extraPriceTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
-                    amountTxt.setText(commaSepFormat.format(0));
-                    amountTxt.setPaintFlags(amountTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
-                    takeAwayCheck.setEnabled(false);
+                    viewHolder.itemNameTxt.setText(categoryItem.getItemName());
+                    viewHolder.itemNameTxt.setPaintFlags(viewHolder.itemNameTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+                    viewHolder.quantityBtn.setText(categoryItem.getQuantity() + "");
+                    viewHolder.quantityBtn.setPaintFlags(viewHolder.quantityBtn.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+                    viewHolder.priceTxt.setText(commaSepFormat.format(0));
+                    viewHolder.priceTxt.setPaintFlags(viewHolder.priceTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+                    viewHolder.discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
+                    viewHolder.discountTxt.setPaintFlags(viewHolder.discountTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+                    viewHolder.extraPriceTxt.setText(commaSepFormat.format(0));
+                    viewHolder.extraPriceTxt.setPaintFlags(viewHolder.extraPriceTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+                    viewHolder.amountTxt.setText(commaSepFormat.format(0));
+                    viewHolder.amountTxt.setPaintFlags(viewHolder.amountTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+                    viewHolder.takeAwayCheck.setEnabled(false);
 
                 } else {
-                    itemNameTxt.setText(categoryItem.getItemName());
-                    quantityBtn.setText(categoryItem.getQuantity() + "");
-                    priceTxt.setText(commaSepFormat.format(categoryItem.getPrice()));
-                    discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
+                    viewHolder.itemNameTxt.setText(categoryItem.getItemName());
+                    viewHolder.quantityBtn.setText(categoryItem.getQuantity() + "");
+                    viewHolder.priceTxt.setText(commaSepFormat.format(categoryItem.getPrice()));
+                    viewHolder.discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
                 }
                 if (ADD_INVOICE.equals("NULL") || ADD_INVOICE == null) {
-                    clearBtn.setOnClickListener(new View.OnClickListener() {
+                    viewHolder.clearBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
@@ -1814,9 +1814,9 @@ public class CategoryActivity extends ActionBarActivity {
 
 
                 } else if (ADD_INVOICE == "EDITING_INVOICE" || ADD_INVOICE.equals("EDITING_INVOICE") || ADD_INVOICE.equals("status1")) {
-                    clearBtn.setEnabled(false);
-                    clearBtn.setColorFilter(Color.argb(220, 220, 220, 220));
-                    clearBtn.setOnClickListener(new View.OnClickListener() {
+                    viewHolder.clearBtn.setEnabled(false);
+                    viewHolder.clearBtn.setColorFilter(Color.argb(220, 220, 220, 220));
+                    viewHolder.clearBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             Toast.makeText(CategoryActivity.this, "Can't Cancel NOW !", Toast.LENGTH_SHORT).show();
@@ -1831,22 +1831,22 @@ public class CategoryActivity extends ActionBarActivity {
                         extraVlaue += addOn.getPrice();
                     }
                 }
-                extraPriceTxt.setText(commaSepFormat.format(extraVlaue));
+                viewHolder.extraPriceTxt.setText(commaSepFormat.format(extraVlaue));
                 categoryItem.setExtraPrice(extraVlaue);
                 categoryItemAdapter.notifyDataSetChanged();
-                amountTxt.setText(commaSepFormat.format(categoryItem.getTotalAmount()));
+                viewHolder.amountTxt.setText(commaSepFormat.format(categoryItem.getTotalAmount()));
                 Log.e("TakeAway", TAKE_AWAY + "");
-                takeAwayCheck.setChecked(categoryItem.getTakeAway());
-                takeAwayCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                                             @Override
-                                                             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                                 if (categoryItem.getOrder_type_id().equals("2")) {
-                                                                     Log.e("TakeAway", "true");
-                                                                 }
-                                                                 categoryItem.setTakeAway(isChecked);
-                                                                 categoryItemAdapter.notifyDataSetChanged();
-                                                             }
-                                                         }
+                viewHolder.takeAwayCheck.setChecked(categoryItem.getTakeAway());
+                viewHolder.takeAwayCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                                                        @Override
+                                                                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                                            if (categoryItem.getOrder_type_id().equals("2")) {
+                                                                                Log.e("TakeAway", "true");
+                                                                            }
+                                                                            categoryItem.setTakeAway(isChecked);
+                                                                            categoryItemAdapter.notifyDataSetChanged();
+                                                                        }
+                                                                    }
                 );
                 double totalValue = 0;
                 double teValue = 0;
@@ -1870,7 +1870,7 @@ public class CategoryActivity extends ActionBarActivity {
                 tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
                 serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
                 taxAmtTxt.setText(commaSepFormat.format(taxValue));
-                quantityBtn.setOnClickListener(new View.OnClickListener() {
+                viewHolder.quantityBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
@@ -1952,7 +1952,7 @@ public class CategoryActivity extends ActionBarActivity {
                         builder.show();
                     }
                 });
-                extraBtn.setOnClickListener(new View.OnClickListener() {
+                viewHolder.extraBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(final View v) {
                         final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
@@ -1999,37 +1999,37 @@ public class CategoryActivity extends ActionBarActivity {
             } else {
                 Log.i("takeaway!!!!!", TAKE_AWAY + "");      // for from  take away including new invoice and exiting invoice
                 if ((statusiddd == "6" || statusiddd.equals("6")) || (statusiddd == "7" || statusiddd.equals("7"))) {
-                    itemNameTxt.setText(categoryItem.getItemName());
-                    itemNameTxt.setPaintFlags(itemNameTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
-                    quantityBtn.setText(categoryItem.getQuantity() + "");
-                    quantityBtn.setPaintFlags(quantityBtn.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
-                    priceTxt.setText(commaSepFormat.format(0));
-                    priceTxt.setPaintFlags(priceTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
-                    discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
-                    discountTxt.setPaintFlags(discountTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
-                    extraPriceTxt.setText(commaSepFormat.format(0));
-                    extraPriceTxt.setPaintFlags(extraPriceTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
-                    amountTxt.setText(commaSepFormat.format(0));
-                    amountTxt.setPaintFlags(amountTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
-                    clearBtn.setEnabled(false);
-                    clearBtn.setColorFilter(Color.argb(220, 220, 220, 220));
-                    clearBtn.setOnClickListener(new View.OnClickListener() {
+                    viewHolder.itemNameTxt.setText(categoryItem.getItemName());
+                    viewHolder.itemNameTxt.setPaintFlags(viewHolder.itemNameTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+                    viewHolder.quantityBtn.setText(categoryItem.getQuantity() + "");
+                    viewHolder.quantityBtn.setPaintFlags(viewHolder.quantityBtn.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+                    viewHolder.priceTxt.setText(commaSepFormat.format(0));
+                    viewHolder.priceTxt.setPaintFlags(viewHolder.priceTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+                    viewHolder.discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
+                    viewHolder.discountTxt.setPaintFlags(viewHolder.discountTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+                    viewHolder.extraPriceTxt.setText(commaSepFormat.format(0));
+                    viewHolder.extraPriceTxt.setPaintFlags(viewHolder.extraPriceTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+                    viewHolder.amountTxt.setText(commaSepFormat.format(0));
+                    viewHolder.amountTxt.setPaintFlags(viewHolder.amountTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+                    viewHolder.clearBtn.setEnabled(false);
+                    viewHolder.clearBtn.setColorFilter(Color.argb(220, 220, 220, 220));
+                    viewHolder.clearBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             Toast.makeText(CategoryActivity.this, "Can't Cancel NOW !", Toast.LENGTH_SHORT).show();
                             Log.e("Can't Cancel NOW !", "Can't Cancel NOW !Can't Cancel NOW !");
                         }
                     });
-                    takeAwayCheck.setEnabled(false);
+                    viewHolder.takeAwayCheck.setEnabled(false);
                 } else {
-                    itemNameTxt.setText(categoryItem.getItemName());
-                    quantityBtn.setText(categoryItem.getQuantity() + "");
-                    priceTxt.setText(commaSepFormat.format(categoryItem.getPrice()));
-                    discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
+                    viewHolder.itemNameTxt.setText(categoryItem.getItemName());
+                    viewHolder.quantityBtn.setText(categoryItem.getQuantity() + "");
+                    viewHolder.priceTxt.setText(commaSepFormat.format(categoryItem.getPrice()));
+                    viewHolder.discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
                     if (ADD_INVOICE == "EDITING_INVOICE") {
-                        clearBtn.setEnabled(false);
-                        clearBtn.setColorFilter(Color.argb(220, 220, 220, 220));
-                        clearBtn.setOnClickListener(new View.OnClickListener() {
+                        viewHolder.clearBtn.setEnabled(false);
+                        viewHolder.clearBtn.setColorFilter(Color.argb(220, 220, 220, 220));
+                        viewHolder.clearBtn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 Toast.makeText(CategoryActivity.this, "Can't Cancel NOW !", Toast.LENGTH_SHORT).show();
@@ -2037,7 +2037,7 @@ public class CategoryActivity extends ActionBarActivity {
                             }
                         });
                     } else if (ADD_INVOICE == "NULL" || ADD_INVOICE == null) {
-                        clearBtn.setOnClickListener(new View.OnClickListener() {
+                        viewHolder.clearBtn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
@@ -2103,26 +2103,26 @@ public class CategoryActivity extends ActionBarActivity {
                             extraVlaue += addOn.getPrice();
                         }
                     }
-                    extraPriceTxt.setText(commaSepFormat.format(extraVlaue));
+                    viewHolder.extraPriceTxt.setText(commaSepFormat.format(extraVlaue));
                     categoryItem.setExtraPrice(extraVlaue);
                     categoryItemAdapter.notifyDataSetChanged();
-                    amountTxt.setText(commaSepFormat.format(categoryItem.getTotalAmount()));
+                    viewHolder.amountTxt.setText(commaSepFormat.format(categoryItem.getTotalAmount()));
                     Log.e("TakeAway", TAKE_AWAY + "");
-                    takeAwayCheck.setChecked(categoryItem.getTakeAway());
+                    viewHolder.takeAwayCheck.setChecked(categoryItem.getTakeAway());
                     if (takeiddd.equals("1")) {
-                        takeAwayCheck.setEnabled(false);
+                        viewHolder.takeAwayCheck.setEnabled(false);
                     }
-                    takeAwayCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    viewHolder.takeAwayCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
-                                                                 @Override
-                                                                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                                     if (categoryItem.getOrder_type_id().equals("2")) {
-                                                                         Log.e("TakeAway", "true");
-                                                                     }
-                                                                     categoryItem.setTakeAway(isChecked);
-                                                                     categoryItemAdapter.notifyDataSetChanged();
-                                                                 }
-                                                             }
+                                                                            @Override
+                                                                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                                                if (categoryItem.getOrder_type_id().equals("2")) {
+                                                                                    Log.e("TakeAway", "true");
+                                                                                }
+                                                                                categoryItem.setTakeAway(isChecked);
+                                                                                categoryItemAdapter.notifyDataSetChanged();
+                                                                            }
+                                                                        }
                     );
                     double totalValue = 0;
                     double teValue = 0;
@@ -2146,7 +2146,7 @@ public class CategoryActivity extends ActionBarActivity {
                     tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
                     serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
                     taxAmtTxt.setText(commaSepFormat.format(taxValue));
-                    quantityBtn.setOnClickListener(new View.OnClickListener() {
+                    viewHolder.quantityBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
@@ -2219,7 +2219,7 @@ public class CategoryActivity extends ActionBarActivity {
                             builder.show();
                         }
                     });
-                    extraBtn.setOnClickListener(new View.OnClickListener() {
+                    viewHolder.extraBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(final View v) {
                             final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
@@ -2265,6 +2265,32 @@ public class CategoryActivity extends ActionBarActivity {
                 }
             }
             return view;
+        }
+
+        public class CategoryItemViewHolder extends RecyclerView.ViewHolder {
+
+            public TextView itemNameTxt;
+            Button quantityBtn;
+            TextView priceTxt;
+            TextView discountTxt;
+            Button extraBtn;
+            TextView extraPriceTxt;
+            TextView amountTxt;
+            CheckBox takeAwayCheck;
+            ImageView clearBtn;
+
+            public CategoryItemViewHolder(View view) {
+                super(view);
+                itemNameTxt = (TextView) view.findViewById(R.id.item_name_txt);
+                quantityBtn = (Button) view.findViewById(R.id.quantity_btn);
+                priceTxt = (TextView) view.findViewById(R.id.price_txt);
+                discountTxt = (TextView) view.findViewById(R.id.discount_txt);
+                extraBtn = (Button) view.findViewById(R.id.extra_btn);
+                extraPriceTxt = (TextView) view.findViewById(R.id.extra_price_txt);
+                amountTxt = (TextView) view.findViewById(R.id.amount_txt);
+                takeAwayCheck = (CheckBox) view.findViewById(R.id.take_away_check);
+                clearBtn = (ImageView) view.findViewById(R.id.clear_btn);
+            }
         }
     }
 
@@ -2372,7 +2398,7 @@ public class CategoryActivity extends ActionBarActivity {
 
 
             Glide.with(mContext)
-                    .load(MainActivity.IMG_URL_PREFIX+album.getImage())
+                    .load(MainActivity.IMG_URL_PREFIX + album.getImage())
                     .placeholder(R.drawable.default_pic)
                     .diskCacheStrategy(DiskCacheStrategy.RESULT)
                     .into(holder.thumbnail);
@@ -2486,7 +2512,7 @@ public class CategoryActivity extends ActionBarActivity {
             //byte[] ImageShow = Base64.decode(item.getImage(), Base64.DEFAULT);
             //Bitmap mBitmap = BitmapFactory.decodeByteArray(ImageShow, 0, ImageShow.length);
             Glide.with(mContext)
-                    .load(MainActivity.IMG_URL_PREFIX+item.getImage())
+                    .load(MainActivity.IMG_URL_PREFIX + item.getImage())
                     .diskCacheStrategy(DiskCacheStrategy.RESULT)
                     .into(holder.thumbnail);
             //holder.thumbnail.setImageBitmap(mBitmap);

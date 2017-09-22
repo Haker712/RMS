@@ -139,7 +139,7 @@ public class MainActivity extends Activity {
         database = new Database(this).getDataBase();
         sharedpreferences = getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE);
         registerIds();
-        activateEdit.setText("4c16d0a7555744ac18f982e8a58c1140");
+        activateEdit.setText("337485c22c2860b238d80fe7ec5edfa3");
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
