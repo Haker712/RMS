@@ -189,8 +189,7 @@ public class TableActivity extends ActionBarActivity {
                     bookingTable.setBooking_warning(curConfig.getString(curConfig.getColumnIndex("booking_warning_time")));
                 }
                 curConfig.close();
-                getBookingArrayList.add(bookingTable);
-            }
+                getBookingArrayList.add(bookingTable); }
 
             cur.close();
         } catch (Exception e) {
