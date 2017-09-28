@@ -281,7 +281,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
 
     public void getConfigData() {
         try {
-            database.beginTransaction();
+
             Cursor cur = database.rawQuery("SELECT * FROM config", null);
             while (cur.moveToNext()) {
                 taxAmt = cur.getDouble(cur.getColumnIndex("tax"));
@@ -289,8 +289,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                 roomchargeAmt = cur.getDouble(cur.getColumnIndex("room_charge"));
             }
             cur.close();
-            database.setTransactionSuccessful();
-            database.endTransaction();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -655,15 +654,12 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     }
 
     private String getActivateKeyFromDB() {
-        database.beginTransaction();
         String backend_activate_key = null;
         Cursor cur = database.rawQuery("SELECT * FROM activate_key", null);
         while (cur.moveToNext()) {
             backend_activate_key = cur.getString(cur.getColumnIndex("backend_activation_key"));
         }
         cur.close();
-        database.setTransactionSuccessful();
-        database.endTransaction();
         return backend_activate_key;
     }
 
