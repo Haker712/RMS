@@ -2892,37 +2892,37 @@ public class CategoryActivity extends ActionBarActivity {
             startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
             finish();
         } else if (check_check.equals("room")) {
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put("room_id", ROOM_ID + "");
-                jsonObject.put("status", "0");
-                jsonObject.put("booking_id", "null");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            Log.e("RoomStatusJson", jsonObject + "");
-            RequestInterface request = retrofit.create(RequestInterface.class);
-            Call<Success> call = request.postRoomStatus(jsonObject + "");
-            call.enqueue(new Callback<Success>() {
-                @Override
-                public void onResponse(Call<Success> call, Response<Success> response) {
-                    try {
-                        Success jsonResponse = response.body();
-                        String message = jsonResponse.getMessage();
-                        if (message.equals("Success")) {
-                            Log.d("TableStatus", message);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Log.d("fail!!", "");
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Success> call, Throwable t) {
-                    Log.d("TableStatuscatt", t.getMessage());
-                }
-            });
+//            JSONObject jsonObject = new JSONObject();
+//            try {
+//                jsonObject.put("room_id", ROOM_ID + "");
+//                jsonObject.put("status", "0");
+//                jsonObject.put("booking_id", "null");
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//            Log.e("RoomStatusJson", jsonObject + "");
+//            RequestInterface request = retrofit.create(RequestInterface.class);
+//            Call<Success> call = request.postRoomStatus(jsonObject + "");
+//            call.enqueue(new Callback<Success>() {
+//                @Override
+//                public void onResponse(Call<Success> call, Response<Success> response) {
+//                    try {
+//                        Success jsonResponse = response.body();
+//                        String message = jsonResponse.getMessage();
+//                        if (message.equals("Success")) {
+//                            Log.d("TableStatus", message);
+//                        }
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        Log.d("fail!!", "");
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Call<Success> call, Throwable t) {
+//                    Log.d("TableStatuscatt", t.getMessage());
+//                }
+//            });
             startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
             finish();
         } else {

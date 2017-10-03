@@ -51,12 +51,16 @@ import com.aceplus.rmsproject.rmsproject.object.JSONResponseTable;
 import com.aceplus.rmsproject.rmsproject.object.Success;
 import com.aceplus.rmsproject.rmsproject.utils.Database;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -109,6 +113,8 @@ public class TableActivity extends ActionBarActivity {
     AtomicBoolean ContinueThread;
     Activity activity;
 
+    Socket socket;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,6 +129,27 @@ public class TableActivity extends ActionBarActivity {
         mProgressDialog = new ProgressDialog(TableActivity.this, ProgressDialog.THEME_HOLO_LIGHT);
         mProgressDialog.setIndeterminate(false);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+
+        String mainurl = MainActivity.URL;
+        String supmainturl = "";
+
+        if (mainurl != null && mainurl.length() > 0) {
+            supmainturl = mainurl.substring(0, mainurl.length() - 4);
+        }
+        try {
+            String socketurl = supmainturl + "3333";
+            Log.i("SocketUrl", socketurl);
+            socket = IO.socket(socketurl);
+        } catch (URISyntaxException e) {
+            Log.e("URL ERR :", e.getMessage());
+
+        }
+
+
+        socket.on("tableChange", onNewMessage);
+        socket.connect();
+
+
         Interceptor interceptor = new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
@@ -147,6 +174,28 @@ public class TableActivity extends ActionBarActivity {
         registerIDs();
         catchEvents();
     }
+
+    private Emitter.Listener onNewMessage = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+//                    JSONObject data = (JSONObject) args[0];
+//                    String username;
+//                    //String message;
+//                    try {
+//                        username = data.getString("description");
+//                        //message = data.getString("message");
+//                    } catch (JSONException e) {
+//                        return;
+//                    }
+                    loadTableJson();
+                    mProgressDialog.dismiss();
+                }
+            });
+        }
+    };
 
     private void getTableData() {  // data from database !!
         //database.beginTransaction();
@@ -189,7 +238,8 @@ public class TableActivity extends ActionBarActivity {
                     bookingTable.setBooking_warning(curConfig.getString(curConfig.getColumnIndex("booking_warning_time")));
                 }
                 curConfig.close();
-                getBookingArrayList.add(bookingTable); }
+                getBookingArrayList.add(bookingTable);
+            }
 
             cur.close();
         } catch (Exception e) {
@@ -248,7 +298,7 @@ public class TableActivity extends ActionBarActivity {
                 get4transfertableArrayList.add(bookingTable);
             }
             cur.close();
-        }catch (Exception e) {
+        } catch (Exception e) {
 
         }/* finally {
             cur.close();
@@ -303,7 +353,7 @@ public class TableActivity extends ActionBarActivity {
         return group_invoiceee_id;
     }
 
-    private void callDialog(String messageTxt) {
+    private void callDialog(String messageTxt)  {
         try {
             mProgressDialog = new ProgressDialog(TableActivity.this, ProgressDialog.THEME_HOLO_LIGHT);
             mProgressDialog.setIndeterminate(false);
@@ -414,7 +464,7 @@ public class TableActivity extends ActionBarActivity {
                 stringAdapter.setDropDownViewResource(R.layout.spinner_dropdown_textview);
                 from_spinner.setAdapter(stringAdapter);
 
-                if(tableName != null && tableName.size() > 0) {
+                if (tableName != null && tableName.size() > 0) {
                     from_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view,
@@ -447,7 +497,7 @@ public class TableActivity extends ActionBarActivity {
                 toArrayAdapter.setDropDownViewResource(R.layout.spinner_dropdown_textview);
                 to_spinner.setAdapter(toArrayAdapter);
 
-                if(fortransfertableName != null && fortransfertableName.size() > 0 && get4transfertableArrayList != null && get4transfertableArrayList.size() > 0) {
+                if (fortransfertableName != null && fortransfertableName.size() > 0 && get4transfertableArrayList != null && get4transfertableArrayList.size() > 0) {
                     to_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -478,6 +528,19 @@ public class TableActivity extends ActionBarActivity {
                                 @SuppressLint("LongLogTag")
                                 @Override
                                 public void onClick(View v) {
+
+
+                                    Handler handler = new Handler();
+
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            socket.emit("table_transfer", "transfer_table");
+                                            Toast.makeText(TableActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+
+
                                     if (fromTable == null && toTable == null) {
                                         Log.e("TableTransfer", "null");
                                     } else {
@@ -516,6 +579,10 @@ public class TableActivity extends ActionBarActivity {
                                                 Log.d("TableTransfer", message);
                                                 mProgressDialog.dismiss();
                                                 builder.dismiss();
+                                            } else {
+                                                Toast.makeText(TableActivity.this, "U can't transfer", Toast.LENGTH_SHORT).show();
+                                                builder.dismiss();
+                                                mProgressDialog.dismiss();
                                             }
                                         } catch (Exception e) {
                                             e.printStackTrace();
@@ -525,7 +592,8 @@ public class TableActivity extends ActionBarActivity {
                                             callUploadDialog("Please upload again!");
                                         }
                                     }
-                                    refreshTableJson();
+                                    // refreshTableJson();
+                                    //loadTableJson();
                                 }
                             });
                             final Button btnDecline = builder.getButton(DialogInterface.BUTTON_NEGATIVE);
@@ -590,6 +658,7 @@ public class TableActivity extends ActionBarActivity {
                     public void onClick(View v) {
                         JSONArray tableListJsonArray = new JSONArray();
                         groupTableList.clear();
+
                         for (BookingTable book : bookingTableArrayList) {
                             if (book.isTable_check() == true) {
                                 groupTableID = book.getTableID();
@@ -600,11 +669,12 @@ public class TableActivity extends ActionBarActivity {
                                     product.put("table_id", book.getTableID());
                                     product.put("booking_id", book.getBookingID() + "");
                                     product.put("status", "1");
+                                    product.put("old",0);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                                 tableListJsonArray.put(product);
-                                book.setTableService("1");
+                                //book.setTableService("1");
                                 book.setTable_check(false);
                                 adapter.notifyDataSetChanged();
                             }
@@ -621,6 +691,17 @@ public class TableActivity extends ActionBarActivity {
                             Success jsonResponse = call.execute().body();
                             String message = jsonResponse.getMessage();
                             if (message.equals("Success")) {
+
+                                Handler handler = new Handler();
+
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        socket.emit("table_message", "TakeTable");
+                                        Toast.makeText(TableActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
                                 Log.d("TableStatus", message);
                                 mProgressDialog.dismiss();
                                 CategoryActivity.TABLE_ID = groupTableID;
@@ -634,6 +715,9 @@ public class TableActivity extends ActionBarActivity {
                                 builder.dismiss();
                                 startActivity(new Intent(TableActivity.this, CategoryActivity.class));
                                 finish();
+                            }else {
+                                Toast.makeText(activity, "These tables can't be grouped", Toast.LENGTH_SHORT).show();
+                                mProgressDialog.dismiss();
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -779,12 +863,14 @@ public class TableActivity extends ActionBarActivity {
                             product.put("booking_id", table.getBookingID() + "");
                             product.put("status", "1");
                             product.put("table_id", table.getTableID() + "");
+                            product.put("old", "1");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                         tableListJsonArray.put(product);
                         Log.e("TableList", tableListJsonArray.toString());
                         callDialog("Upload table data...");
+
                         RequestInterface request = retrofit.create(RequestInterface.class);
                         Call<Success> call = request.postTableStatus(tableListJsonArray.toString());
                         call.enqueue(new Callback<Success>() {
@@ -856,12 +942,15 @@ public class TableActivity extends ActionBarActivity {
                             product.put("booking_id", table.getBookingID() + "");
                             product.put("status", "1");
                             product.put("table_id", table.getTableID() + "");
+                            product.put("old", "0");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                         tableListJsonArray.put(product);
                         Log.e("TableList", tableListJsonArray.toString());
                         callDialog("Upload table data...");
+                        mProgressDialog.dismiss();
+
                         RequestInterface request = retrofit.create(RequestInterface.class);
                         Call<Success> call = request.postTableStatus(tableListJsonArray.toString());
                         call.enqueue(new Callback<Success>() {
@@ -871,6 +960,17 @@ public class TableActivity extends ActionBarActivity {
                                     Success jsonResponse = response.body();
                                     String message = jsonResponse.getMessage();
                                     if (message.equals("Success")) {
+
+                                        Handler handler = new Handler();
+
+                                        handler.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                socket.emit("table_message", "TakeTable");
+                                                Toast.makeText(mContext, "SocketFire", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
                                         Log.d("TableStatus", message);
                                         mProgressDialog.dismiss();
                                         CategoryActivity.TABLE_ID = table.getTableID();
@@ -883,6 +983,10 @@ public class TableActivity extends ActionBarActivity {
                                         CategoryActivity.VOUNCHER_ID = "NULL";
                                         startActivity(new Intent(TableActivity.this, CategoryActivity.class));
                                         finish();
+                                    } else {
+
+                                        Toast.makeText(TableActivity.this, "This TABLE is unavailable", Toast.LENGTH_SHORT).show();
+
                                     }
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -1166,28 +1270,28 @@ public class TableActivity extends ActionBarActivity {
 
     public void onStart() {
         super.onStart();
-        Thread background = new Thread(new Runnable() {
-
-            public void run() {
-                try {
-                    while (ContinueThread.get()) {
-                        Thread.sleep(30000);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                refreshTableJson();
-                            }
-                        });
-                    }
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-
-        });
-
-        ContinueThread.set(true);
-        background.start();
+//        Thread background = new Thread(new Runnable() {
+//
+//            public void run() {
+//                try {
+//                    while (ContinueThread.get()) {
+//                        Thread.sleep(30000);
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                refreshTableJson();
+//                            }
+//                        });
+//                    }
+//                } catch (InterruptedException e) {
+//                    Thread.currentThread().interrupt();
+//                }
+//            }
+//
+//        });
+//
+//        ContinueThread.set(true);
+//        background.start();
     }
 
     public void onStop() {

@@ -1,6 +1,7 @@
 package com.aceplus.rmsproject.rmsproject;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -46,11 +47,15 @@ import com.aceplus.rmsproject.rmsproject.object.Room;
 import com.aceplus.rmsproject.rmsproject.object.Success;
 import com.aceplus.rmsproject.rmsproject.utils.Database;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -97,10 +102,14 @@ public class RoomActivity extends AppCompatActivity {
     AtomicBoolean ContinueThread;
     String invoice_id = null;
 
+    Socket socket;
+    Activity activity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_room);
+        activity = this;
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         try {
@@ -111,6 +120,26 @@ public class RoomActivity extends AppCompatActivity {
         ContinueThread = new AtomicBoolean(false);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        String mainurl = MainActivity.URL;
+        String supmainturl = "";
+
+        if (mainurl != null && mainurl.length() > 0) {
+            supmainturl = mainurl.substring(0, mainurl.length() - 4);
+        }
+        try {
+            String socketurl = supmainturl + "3333";
+            Log.i("SocketUrl", socketurl);
+            socket = IO.socket(socketurl);
+        } catch (URISyntaxException e) {
+            Log.e("URL ERR :", e.getMessage());
+
+        }
+
+
+        socket.on("roomChange", onNewMessage);
+        socket.connect();
+
         Interceptor interceptor = new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
@@ -132,6 +161,33 @@ public class RoomActivity extends AppCompatActivity {
         registerIDs();
         catchEvents();
     }
+
+    private Emitter.Listener onNewMessage = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+//                    JSONObject data = (JSONObject) args[0];
+//                    String username;
+//                    //String message;
+//                    try {
+//                        username = data.getString("description");
+//                        //message = data.getString("message");
+//                    } catch (JSONException e) {
+//                        return;
+//                    }
+                    try {
+                        Thread.sleep(1000);
+                        loadRoomJson();
+                        mProgressDialog.dismiss();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    };
 
     private void callDialog(String message) {
         try {
@@ -183,7 +239,7 @@ public class RoomActivity extends AppCompatActivity {
         database.endTransaction();
     }
 
-    private void getRoomDataInDB()  {
+    private void getRoomDataInDB() {
 
         getRoomArrayList.clear();
         Cursor cur;
@@ -523,6 +579,9 @@ public class RoomActivity extends AppCompatActivity {
                         btnAccept.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+
+                                socket.emit("room_transfer", "transfer_room");
+
                                 String arg[] = {fromRoom};
                                 ContentValues cv = new ContentValues();
                                 cv.put("room_id", toRoom);
@@ -542,6 +601,7 @@ public class RoomActivity extends AppCompatActivity {
                                 String transferInvoice;
                                 transferInvoice = getRoomInvoiceDetail(fromRoom);
                                 callDialog("Uploading room transfer....");
+                                mProgressDialog.dismiss();
                                 RequestInterface request = retrofit.create(RequestInterface.class);
                                 Call<Success> call = request.postRoomTransfer(transferInvoice, fromRoom, toRoom);
                                 Log.i("transferInvoice", transferInvoice + "");
@@ -557,13 +617,17 @@ public class RoomActivity extends AppCompatActivity {
                                                 Log.d("RoomTransfer", message);
                                                 mProgressDialog.dismiss();
                                                 builder.dismiss();
+                                            } else {
+
+                                                Toast.makeText(RoomActivity.this, "U can't transfer", Toast.LENGTH_SHORT).show();
+
                                             }
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                             mProgressDialog.dismiss();
                                             callUploadDialog("Room transfer is null.");
                                         }
-                                        loadRoomJson();
+                                        // loadRoomJson();
                                     }
 
                                     @Override
@@ -653,6 +717,7 @@ public class RoomActivity extends AppCompatActivity {
             holder.backgroundLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                     if (table.getTableService().equals("0")) {
                         final AlertDialog builder = new AlertDialog.Builder(RoomActivity.this, R.style.InvitationDialog)
                                 .setPositiveButton(R.string.invitation_ok, null)
@@ -667,12 +732,17 @@ public class RoomActivity extends AppCompatActivity {
                                 btnAccept.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
+
+                                        socket.emit("room_message", "TakeRoom");
+                                        Toast.makeText(mContext, "SocketFire", Toast.LENGTH_SHORT).show();
+
                                         final String room_id = table.getTableID();
                                         final String status = table.getTableService();
                                         JSONObject jsonObject = new JSONObject();
                                         try {
                                             jsonObject.put("room_id", room_id + "");
                                             jsonObject.put("status", "1");
+                                            jsonObject.put("old", "0");
                                             String booking_id = table.getBookingID();
                                             if (booking_id == null) {
                                                 jsonObject.put("booking_id", "null");
@@ -684,6 +754,7 @@ public class RoomActivity extends AppCompatActivity {
                                         }
                                         Log.e("RoomStatusJson", jsonObject + "");
                                         callDialog("Uploading room status....");
+
                                         RequestInterface request = retrofit.create(RequestInterface.class);
                                         Call<Success> call = request.postRoomStatus(jsonObject + "");
                                         call.enqueue(new Callback<Success>() {
@@ -693,9 +764,10 @@ public class RoomActivity extends AppCompatActivity {
                                                 try {
                                                     Success jsonResponse = response.body();
                                                     String message = jsonResponse.getMessage();
+                                                    mProgressDialog.dismiss();
+
                                                     if (message.equals("Success")) {
                                                         Log.d("RoomStatus", message);
-                                                        mProgressDialog.dismiss();
                                                         CategoryActivity.ROOM_ID = room_id;
                                                         CategoryActivity.TAKE_AWAY = "room";
                                                         CategoryActivity.groupTableArrayList = null;
@@ -725,10 +797,12 @@ public class RoomActivity extends AppCompatActivity {
                                                         CategoryActivity.check_check = "room";
                                                         startActivity(new Intent(RoomActivity.this, CategoryActivity.class));
                                                         finish();
+                                                    } else {
+
+                                                        Toast.makeText(RoomActivity.this, "This TABLE is unavailable", Toast.LENGTH_SHORT).show();
                                                     }
                                                 } catch (Exception e) {
                                                     e.printStackTrace();
-                                                    mProgressDialog.dismiss();
                                                     callUploadDialog("Room status is null.");
                                                 }
                                             }
@@ -762,6 +836,7 @@ public class RoomActivity extends AppCompatActivity {
                         try {
                             jsonObject.put("room_id", room_id + "");
                             jsonObject.put("status", "1");
+                            jsonObject.put("old", "1");
                             String booking_id = table.getBookingID();
                             if (booking_id == null) {
                                 jsonObject.put("booking_id", "null");
@@ -782,9 +857,9 @@ public class RoomActivity extends AppCompatActivity {
                                 try {
                                     Success jsonResponse = response.body();
                                     String message = jsonResponse.getMessage();
+                                    mProgressDialog.dismiss();
                                     if (message.equals("Success")) {
                                         Log.d("RoomStatus", message);
-                                        mProgressDialog.dismiss();
                                         CategoryActivity.ROOM_ID = room_id;
                                         CategoryActivity.TAKE_AWAY = "room";
                                         CategoryActivity.groupTableArrayList = null;
@@ -817,7 +892,6 @@ public class RoomActivity extends AppCompatActivity {
                                     }
                                 } catch (Exception e) {
                                     e.printStackTrace();
-                                    mProgressDialog.dismiss();
                                     callUploadDialog("Room status is null.");
                                 }
                             }
@@ -901,26 +975,26 @@ public class RoomActivity extends AppCompatActivity {
 
     public void onStart() {
         super.onStart();
-        Thread background = new Thread(new Runnable() {
-
-            public void run() {
-                try {
-                    while (ContinueThread.get()) {
-                        Thread.sleep(30000);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                loadRoomJson();
-                            }
-                        });
-                    }
-                } catch (Throwable t) {
-                }
-            }
-
-        });
-        ContinueThread.set(true);
-        background.start();
+//        Thread background = new Thread(new Runnable() {
+//
+//            public void run() {
+//                try {
+//                    while (ContinueThread.get()) {
+//                        Thread.sleep(30000);
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                loadRoomJson();
+//                            }
+//                        });
+//                    }
+//                } catch (Throwable t) {
+//                }
+//            }
+//
+//        });
+//        ContinueThread.set(true);
+//        background.start();
     }
 
     public void onStop() {
