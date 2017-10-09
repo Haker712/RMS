@@ -1,6 +1,7 @@
 package com.aceplus.rmsproject.rmsproject;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -48,9 +49,13 @@ import com.aceplus.rmsproject.rmsproject.utils.GetDevID;
 import com.aceplus.rmsproject.rmsproject.utils.JsonForShowRoomId;
 import com.aceplus.rmsproject.rmsproject.utils.JsonForShowTableId;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,6 +100,9 @@ public class InvoiceActivity extends AppCompatActivity {
     HashMap<String, String> detailDataMap;
     String con_name;
 
+    Socket socket;
+    Activity activity = this;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +121,24 @@ public class InvoiceActivity extends AppCompatActivity {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new InvoiceAdapter(forInvoice);
+
+        String mainurl = MainActivity.URL;
+        String supmainturl = "";
+
+        if (mainurl != null && mainurl.length() > 0) {
+            supmainturl = mainurl.substring(0, mainurl.length() - 4);
+        }
+        try {
+            String socketurl = supmainturl + "3333";
+            Log.i("SocketUrl", socketurl);
+            socket = IO.socket(socketurl);
+        } catch (URISyntaxException e) {
+            Log.e("URL ERR :", e.getMessage());
+
+        }
+        socket.on("invoice_update", onNewMessage);
+        socket.connect();
+
         Interceptor interceptor = new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
@@ -185,6 +211,25 @@ public class InvoiceActivity extends AppCompatActivity {
             }
         });
     }
+
+    private Emitter.Listener onNewMessage = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+//                    try {
+//                        Thread.sleep(500);
+                    getInvoiceData();
+                    adapter.notifyDataSetChanged();
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+                    Toast.makeText(activity, "Here", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    };
 
     private ArrayList<Invoice> getInvoiceData() {  // getting all invoice data for invoice activity
         RequestInterface request = retrofit.create(RequestInterface.class);
@@ -300,7 +345,7 @@ public class InvoiceActivity extends AppCompatActivity {
             roommmID = "ROOM " + (download_forShow_roomID.getRoom_id());
         }
 
-        detailDataMap.put("RommCharge",roommmID);
+        detailDataMap.put("RommCharge", roommmID);
         //InvoiceDetailActivity.RommCharge = "";
         //InvoiceDetailActivity.RommCharge = roommmID;
         return roommmID;

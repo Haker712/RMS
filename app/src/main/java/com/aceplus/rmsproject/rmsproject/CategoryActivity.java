@@ -16,6 +16,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
@@ -77,6 +78,8 @@ import com.aceplus.rmsproject.rmsproject.utils.JsonForShowTableId;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -84,6 +87,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -200,6 +204,8 @@ public class CategoryActivity extends ActionBarActivity {
     String itemname;
     String con_name;
 
+    Socket socket;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -210,6 +216,22 @@ public class CategoryActivity extends ActionBarActivity {
         setSupportActionBar(toolbar);
         registerIDs();
         catchEvents();
+
+        String mainurl = MainActivity.URL;
+        String supmainturl = "";
+
+        if (mainurl != null && mainurl.length() > 0) {
+            supmainturl = mainurl.substring(0, mainurl.length() - 4);
+        }
+        try {
+            String socketurl = supmainturl + "3333";
+            Log.i("SocketUrl", socketurl);
+            socket = IO.socket(socketurl);
+        } catch (URISyntaxException e) {
+            Log.e("URL ERR :", e.getMessage());
+
+        }
+
     }
 
     private void callDialog(String messageTxt) {
@@ -1595,7 +1617,7 @@ public class CategoryActivity extends ActionBarActivity {
             View view = convertView;
             final CategoryItemViewHolder viewHolder;
 
-            if(view == null) {
+            if (view == null) {
                 LayoutInflater layoutInflater = context.getLayoutInflater();
                 view = layoutInflater.inflate(R.layout.category_list_item, null, true);
                 viewHolder = new CategoryItemViewHolder(view);
@@ -2702,6 +2724,7 @@ public class CategoryActivity extends ActionBarActivity {
         Log.i("orderjsonObject", orderjsonObject + "");
         Log.e("OrderJson", jsonArray + "");
 
+
         callDialog("Uploading order data....");
         RequestInterface request = retrofit.create(RequestInterface.class);
         Call<Success> call = request.postOrderInvoice(jsonArray.toString());
@@ -2714,6 +2737,18 @@ public class CategoryActivity extends ActionBarActivity {
                     String message = response.body().getMessage();
                     if (message.equals("Success")) {
                         Log.d("Order", message);
+
+                        Handler handler = new Handler();
+
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                socket.emit("order", "blah blah");
+                                Toast.makeText(CategoryActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+
                         mProgressDialog.dismiss();
                         saveOrderData();
                         startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
