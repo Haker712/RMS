@@ -42,6 +42,8 @@ public class Category_Item {
     ArrayList<AddOn> addOnArrayList;
     ArrayList<SetItem> setItemArrayList;
 
+    String state;
+
     public String getOrderIDD() {
         return orderIDD;
     }
@@ -266,5 +268,26 @@ public class Category_Item {
 
     public void setOrder_type_id(String order_type_id) {
         this.order_type_id = order_type_id;
+    }
+
+    public void setTotalExtraPrice(double totalExtraPrice) {
+        this.totalExtraPrice = totalExtraPrice;
+    }
+
+//    public String getStatus() {
+//        return status;
+//    }
+//
+//    public void setStatus(String status) {
+//        this.status = status;
+//    }
+
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 }
