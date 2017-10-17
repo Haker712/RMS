@@ -3418,7 +3418,7 @@ public class CategoryActivity extends ActionBarActivity {
         JSONArray roomArray = new JSONArray();
 
         int invoiceDetailID = 1;
-        for (Category_Item category_item : categoryItemList) {
+        for (Category_Item category_item : TotalitemArraylist) {
 
             int quantity = category_item.getQuantity();
 
