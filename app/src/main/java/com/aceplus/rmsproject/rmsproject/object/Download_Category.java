@@ -9,7 +9,7 @@ public class Download_Category {
     String status;
     String parent_id;
     String kitchen_id;
-    String mobile_image;
+    String image;
 
     public String getId() {
         return id;
@@ -31,7 +31,7 @@ public class Download_Category {
         return kitchen_id;
     }
 
-    public String getMobile_image() {
-        return mobile_image;
+    public String getImage() {
+        return image;
     }
 }

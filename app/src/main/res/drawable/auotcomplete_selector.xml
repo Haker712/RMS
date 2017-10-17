@@ -12,5 +12,5 @@
         /> <!-- focused -->
     <item
         android:drawable="@drawable/auotcomplete_normal"
-        /> <!-- default -->
+        /> <!-- default_pic -->
 </selector>

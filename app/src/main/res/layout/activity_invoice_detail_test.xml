@@ -30,11 +30,11 @@
             android:layout_width="20dp"
             android:layout_height="10dp" />
 
-        <Button
-            android:id="@+id/print_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/print"/>
+        <!--<Button-->
+            <!--android:id="@+id/print_btn"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="@drawable/print"/>-->
 
         <Button
             android:id="@+id/paid_btn"
@@ -48,10 +48,11 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/txt"
-        android:layout_below="@+id/app_bar"
         android:gravity="center_vertical"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:layout_below="@+id/app_bar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
         <RelativeLayout
             android:layout_width="match_parent"

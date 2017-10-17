@@ -13,6 +13,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.StrictMode;
+import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.util.Base64;
 import android.util.Log;
@@ -25,6 +27,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aceplus.rmsproject.rmsproject.object.ActivateKey;
+import com.aceplus.rmsproject.rmsproject.object.ActivationRequestData;
 import com.aceplus.rmsproject.rmsproject.object.BRoom;
 import com.aceplus.rmsproject.rmsproject.object.BTable;
 import com.aceplus.rmsproject.rmsproject.object.Download_AddOn;
@@ -45,8 +49,13 @@ import com.aceplus.rmsproject.rmsproject.object.JSONResponseDiscount;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseTableVersion;
 import com.aceplus.rmsproject.rmsproject.object.JsonResponseSyncs;
 import com.aceplus.rmsproject.rmsproject.object.Login;
+import com.aceplus.rmsproject.rmsproject.utils.ActivationRequestInterface;
 import com.aceplus.rmsproject.rmsproject.utils.Database;
+import com.aceplus.rmsproject.rmsproject.utils.JsonForShowTableId;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
+import com.aceplus.rmsproject.rmsproject.utils.RetrofitService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -95,22 +104,32 @@ public class MainActivity extends Activity {
     //i/me/my/mine//
     //public static String URL = "http://192.168.11.57:8900";
     //public static String URL = "http://192.168.11.62:8019";
-//    public static String URL = "http://192.168.195.1:8900";
+    //public static String URL = "http://192.168.195.1:8900";
     //public static String URL = "http://192.168.11.180:8080";
     //public static String URL = "http://192.168.11.57:8900";
     //public static String URL = "http://192.168.195.1:8900";
-    //public static String URL = "http://192.168.11.201:8080";
+    public static String URL = "";
+//    public static String ACTIVATED_URL = "http://aceplusactivation.com";
+    public static String IMG_URL_PREFIX = "http://192.168.11.201:8080/uploads/";
+    //public static String URL = "http://192.168.7.176:8080";
 
-    //public static String URL = "http://192.168.137.1:8080";
+    //  public static String URL = "http://192.168.137.1:8080";
 
-    public static String URL = "http://192.168.195.1:8080";
 
-    //public static String URL = "http://10.42.0.1:8080";
+    // public static String URL = "http://10.42.0.1:8080";
+    // public static String URL = "http://192.168.7.175:8080";
 
     SharedPreferences sharedpreferences;
     public static final String LOGIN_PREFERENCES = "Login";
     public static final String WAITER_ID = "waiter_id";
     public static boolean userLogin = false;
+
+    ActivateKey activateKey = new ActivateKey();
+
+    String activationKey;
+
+    SharedPreferences prefs;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +139,18 @@ public class MainActivity extends Activity {
         database = new Database(this).getDataBase();
         sharedpreferences = getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE);
         registerIds();
+        activateEdit.setText("337485c22c2860b238d80fe7ec5edfa3");
+
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
+        final String tablet_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        prefs = getSharedPreferences("MYPRE", MODE_PRIVATE);
+         editor = prefs.edit();
+
         if (getActivateKeyStatus() == true) {  // get ket from backend
             loginLayout.setVisibility(View.GONE);
             activateLayout.setVisibility(View.VISIBLE);
@@ -127,23 +158,45 @@ public class MainActivity extends Activity {
             submmitBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    database.beginTransaction();
-                    ContentValues cv = new ContentValues();
-                    cv.put("status", "false");
-                    cv.put("backend_activation_key", "roXfvF8FeyLY");
-                    database.insert("activate_key", null, cv);
-                    database.setTransactionSuccessful();
-                    database.endTransaction();
-                    Toast.makeText(MainActivity.this, "Successfully!", Toast.LENGTH_LONG).show();
-                    activateLayout.setVisibility(View.GONE);
-                    loginLayout.setVisibility(View.VISIBLE);
-                    nameTxt.setText("User Login");
-                    catchEvents();
-                    Toast.makeText(MainActivity.this, "Successfully", Toast.LENGTH_LONG).show();
+
+                    ActivationRequestData activationRequestData = new ActivationRequestData();
+                    activationRequestData.setTablet_activation_key(activateEdit.getText().toString());
+                    activationRequestData.setTablet_id(tablet_id);
+
+                    String param_Data = getJsonFromObject(activationRequestData);
+
+                    ActivationRequestInterface activationRequestInterface = RetrofitService.createService(ActivationRequestInterface.class);
+                    Call<ActivateKey> call = activationRequestInterface.getActivation(param_Data);
+                    try {
+                        activateKey = call.execute().body();
+                        if (activateKey != null) {
+                            if (activateKey.getStatusCode().equals("200")) {
+                                activationKey = activateKey.getBackend_activation_key();
+
+                                editor.putString("BACKEND_URL", activateKey.getBackend_url());
+                                editor.commit();
+
+                                database.beginTransaction();
+                                ContentValues cv = new ContentValues();
+                                cv.put("status", "false");
+                                cv.put("backend_activation_key", activationKey);
+                                database.insert("activate_key", null, cv);
+                                database.setTransactionSuccessful();
+                                database.endTransaction();
+                                Toast.makeText(MainActivity.this, "Successfully!", Toast.LENGTH_LONG).show();
+                                activateLayout.setVisibility(View.GONE);
+                                loginLayout.setVisibility(View.VISIBLE);
+                                nameTxt.setText("User Login");
+                                catchEvents();
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                 }
             });
-        } else
-        {
+        } else {
             activateLayout.setVisibility(View.GONE);
             loginLayout.setVisibility(View.VISIBLE);
             nameTxt.setText("User Login");
@@ -232,26 +285,36 @@ public class MainActivity extends Activity {
                 setIPAddress();
             }
         });
-        Interceptor interceptor = new Interceptor() {
-            @Override
-            public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", "25c512a9b6b76c778e321e35606016f10e95e74b").build();
-                return chain.proceed(newRequest);
-            }
-        };
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.interceptors().add(interceptor);
-        builder.readTimeout(180, TimeUnit.SECONDS);
-        builder.connectTimeout(180, TimeUnit.SECONDS);
-        OkHttpClient client = builder.build();
-        retrofit = new Retrofit.Builder()
-                .baseUrl(URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
+
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if ( prefs.getString("BACKEND_URL","")!=null){
+                    String BACKEND_URL = prefs.getString("BACKEND_URL","");
+                    URL=BACKEND_URL;
+                    IMG_URL_PREFIX=BACKEND_URL+"/uploads/";
+                }
+
+
+                Interceptor interceptor = new Interceptor() {
+                    @Override
+                    public okhttp3.Response intercept(Chain chain) throws IOException {
+                        Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", "25c512a9b6b76c778e321e35606016f10e95e74b").build();
+                        return chain.proceed(newRequest);
+                    }
+                };
+                OkHttpClient.Builder builder = new OkHttpClient.Builder();
+                builder.interceptors().add(interceptor);
+                builder.readTimeout(180, TimeUnit.SECONDS);
+                builder.connectTimeout(180, TimeUnit.SECONDS);
+                OkHttpClient client = builder.build();
+                retrofit = new Retrofit.Builder()
+                        .baseUrl(URL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .client(client)
+                        .build();
+
                 if (usernameEdit.getText().length() == 0) {
                     usernameEdit.setError("Username is required.");
                     usernameEdit.requestFocus();
@@ -265,7 +328,7 @@ public class MainActivity extends Activity {
                 if (hasCategoryDataInDb()) {
                     callDialog("User Login....");
                     RequestInterface request = retrofit.create(RequestInterface.class);
-                     Call<Login> call = request.createTask("Phyoe Lay", "11111111", getActivateKeyFromDB());
+                    Call<Login> call = request.createTask(usernameEdit.getText().toString(), String.valueOf(passwordEdit.getText()), getActivateKeyFromDB());
                     //Call<Login> call = request.createTask(usernameEdit.getText().toString(), passwordEdit.getText().toString() , getActivateKeyFromDB());
                     call.enqueue(new Callback<Login>() {
                         @Override
@@ -316,6 +379,7 @@ public class MainActivity extends Activity {
                                 callUploadDialog("Login data is null.");
                             }
                         }
+
                         @Override
                         public void onFailure(Call<Login> call, Throwable t) {
                             progressDialog.dismiss();
@@ -402,6 +466,7 @@ public class MainActivity extends Activity {
                     callUploadDialog("Table data is null.");
                 }
             }
+
             @Override
             public void onFailure(Call<JSONResponseTableVersion> call, Throwable t) {
                 if (value == 0) {
@@ -517,7 +582,7 @@ public class MainActivity extends Activity {
                                 cv.put("status", download_category.getStatus());
                                 cv.put("parent_id", download_category.getParent_id());
                                 cv.put("kitchen_id", download_category.getKitchen_id());
-                                cv.put("image", download_category.getMobile_image());
+                                cv.put("image", download_category.getImage());
                                 database.insert("category", null, cv);
                             }
                         }
@@ -705,6 +770,7 @@ public class MainActivity extends Activity {
                     callUploadDialog(response.message());
                 }
             }
+
             @Override
             public void onFailure(Call<JsonResponseSyncs> call, Throwable t) {
                 Log.d("Login", t.getMessage());
@@ -746,6 +812,7 @@ public class MainActivity extends Activity {
                     callUploadDialog("Discount data is null.");
                 }
             }
+
             @Override
             public void onFailure(Call<JSONResponseDiscount> call, Throwable t) {
                 progressDialog.dismiss();
@@ -764,6 +831,12 @@ public class MainActivity extends Activity {
 
     private boolean hasCategoryDataInDb() {
         return database.rawQuery("SELECT * FROM tableVersion", null).getCount() >= 1;
+    }
+
+    private String getJsonFromObject(Object object) {
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        String jsonString = gson.toJson(object);
+        return jsonString;
     }
 
 }

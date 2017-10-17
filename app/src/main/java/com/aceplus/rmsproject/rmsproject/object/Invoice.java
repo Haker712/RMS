@@ -13,6 +13,7 @@ public class Invoice {
     String netAmount;
     String extraAmount;
     String RoonOrTable;
+    int Status;
 
     /*public ArrayList<order_room> orderrooms;
     public ArrayList<order_table> ordertables;*/
@@ -103,5 +104,13 @@ public class Invoice {
 
     public void setNetAmount(String netAmount) {
         this.netAmount = netAmount;
+    }
+
+    public int getStatus() {
+        return Status;
+    }
+
+    public void setStatus(int status) {
+        Status = status;
     }
 }

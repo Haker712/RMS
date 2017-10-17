@@ -48,6 +48,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -72,17 +74,17 @@ public class InvoiceDetailActivity extends ActionBarActivity {
 
     private Toolbar toolbar;
     SQLiteDatabase database;
-    public static String vouncherID = null;
-    public static String userID = null;
-    public static String date = null;
-    public static String tableNo = null;
-    public static String RommCharge = null;
-    public static String TABLE_ID = null;
-    public static String ROOM_ID = null;
-    public static String totalAmount = null;
-    public static String totalExtra = null;
-    public static String totalDiscount = null;
-    public static String netAmount = null;
+    public /*static*/ String vouncherID = null;
+    public /*static*/ String userID = null;
+    public /*static*/ String date = null;
+    public /*static*/ String tableNo = null;
+    public /*static*/ String RommCharge = null;
+    public /*static*/ String TABLE_ID = null;
+    public /*static*/ String ROOM_ID = null;
+    public /*static*/ String totalAmount = null;
+    public /*static*/ String totalExtra = null;
+    public /*static*/ String totalDiscount = null;
+    public /*static*/ String netAmount = null;
     private double taxAmt = 0.0;
     private double serviceAmt = 0.0;
     private double roomchargeAmt = 0.0;
@@ -122,7 +124,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     double FOC_tax;
     double FOC_Service;
     String set_MenuID = "";
-    private static ArrayList<SetMenu_Item_for_dialog> setMenu_item_name = new ArrayList<>();
+    private /*static*/ ArrayList<SetMenu_Item_for_dialog> setMenu_item_name = new ArrayList<>();
     private ArrayList<Download_forShow_tableID> download_forShow_tableIDs;
     private ListView SetItemListView;
     SetItemDetailAdapter setItemdetailadapter;
@@ -130,6 +132,14 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     private ArrayList<Download_forShow_tableID> download_orderTableArrayList = new ArrayList<>();
     private ArrayList<Download_forShow_roomID> download_orderRoomArrayList = new ArrayList<>();
     Boolean paidavailable = true;
+
+    /***
+     * PhoneLinAung 19.9.17 Start
+     */
+
+    ArrayList<InvoiceDetailProduct> invoiceDetailProductArrayList = new ArrayList<>();
+    Map<String, String> detailDataMap = new HashMap<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,16 +180,51 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         mProgressDialog = new ProgressDialog(InvoiceDetailActivity.this, ProgressDialog.THEME_HOLO_LIGHT);
         mProgressDialog.setIndeterminate(false);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+
+        getArrayIntent();
+        setDetailDataFromMap();
         getConfigData();
         setAdapter();
         catchEvents();
     }
 
+    /***
+     * PhoneLinAung 19.9.17 Start
+     */
+
+    private void getArrayIntent() {
+
+        Intent intent = getIntent();
+        Bundle args = intent.getBundleExtra("BUNDLE");
+        invoiceDetailProductArrayList = (ArrayList<InvoiceDetailProduct>) args.getSerializable("ARRAYLIST");
+        detailDataMap = (Map<String, String>) args.getSerializable("Map");
+
+
+    }
+
+    private void setDetailDataFromMap() {
+
+
+        vouncherID = detailDataMap.get("vouncherID");
+        userID = detailDataMap.get("userId");
+        date = detailDataMap.get("date");
+        tableNo = detailDataMap.get("tableNo");
+        RommCharge = detailDataMap.get("RommCharge");
+        TABLE_ID = detailDataMap.get("TABLE_ID");
+        ROOM_ID = detailDataMap.get("ROOM_ID");
+        totalAmount = detailDataMap.get("totalAmount");
+        totalExtra = detailDataMap.get("totalExtra");
+        totalDiscount = detailDataMap.get("totalDiscount");
+        netAmount = detailDataMap.get("netAmount");
+
+
+    }
+
+
     // This is where get data from invoice.activity
     @SuppressLint("LongLogTag")
     private void setAdapter() {
-        invoiceDetailAdapter = new InvoiceDetailAdapter(InvoiceDetailActivity.this, InvoiceActivity.detailProductArrayList);
-        Log.i("detailProductArrayList>>>>", String.valueOf(InvoiceActivity.detailProductArrayList.size()));
+        invoiceDetailAdapter = new InvoiceDetailAdapter(InvoiceDetailActivity.this, invoiceDetailProductArrayList);
         productListView = (ListView) findViewById(R.id.list_view);
         productListView.setAdapter(invoiceDetailAdapter);
         invoiceDetailAdapter.notifyDataSetChanged();
@@ -206,7 +251,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         refundTxt = (TextView) findViewById(R.id.refund_txt);
         addBtn = (Button) findViewById(R.id.add_btn);
         paidBtn = (Button) findViewById(R.id.paid_btn);
-        printBtn = (Button) findViewById(R.id.print_btn);
+        //  printBtn = (Button) findViewById(R.id.print_btn);
     }
 
     private void callUploadDialog(String message) {
@@ -236,7 +281,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
 
     public void getConfigData() {
         try {
-            database.beginTransaction();
+
             Cursor cur = database.rawQuery("SELECT * FROM config", null);
             while (cur.moveToNext()) {
                 taxAmt = cur.getDouble(cur.getColumnIndex("tax"));
@@ -244,8 +289,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                 roomchargeAmt = cur.getDouble(cur.getColumnIndex("room_charge"));
             }
             cur.close();
-            database.setTransactionSuccessful();
-            database.endTransaction();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -278,7 +322,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         taxTxt.setText(commaSepFormat.format(taxValue));
         Log.d("TaxValue", taxAmt + "%");
         double serviceValue = 0;
-        if (RommCharge != "") {
+        if (!RommCharge.equals("")) {
             serviceValue = (total * serviceAmt / 100) + roomchargeAmt;
         } else {
             serviceValue = total * serviceAmt / 100;
@@ -403,34 +447,34 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                   }
         );
 
-        printBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                       /* PrintActivity.print_datetime = null;
-                        PrintActivity.print_voucherID = null;
-                        PrintActivity.print_tableNo = null;
-                        PrintActivity.print_staffName = null;
-                        PrintActivity.print_tax = null;
-                        PrintActivity.print_service = null;
-                        PrintActivity.print_totalAmount = null;
-                        PrintActivity.print_netAmount = null;*/
-//here!!
-
-
-                Intent intent = new Intent(InvoiceDetailActivity.this, PrintActivity.class);
-                intent.putExtra("voucherID", vouncherID);
-                intent.putExtra("datetime", date);
-                intent.putExtra("tableNo", tableNo);
-                intent.putExtra("staffName", userID);
-                intent.putExtra("totalAmt", totalAmount);
-                intent.putExtra("netAmt", netAmount);
-                intent.putExtra("taxAmt", taxTxt.getText().toString().trim().replace(",", ""));
-                intent.putExtra("serviceAmt", serviceTxt.getText().toString().trim().replace(",", ""));
-                //intent.putCharSequenceArrayListExtra("json", );
-
-                startActivity(intent);
-            }
-        });
+//        printBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                       /* PrintActivity.print_datetime = null;
+//                        PrintActivity.print_voucherID = null;
+//                        PrintActivity.print_tableNo = null;
+//                        PrintActivity.print_staffName = null;
+//                        PrintActivity.print_tax = null;
+//                        PrintActivity.print_service = null;
+//                        PrintActivity.print_totalAmount = null;
+//                        PrintActivity.print_netAmount = null;*/
+////here!!
+//
+//
+//                Intent intent = new Intent(InvoiceDetailActivity.this, PrintActivity.class);
+//                intent.putExtra("voucherID", vouncherID);
+//                intent.putExtra("datetime", date);
+//                intent.putExtra("tableNo", tableNo);
+//                intent.putExtra("staffName", userID);
+//                intent.putExtra("totalAmt", totalAmount);
+//                intent.putExtra("netAmt", netAmount);
+//                intent.putExtra("taxAmt", taxTxt.getText().toString().trim().replace(",", ""));
+//                intent.putExtra("serviceAmt", serviceTxt.getText().toString().trim().replace(",", ""));
+//                //intent.putCharSequenceArrayListExtra("json", );
+//
+//                startActivity(intent);
+//            }
+//        });
 
         paidBtn.setOnClickListener(new View.OnClickListener()
 
@@ -610,15 +654,12 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     }
 
     private String getActivateKeyFromDB() {
-        database.beginTransaction();
         String backend_activate_key = null;
         Cursor cur = database.rawQuery("SELECT * FROM activate_key", null);
         while (cur.moveToNext()) {
             backend_activate_key = cur.getString(cur.getColumnIndex("backend_activation_key"));
         }
         cur.close();
-        database.setTransactionSuccessful();
-        database.endTransaction();
         return backend_activate_key;
     }
 
@@ -910,9 +951,9 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View v) {
                     final AlertDialog builder = new AlertDialog.Builder(InvoiceDetailActivity.this, R.style.InvitationDialog)
-                        .setPositiveButton(R.string.invitation_ok, null)
-                        .setNegativeButton(R.string.invitation_cancel, null)
-                        .create();
+                            .setPositiveButton(R.string.invitation_ok, null)
+                            .setNegativeButton(R.string.invitation_cancel, null)
+                            .create();
                     builder.setTitle(R.string.clear);
                     builder.setMessage("Do you want to cancel this item?");
                     builder.setOnShowListener(new DialogInterface.OnShowListener() {
@@ -935,8 +976,8 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                         //double totalDis = Double.parseDouble(totalDisTxt.getText().toString().trim().replaceAll(",", ""));
                                         //double memberAmt = Double.parseDouble(totalMemberDisTxt.getText().toString().trim().replaceAll(",", ""));
                                         final double totalAmtValue = totalAmt - amt;
-                                        final double totalExaValue = Double.parseDouble(totalExtra)  - (exa * quantity);
-                                        final double totalDisValue = Double.parseDouble(totalDiscount)  - (dis * quantity);
+                                        final double totalExaValue = Double.parseDouble(totalExtra) - (exa * quantity);
+                                        final double totalDisValue = Double.parseDouble(totalDiscount) - (dis * quantity);
                                         final double taxValue = totalAmtValue * taxAmt / 100;
                                         final double serviceValue = totalAmtValue * serviceAmt / 100;
                                         final double totalNetValue = (totalAmtValue + taxValue + serviceValue) /*- (totalDisValue *//*+ memberAmt*//*)*/;
@@ -1028,7 +1069,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                         }
                     });
                     builder.show();
-                    }
+                }
 
             });
             return view;
@@ -1072,6 +1113,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
             }
         });
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.take_away_menu, menu);

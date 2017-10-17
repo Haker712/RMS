@@ -108,7 +108,10 @@ public class Download_ForInvoiveItemDetail {
     private ArrayList<Download_ordertable> ordertables;
     @SerializedName("order_room")
     @Expose
-    private ArrayList<Download_orderroom>  orderrooms;
+    private ArrayList<Download_orderroom> orderrooms;
+    @SerializedName("state")
+    @Expose
+    private String state;
 
     public Integer getTake_item() {
         return take_item;
@@ -372,5 +375,13 @@ public class Download_ForInvoiveItemDetail {
 
     public void setOrderrooms(ArrayList<Download_orderroom> orderrooms) {
         this.orderrooms = orderrooms;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 }
