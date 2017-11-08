@@ -289,7 +289,7 @@ public class CategoryActivity extends ActionBarActivity {
         builder.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialog) {
-                final Button btnAccept = builder.getButton(android.supGport.v7.app.AlertDialog.BUTTON_POSITIVE);
+                final Button btnAccept = builder.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
                 btnAccept.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
