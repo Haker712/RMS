@@ -249,7 +249,7 @@
                                 <TextView
                                     android:layout_width="100dp"
                                     android:layout_height="wrap_content"
-                                    android:text="Table No"
+                                    android:text="Voucher Info"
                                     android:textColor="@color/orange" />
 
                                 <TextView
@@ -346,6 +346,11 @@
                                     android:text="0" />
                             </RelativeLayout>
 
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/colorPrimaryDark"/>
+
                             <RelativeLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -363,6 +368,11 @@
                                     android:layout_alignParentRight="true"
                                     android:text="0" />
                             </RelativeLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/colorPrimaryDark"/>
 
                             <!--<RelativeLayout
                                 android:layout_width="match_parent"
@@ -454,6 +464,11 @@
                                     android:text="0" />
                             </RelativeLayout>
 
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/colorPrimaryDark"/>
+
                             <RelativeLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -471,6 +486,11 @@
                                     android:layout_alignParentRight="true"
                                     android:text="0" />
                             </RelativeLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/colorPrimaryDark"/>
 
                         </LinearLayout>
                     </ScrollView>

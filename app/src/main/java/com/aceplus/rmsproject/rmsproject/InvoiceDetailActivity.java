@@ -151,7 +151,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         Interceptor interceptor = new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", "25c512a9b6b76c778e321e35606016f10e95e74b").build();
+                Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", getActivateKeyFromDB()).build();
                 return chain.proceed(newRequest);
             }
         };
@@ -198,8 +198,6 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         Bundle args = intent.getBundleExtra("BUNDLE");
         invoiceDetailProductArrayList = (ArrayList<InvoiceDetailProduct>) args.getSerializable("ARRAYLIST");
         detailDataMap = (Map<String, String>) args.getSerializable("Map");
-
-
     }
 
     private void setDetailDataFromMap() {
@@ -209,6 +207,9 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         userID = detailDataMap.get("userId");
         date = detailDataMap.get("date");
         tableNo = detailDataMap.get("tableNo");
+        if(tableNo.equals("")) {
+            tableNo = "TAKE AWAY";
+        }
         RommCharge = detailDataMap.get("RommCharge");
         TABLE_ID = detailDataMap.get("TABLE_ID");
         ROOM_ID = detailDataMap.get("ROOM_ID");
@@ -431,21 +432,22 @@ public class InvoiceDetailActivity extends ActionBarActivity {
             public void afterTextChanged(Editable s) {
             }
         });
-        addBtn.setOnClickListener(new View.OnClickListener()
 
-                                  {
-                                      @SuppressLint("LongLogTag")
-                                      @Override
-                                      public void onClick(View v) {   // add btn which lead to category activity !
-                                          CategoryActivity.VOUNCHER_ID = vouncherID;
-                                          CategoryActivity.TAKE_AWAY = "add_invoice";
-                                          CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
-                                          Log.i("CategoryActivity.VOUNCHER_ID", CategoryActivity.VOUNCHER_ID + "");
-                                          startActivity(new Intent(InvoiceDetailActivity.this, CategoryActivity.class));
-                                          finish();
+            addBtn.setOnClickListener(new View.OnClickListener()
+
+                                      {
+                                          @SuppressLint("LongLogTag")
+                                          @Override
+                                          public void onClick(View v) {   // add btn which lead to category activity !
+                                              CategoryActivity.VOUNCHER_ID = vouncherID;
+                                              CategoryActivity.TAKE_AWAY = "add_invoice";
+                                              CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
+                                              Log.i("CategoryActivity.VOUNCHER_ID", CategoryActivity.VOUNCHER_ID + "");
+                                              startActivity(new Intent(InvoiceDetailActivity.this, CategoryActivity.class));
+                                              finish();
+                                          }
                                       }
-                                  }
-        );
+            );
 
 //        printBtn.setOnClickListener(new View.OnClickListener() {
 //            @Override

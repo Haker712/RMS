@@ -13,6 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
@@ -23,6 +24,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,9 +60,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
@@ -80,6 +88,7 @@ public class MainActivity extends Activity {
     private Button submmitBtn;
     private TextView nameTxt;
     private TextView ipchangeTxt;
+    private ImageView logoImage;
     private RelativeLayout loginLayout;
     private RelativeLayout activateLayout;
     SQLiteDatabase database;
@@ -139,7 +148,7 @@ public class MainActivity extends Activity {
         database = new Database(this).getDataBase();
         sharedpreferences = getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE);
         registerIds();
-        activateEdit.setText("337485c22c2860b238d80fe7ec5edfa3");
+        activateEdit.setText("880661d88126fffe7360cb8b1e494db0");
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -158,6 +167,12 @@ public class MainActivity extends Activity {
             submmitBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    final ProgressDialog mProgressDialog = new ProgressDialog(MainActivity.this, ProgressDialog.THEME_HOLO_LIGHT);
+                    mProgressDialog.setIndeterminate(false);
+                    mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    mProgressDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                    mProgressDialog.setMessage(getResources().getString(R.string.download_progress));
+                    mProgressDialog.show();
 
                     ActivationRequestData activationRequestData = new ActivationRequestData();
                     activationRequestData.setTablet_activation_key(activateEdit.getText().toString());
@@ -167,10 +182,53 @@ public class MainActivity extends Activity {
 
                     ActivationRequestInterface activationRequestInterface = RetrofitService.createService(ActivationRequestInterface.class);
                     Call<ActivateKey> call = activationRequestInterface.getActivation(param_Data);
-                    try {
+
+                    call.enqueue(new Callback<ActivateKey>() {
+                        @Override
+                        public void onResponse(Call<ActivateKey> call, Response<ActivateKey> response) {
+                            if (response.code() == 200) {
+                                activateKey = response.body();
+                                if (activateKey.getStatusCode().equals("200")) {
+                                    mProgressDialog.cancel();
+                                    activationKey = activateKey.getBackend_activation_key();
+
+                                    editor.putString("BACKEND_URL", activateKey.getBackend_url());
+                                    editor.commit();
+
+                                    database.beginTransaction();
+                                    ContentValues cv = new ContentValues();
+                                    cv.put("status", "false");
+                                    cv.put("backend_activation_key", activationKey);
+                                    database.insert("activate_key", null, cv);
+                                    database.setTransactionSuccessful();
+                                    database.endTransaction();
+                                    Toast.makeText(MainActivity.this, "Successfully!", Toast.LENGTH_LONG).show();
+                                    activateLayout.setVisibility(View.GONE);
+                                    loginLayout.setVisibility(View.VISIBLE);
+                                    nameTxt.setText("User Login");
+                                    catchEvents();
+                                } else {
+                                    mProgressDialog.dismiss();
+                                    if(response.body().getMessage() != null && !response.body().getMessage().equals("")) {
+                                        callUploadDialog(response.body().getMessage());
+                                    } else{
+                                        callUploadDialog(getResources().getString(R.string.server_error));
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ActivateKey> call, Throwable t) {
+                            mProgressDialog.cancel();
+                            callUploadDialog(getResources().getString(R.string.connection_failure));
+                        }
+                    });
+                   /* try {
                         activateKey = call.execute().body();
                         if (activateKey != null) {
                             if (activateKey.getStatusCode().equals("200")) {
+                                progressDialog.cancel();
                                 activationKey = activateKey.getBackend_activation_key();
 
                                 editor.putString("BACKEND_URL", activateKey.getBackend_url());
@@ -191,8 +249,9 @@ public class MainActivity extends Activity {
                             }
                         }
                     } catch (IOException e) {
+                        callUploadDialog(getResources().getString(R.string.connection_failure));
                         e.printStackTrace();
-                    }
+                    }*/
 
                 }
             });
@@ -212,6 +271,7 @@ public class MainActivity extends Activity {
         LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View view = layoutInflater.inflate(R.layout.set_ip_dialog, null);
         final EditText ipEdit = (EditText) view.findViewById(R.id.ip_edit);
+        ipEdit.setText("http://192.168.1.1:8888");
         builder.setView(view);
         builder.setTitle(R.string.quantity_title);
         builder.setOnShowListener(new DialogInterface.OnShowListener() {
@@ -227,6 +287,8 @@ public class MainActivity extends Activity {
                         } else {
                             String ip = ipEdit.getText().toString();
                             URL = ip;
+                            editor.putString("BACKEND_URL", URL);
+                            editor.commit();
                             Toast.makeText(MainActivity.this, "IP address" + ip, Toast.LENGTH_LONG).show();
                             builder.dismiss();
                         }
@@ -268,6 +330,7 @@ public class MainActivity extends Activity {
         loginLayout = (RelativeLayout) findViewById(R.id.relative_layout);
         activateLayout = (RelativeLayout) findViewById(R.id.activate_relative_layout);
         nameTxt = (TextView) findViewById(R.id.user_login_txt);
+        logoImage = (ImageView) findViewById(R.id.logo_img);
     }
 
     private void callDialog(String message) {
@@ -297,10 +360,10 @@ public class MainActivity extends Activity {
                 }
 
 
-                Interceptor interceptor = new Interceptor() {
+                /*Interceptor interceptor = new Interceptor() {
                     @Override
                     public okhttp3.Response intercept(Chain chain) throws IOException {
-                        Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", "25c512a9b6b76c778e321e35606016f10e95e74b").build();
+                        Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", getActivateKeyFromDB()).build();
                         return chain.proceed(newRequest);
                     }
                 };
@@ -313,7 +376,7 @@ public class MainActivity extends Activity {
                         .baseUrl(URL)
                         .addConverterFactory(GsonConverterFactory.create())
                         .client(client)
-                        .build();
+                        .build();*/
 
                 if (usernameEdit.getText().length() == 0) {
                     usernameEdit.setError("Username is required.");
@@ -327,7 +390,7 @@ public class MainActivity extends Activity {
                 Log.e("TureOrFalse", hasCategoryDataInDb() + "");
                 if (hasCategoryDataInDb()) {
                     callDialog("User Login....");
-                    RequestInterface request = retrofit.create(RequestInterface.class);
+                    RequestInterface request = RetrofitService.createRetrofitService(RequestInterface.class, MainActivity.this);
                     Call<Login> call = request.createTask(usernameEdit.getText().toString(), String.valueOf(passwordEdit.getText()), getActivateKeyFromDB());
                     //Call<Login> call = request.createTask(usernameEdit.getText().toString(), passwordEdit.getText().toString() , getActivateKeyFromDB());
                     call.enqueue(new Callback<Login>() {
@@ -376,7 +439,12 @@ public class MainActivity extends Activity {
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                callUploadDialog("Login data is null.");
+                                progressDialog.dismiss();
+                                if(response.message() != null && !response.message().equals("")) {
+                                    callUploadDialog(response.message());
+                                } else{
+                                    callUploadDialog(getResources().getString(R.string.server_error));
+                                }
                             }
                         }
 
@@ -391,6 +459,52 @@ public class MainActivity extends Activity {
                 }
             }
         });
+
+        logoImage.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                backupDatabase(MainActivity.this);
+                return false;
+            }
+        });
+    }
+
+    /**
+     * Back-up current database
+     * @param context current activity
+     */
+    public static void backupDatabase(Context context) {
+        String today = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
+        try {
+            File sd = Environment.getExternalStorageDirectory();
+            File data = Environment.getDataDirectory();
+
+            if (sd.canWrite()) {
+                Toast.makeText(context, "Backup database is starting...",
+                        Toast.LENGTH_SHORT).show();
+                String currentDBPath = "/data/com.aceplus.rmsproject.rmsproject/databases/restaurant.sqlite";
+
+                String backupDBPath = "ROS_DB_Backup_" + today + ".db";
+                File currentDB = new File(data, currentDBPath);
+
+                String folderPath = "mnt/sdcard/ROS_DB_Backup";
+                File f = new File(folderPath);
+                f.mkdir();
+                File backupDB = new File(f, backupDBPath);
+                FileChannel source = new FileInputStream(currentDB).getChannel();
+                FileChannel destination = new FileOutputStream(backupDB).getChannel();
+                destination.transferFrom(source, 0, source.size());
+                source.close();
+                destination.close();
+                Toast.makeText(context, "Backup database Successful!",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "Please set Permission for Storage in Setting!", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(context, "Cannot Backup!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void callUploadDialog(String message) {
@@ -436,7 +550,8 @@ public class MainActivity extends Activity {
         if (value == 0) {
             callDialog("Download table data....");
         }
-        RequestInterface request = retrofit.create(RequestInterface.class);
+
+        RequestInterface request = RetrofitService.createRetrofitService(RequestInterface.class, MainActivity.this);
         Call<JSONResponseTableVersion> call = request.getSyncsTable(getActivateKeyFromDB());
         call.enqueue(new Callback<JSONResponseTableVersion>() {
             @Override
@@ -463,7 +578,11 @@ public class MainActivity extends Activity {
                     database.endTransaction();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    callUploadDialog("Table data is null.");
+                    if(response.message() != null && !response.message().equals("")) {
+                        callUploadDialog(response.message());
+                    } else{
+                        callUploadDialog(getResources().getString(R.string.connection_failure));
+                    }
                 }
             }
 
@@ -472,7 +591,7 @@ public class MainActivity extends Activity {
                 if (value == 0) {
                     progressDialog.dismiss();
                 }
-                callUploadDialog("Please downlaod again!");
+                callUploadDialog("Invalid Requested URL");
             }
         });
     }
@@ -492,7 +611,7 @@ public class MainActivity extends Activity {
 
     private void loadSyncsTable(ArrayList<String> version) {  // syncs down the tables from back end !!
         callDialog("Update Data....");
-        final RequestInterface request = retrofit.create(RequestInterface.class);
+        final RequestInterface request = RetrofitService.createRetrofitService(RequestInterface.class, MainActivity.this);
         String vCategory = null;
         String vItem = null;
         String vAddon = null;
@@ -562,9 +681,25 @@ public class MainActivity extends Activity {
                         byte[] b = baos.toByteArray();
                         String imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
                         database.beginTransaction();
+
+                        download_setMenuArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getSet_menu()));
+                        if (download_setMenuArrayList.size() > 0) {
+                            deleteTableVersion("setMenu");
+                        }
+                        for (Download_SetMenu download_setMenu : download_setMenuArrayList) {
+                            ContentValues cv = new ContentValues();
+                            cv.put("id", download_setMenu.getId());
+                            cv.put("set_menu_name", download_setMenu.getSet_menus_name());
+                            cv.put("set_menu_price", download_setMenu.getSet_menus_price());
+                            cv.put("image", download_setMenu.getMobile_image());
+                            cv.put("status", download_setMenu.getStatus());
+                            database.insert("setMenu", null, cv);
+                        }
+                        Log.d("Demo SetMenu", download_setMenuArrayList.size() + "");
+
                         if (jsonResponse.getCategory() != null) {
                             download_categoryArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getCategory()));
-                            if (download_categoryArrayList.size() > 0) {
+                            if (download_setMenuArrayList.size() > 0) {
                                 deleteTableVersion("category");
                                 ContentValues setMenuCV = new ContentValues();
                                 setMenuCV.put("id", "set_menu");
@@ -628,7 +763,7 @@ public class MainActivity extends Activity {
                             database.insert("member", null, cv);
                         }
                         Log.d("Demo Member", download_memberArrayList.size() + "");
-                        download_setMenuArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getSet_menu()));
+                        /*download_setMenuArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getSet_menu()));
                         if (download_setMenuArrayList.size() > 0) {
                             deleteTableVersion("setMenu");
                         }
@@ -641,7 +776,7 @@ public class MainActivity extends Activity {
                             cv.put("status", download_setMenu.getStatus());
                             database.insert("setMenu", null, cv);
                         }
-                        Log.d("Demo SetMenu", download_setMenuArrayList.size() + "");
+                        Log.d("Demo SetMenu", download_setMenuArrayList.size() + "");*/
                         download_setItemArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getSet_item()));
                         if (download_setItemArrayList.size() > 0) {
                             deleteTableVersion("setItem");
@@ -782,7 +917,7 @@ public class MainActivity extends Activity {
 
     private void loadDiscountJson() {
         callDialog("Updating data....");
-        RequestInterface request = retrofit.create(RequestInterface.class);
+        RequestInterface request = RetrofitService.createRetrofitService(RequestInterface.class, MainActivity.this);
         Call<JSONResponseDiscount> call = request.getDiscount(getActivateKeyFromDB());
         call.enqueue(new Callback<JSONResponseDiscount>() {
             @Override

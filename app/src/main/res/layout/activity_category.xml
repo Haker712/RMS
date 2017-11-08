@@ -134,58 +134,66 @@
                 android:padding="13dp">
 
                 <TextView
-                    android:layout_width="120dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
+                    android:layout_weight="1.5"
                     android:text="ItemName"
                     android:textColor="@color/blackColor" />
 
                 <TextView
-                    android:layout_width="60dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
+                    android:layout_weight="1"
                     android:text="Quantity"
                     android:textColor="@color/blackColor" />
 
                 <TextView
-                    android:layout_width="70dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
+                    android:layout_weight="1"
                     android:text="Price"
                     android:textColor="@color/blackColor" />
 
                 <TextView
-                    android:layout_width="60dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
+                    android:layout_weight="1"
                     android:text="Discount"
                     android:textColor="@color/blackColor" />
 
                 <TextView
-                    android:layout_width="60dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
+                    android:layout_weight="1"
                     android:text="Extra"
                     android:textColor="@color/blackColor" />
 
                 <TextView
-                    android:layout_width="70dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
+                    android:layout_weight="1"
                     android:text="ExtraPrice"
                     android:textColor="@color/blackColor" />
 
                 <TextView
-                    android:layout_width="70dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
+                    android:layout_weight="1"
                     android:text="Amount"
                     android:textColor="@color/blackColor" />
 
                 <TextView
-                    android:layout_width="70dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
+                    android:layout_weight="1"
                     android:text="TakeAway"
                     android:textColor="@color/blackColor" />
             </LinearLayout>

@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
@@ -56,7 +57,7 @@ public class HomePageActivity extends ActionBarActivity {
         Interceptor interceptor = new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", "25c512a9b6b76c778e321e35606016f10e95e74b").build();
+                Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", getActivateKeyFromDB()).build();
                 return chain.proceed(newRequest);
             }
         };
@@ -92,6 +93,19 @@ public class HomePageActivity extends ActionBarActivity {
         t.start();
         registerIDs();
         catchEvents();
+    }
+
+    private String getActivateKeyFromDB() { // for activation key
+        database.beginTransaction();
+        String backend_activate_key = null;
+        Cursor cur = database.rawQuery("SELECT * FROM activate_key", null);
+        while (cur.moveToNext()) {
+            backend_activate_key = cur.getString(cur.getColumnIndex("backend_activation_key"));
+        }
+        cur.close();
+        database.setTransactionSuccessful();
+        database.endTransaction();
+        return backend_activate_key;
     }
 
     private void registerIDs() {

@@ -39,6 +39,7 @@ import com.aceplus.rmsproject.rmsproject.object.InvoiceDetailProduct;
 import com.aceplus.rmsproject.rmsproject.object.InvoiceDetailProductSetItem;
 import com.aceplus.rmsproject.rmsproject.object.JsonResponseforInvoice;
 import com.aceplus.rmsproject.rmsproject.object.JsonResponseforInvoiceDetail;
+import com.aceplus.rmsproject.rmsproject.object.JsonTest;
 import com.aceplus.rmsproject.rmsproject.object.Order_Complete;
 import com.aceplus.rmsproject.rmsproject.object.order_room;
 import com.aceplus.rmsproject.rmsproject.object.order_table;
@@ -129,7 +130,7 @@ public class InvoiceActivity extends AppCompatActivity {
             supmainturl = mainurl.substring(0, mainurl.length() - 4);
         }
         try {
-            String socketurl = supmainturl + "3333";
+            String socketurl = supmainturl + JsonTest.SOCKET_PORT;
             Log.i("SocketUrl", socketurl);
             socket = IO.socket(socketurl);
         } catch (URISyntaxException e) {
@@ -142,7 +143,7 @@ public class InvoiceActivity extends AppCompatActivity {
         Interceptor interceptor = new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", "25c512a9b6b76c778e321e35606016f10e95e74b").build();
+                Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", getActivateKeyFromDB()).build();
                 return chain.proceed(newRequest);
             }
         };
@@ -313,12 +314,12 @@ public class InvoiceActivity extends AppCompatActivity {
         for (int i = 0; i < download_orderTableArrayList.size(); i++) {
             Download_forShow_tableID download_forShow_tableID = download_orderTableArrayList.get(i);
             if (download_orderTableArrayList.size() == 1) {
-                tableeeID += "TABLE " + download_forShow_tableID.getTable_id();
+                tableeeID += getTableNoFromDB(download_forShow_tableID.getTable_id());
             } else {
                 if (i == download_orderTableArrayList.size() - 1) {
-                    tableeeID += "TABLE " + download_forShow_tableID.getTable_id();
+                    tableeeID += getTableNoFromDB(download_forShow_tableID.getTable_id());
                 } else {
-                    tableeeID += "TABLE " + download_forShow_tableID.getTable_id();
+                    tableeeID += getTableNoFromDB(download_forShow_tableID.getTable_id());
                     tableeeID += ",";
                 }
             }
@@ -342,7 +343,7 @@ public class InvoiceActivity extends AppCompatActivity {
         }
         download_orderRoomArrayList = jsonForShowRoomId.getForShow_roomID();
         for (Download_forShow_roomID download_forShow_roomID : download_orderRoomArrayList) {
-            roommmID = "ROOM " + (download_forShow_roomID.getRoom_id());
+            roommmID = getRoomNoFromDB(download_forShow_roomID.getRoom_id());
         }
 
         detailDataMap.put("RommCharge", roommmID);
@@ -359,6 +360,26 @@ public class InvoiceActivity extends AppCompatActivity {
         }
         cur.close();
         return backend_activate_key;
+    }
+
+    private String getTableNoFromDB(String tableId) {
+        String tableNo = null;
+        Cursor cur = database.rawQuery("SELECT * FROM tableList WHERE id = '" + tableId + "'", null);
+        while (cur.moveToNext()) {
+            tableNo = cur.getString(cur.getColumnIndex("table_no"));
+        }
+        cur.close();
+        return tableNo;
+    }
+
+    private String getRoomNoFromDB(String roomId) {
+        String tableNo = null;
+        Cursor cur = database.rawQuery("SELECT * FROM room WHERE id = '" + roomId + "'", null);
+        while (cur.moveToNext()) {
+            tableNo = cur.getString(cur.getColumnIndex("room_name"));
+        }
+        cur.close();
+        return tableNo;
     }
 
     //for InvoiceDetail data and pass to invoicedetail.activity!
@@ -558,7 +579,8 @@ public class InvoiceActivity extends AppCompatActivity {
 
                     detailDataMap.put("vouncherID", invoice.getVouncherID());
                     detailDataMap.put("date", invoice.getDate());
-                    detailDataMap.put("tableNo", "TAKE AWAY");
+                    //detailDataMap.put("tableNo", "TAKE AWAY");
+                    detailDataMap.put("tableNo", invoice.getRoonOrTable());
 
 //                    InvoiceDetailActivity.vouncherID = invoice.getVouncherID();
 //                    InvoiceDetailActivity.userID = invoice.getUser_id();

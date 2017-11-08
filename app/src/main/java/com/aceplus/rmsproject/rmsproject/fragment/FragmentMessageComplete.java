@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,23 +23,29 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aceplus.rmsproject.rmsproject.MainActivity;
 import com.aceplus.rmsproject.rmsproject.R;
 import com.aceplus.rmsproject.rmsproject.object.Download_OrderStatus;
 import com.aceplus.rmsproject.rmsproject.object.Download_OrderStatusDetail;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseOrderStatus;
+import com.aceplus.rmsproject.rmsproject.object.JsonTest;
 import com.aceplus.rmsproject.rmsproject.object.Order_Complete;
 import com.aceplus.rmsproject.rmsproject.object.Order_Item;
 import com.aceplus.rmsproject.rmsproject.object.Success;
 import com.aceplus.rmsproject.rmsproject.utils.Database;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -61,7 +68,7 @@ public class FragmentMessageComplete extends Fragment {
         // Required empty public constructor
     }
     String WAITER_ID;
-    AtomicBoolean ContinueThread;
+    //AtomicBoolean ContinueThread;
     private Retrofit retrofit;
     private ArrayList<Download_OrderStatus> download_orderStatusArrayList;
     RecyclerView recyclerView;
@@ -71,6 +78,42 @@ public class FragmentMessageComplete extends Fragment {
     private ArrayList<Order_Complete> completeArrayList = new ArrayList<>();
     private ArrayList<Order_Complete> finalCompleteList = new ArrayList<>();
     private ArrayList<Order_Item> checkstatusArrayList = new ArrayList<>();
+    Socket socket;
+    Activity activity;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        String mainurl = MainActivity.URL;
+        String supmainturl = "";
+        activity = this.getActivity();
+        if (mainurl != null && mainurl.length() > 0) {
+            supmainturl = mainurl.substring(0, mainurl.length() - 4);
+        }
+        try {
+            String socketurl = supmainturl + JsonTest.SOCKET_PORT;
+            Log.i("SocketUrl", socketurl);
+            socket = IO.socket(socketurl);
+        } catch (URISyntaxException e) {
+            Log.e("URL ERR :", e.getMessage());
+
+        }
+        socket.on("cooking_done", onMessageCompete);
+        socket.connect();
+    }
+
+    private Emitter.Listener onMessageCompete = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    loadOrderStatusJson();
+                }
+            });
+        }
+    };
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -80,11 +123,11 @@ public class FragmentMessageComplete extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        ContinueThread = new AtomicBoolean(false);
+        //ContinueThread = new AtomicBoolean(false);
         Interceptor interceptor = new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", "25c512a9b6b76c778e321e35606016f10e95e74b").build();
+                Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", getActivateKeyFromDB()).build();
                 return chain.proceed(newRequest);
             }
         };
@@ -115,6 +158,19 @@ public class FragmentMessageComplete extends Fragment {
         });*/
 
         return view;
+    }
+
+    private String getActivateKeyFromDB() { // for activation key
+        database.beginTransaction();
+        String backend_activate_key = null;
+        Cursor cur = database.rawQuery("SELECT * FROM activate_key", null);
+        while (cur.moveToNext()) {
+            backend_activate_key = cur.getString(cur.getColumnIndex("backend_activation_key"));
+        }
+        cur.close();
+        database.setTransactionSuccessful();
+        database.endTransaction();
+        return backend_activate_key;
     }
 
     @SuppressLint("LongLogTag")
@@ -339,9 +395,9 @@ public class FragmentMessageComplete extends Fragment {
             TextView orderTypeTxt = (TextView) view.findViewById(R.id.order_type_txt);
             CheckBox statusCheck = (CheckBox) view.findViewById(R.id.status_check);
             if (order_item.getItem_name() == null) {
-                productNameTxt.setText(getSetMenuItemName(order_item.getSet_item_id())+"  " +order_item.getOrder_detail_id());
+                productNameTxt.setText(getSetMenuItemName(order_item.getSet_item_id()));
             } else {
-                productNameTxt.setText(order_item.getItem_name()+"  "+order_item.getOrder_detail_id());
+                productNameTxt.setText(order_item.getItem_name());
             }
             orderTypeTxt.setText(order_item.getOrder_type());
             statusCheck.setChecked(order_item.isCheck());
@@ -359,7 +415,7 @@ public class FragmentMessageComplete extends Fragment {
     }
 
     private void loadOrderStatusJson() {   // geting data from back end !!
-        final ProgressDialog mProgressDialog = new ProgressDialog(getActivity(), ProgressDialog.THEME_HOLO_LIGHT);
+        final ProgressDialog mProgressDialog = new ProgressDialog(activity, ProgressDialog.THEME_HOLO_LIGHT);
         mProgressDialog.setIndeterminate(false);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mProgressDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
@@ -512,7 +568,7 @@ public class FragmentMessageComplete extends Fragment {
     @Override
     public void onStart() {  // the tim interval !!!!
         super.onStart();
-        Thread background = new Thread(new Runnable() {
+        /*Thread background = new Thread(new Runnable() {
 
             public void run() {
                 try {
@@ -532,12 +588,12 @@ public class FragmentMessageComplete extends Fragment {
         });
 
         ContinueThread.set(true);
-        background.start();
+        background.start();*/
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        ContinueThread.set(false);
+        /*ContinueThread.set(false);*/
     }
 }

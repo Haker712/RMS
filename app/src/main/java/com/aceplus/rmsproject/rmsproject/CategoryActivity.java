@@ -60,6 +60,8 @@ import com.aceplus.rmsproject.rmsproject.object.Download_ForInvoiveItemDetail;
 import com.aceplus.rmsproject.rmsproject.object.Download_Item;
 import com.aceplus.rmsproject.rmsproject.object.Download_SetItem;
 import com.aceplus.rmsproject.rmsproject.object.Download_SetMenu;
+import com.aceplus.rmsproject.rmsproject.object.Download_forInvoice;
+import com.aceplus.rmsproject.rmsproject.object.Invoice;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseAddOn;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseCategory;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseContiment;
@@ -67,7 +69,9 @@ import com.aceplus.rmsproject.rmsproject.object.JSONResponseDiscount;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseItem;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseSetItem;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseSetMenu;
+import com.aceplus.rmsproject.rmsproject.object.JsonResponseforInvoice;
 import com.aceplus.rmsproject.rmsproject.object.JsonResponseforInvoiceDetail;
+import com.aceplus.rmsproject.rmsproject.object.JsonTest;
 import com.aceplus.rmsproject.rmsproject.object.SetItem;
 import com.aceplus.rmsproject.rmsproject.object.Success;
 import com.aceplus.rmsproject.rmsproject.utils.Database;
@@ -78,6 +82,9 @@ import com.aceplus.rmsproject.rmsproject.utils.JsonForShowTableId;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
@@ -192,7 +199,6 @@ public class CategoryActivity extends ActionBarActivity {
 
     public static String check_check = "null";
     Activity activity;
-
     /***
      * PhoneLinAung 11.9.17
      */
@@ -209,6 +215,7 @@ public class CategoryActivity extends ActionBarActivity {
     String itemname;
     String con_name;
 
+    Invoice invoice;
     Socket socket;
 
     @Override
@@ -231,7 +238,7 @@ public class CategoryActivity extends ActionBarActivity {
             supmainturl = mainurl.substring(0, mainurl.length() - 4);
         }
         try {
-            String socketurl = supmainturl + "3333";
+            String socketurl = supmainturl + JsonTest.SOCKET_PORT;
             Log.i("SocketUrl", socketurl);
             socket = IO.socket(socketurl);
         } catch (URISyntaxException e) {
@@ -240,8 +247,72 @@ public class CategoryActivity extends ActionBarActivity {
         }
 
         socket.on("order_remove", onNewMessage);
+        socket.on("invoice_payment", invoicePaidSocket);
         socket.connect();
 
+    }
+
+    /**
+     * If server is paid current invoice, it will be interrupt and close.
+     */
+    private Emitter.Listener invoicePaidSocket = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    JSONObject data = (JSONObject) args[0];
+                    String InvoiceId = "";
+                    try {
+                        InvoiceId = data.getString("invoice_id");
+                        Toast.makeText(activity, InvoiceId + "", Toast.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    if (InvoiceId.equalsIgnoreCase(VOUNCHER_ID)) {
+                        saveBtn.setEnabled(false);
+                        saveBtn.setClickable(false);
+                        callInfoDialog("This invoice is already paid", activity);
+                    }
+                }
+            });
+        }
+    };
+
+    public void callInfoDialog(String message, final Context context) {
+        final android.support.v7.app.AlertDialog builder = new android.support.v7.app.AlertDialog.Builder(context, R.style.InvitationDialog)
+                .setPositiveButton(R.string.invitation_ok, null)
+                .create();
+        builder.setTitle(R.string.alert);
+        builder.setMessage(message);
+        builder.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                final Button btnAccept = builder.getButton(android.supGport.v7.app.AlertDialog.BUTTON_POSITIVE);
+                btnAccept.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        builder.dismiss();
+                        Intent toInvoiceActivity = new Intent(context, InvoiceActivity.class);
+                        activity.startActivity(toInvoiceActivity);
+                        finish();
+                    }
+                });
+            }
+        });
+
+        Handler handler = new Handler();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (activity.isFinishing()) {
+                    return;
+                } else {
+                    builder.show();
+                }
+            }
+        });
     }
 
     private Emitter.Listener onNewMessage = new Emitter.Listener() {
@@ -1144,14 +1215,18 @@ public class CategoryActivity extends ActionBarActivity {
                     deleteTableVersion("category");
                     download_categoryArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getCategory()));
                     database.beginTransaction();
-                    ContentValues setMenuCV = new ContentValues();
-                    setMenuCV.put("id", "set_menu");
-                    setMenuCV.put("name", "SetMenu");
-                    setMenuCV.put("status", "");
-                    setMenuCV.put("parent_id", "0");
-                    setMenuCV.put("kitchen_id", "0");
-                    setMenuCV.put("image", "setmenu.jpg");
-                    database.insert("category", null, setMenuCV);
+
+                    if(download_setMenuArrayList.size() > 0) {
+                        ContentValues setMenuCV = new ContentValues();
+                        setMenuCV.put("id", "set_menu");
+                        setMenuCV.put("name", "SetMenu");
+                        setMenuCV.put("status", "");
+                        setMenuCV.put("parent_id", "0");
+                        setMenuCV.put("kitchen_id", "0");
+                        setMenuCV.put("image", "setmenu.jpg");
+                        database.insert("category", null, setMenuCV);
+                    }
+
                     for (Download_Category download_category : download_categoryArrayList) {
                         ContentValues cv = new ContentValues();
                         cv.put("id", download_category.getId());
@@ -1164,6 +1239,11 @@ public class CategoryActivity extends ActionBarActivity {
                     }
                     database.setTransactionSuccessful();
                     database.endTransaction();
+
+                    CategoryArrayAdapter adapter = (CategoryArrayAdapter) recyclerView.getAdapter();
+                    adapter.albumList = categoryDataFromDB("0");
+                    adapter.notifyDataSetChanged();
+
                     loadItemJson();
                     //loadSetMenuJson();
                     //loadSetItemJson();
@@ -1214,7 +1294,8 @@ public class CategoryActivity extends ActionBarActivity {
                     }
                     database.setTransactionSuccessful();
                     database.endTransaction();
-                    loadSetMenuJson();
+                    loadSetItemJson();
+                    //loadSetMenuJson();
                 } catch (Exception e) {
                     e.printStackTrace();
                     mProgressDialog.dismiss();
@@ -1300,7 +1381,8 @@ public class CategoryActivity extends ActionBarActivity {
                     }
                     database.setTransactionSuccessful();
                     database.endTransaction();
-                    loadSetItemJson();
+                    loadCategoryJson();
+                    //loadSetItemJson();
                 } catch (Exception e) {
                     e.printStackTrace();
                     mProgressDialog.dismiss();
@@ -1445,7 +1527,7 @@ public class CategoryActivity extends ActionBarActivity {
         Interceptor interceptor = new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", "25c512a9b6b76c778e321e35606016f10e95e74b").build();
+                Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", getActivateKeyFromDB()).build();
                 return chain.proceed(newRequest);
             }
         };
@@ -1464,7 +1546,6 @@ public class CategoryActivity extends ActionBarActivity {
             getVouncherDetailData();
         }
         getConfigData();
-
         getItemForAuotSearch();
         setMenuDataFromDB();
         for (Category item : searchTotallist) {
@@ -1621,42 +1702,44 @@ public class CategoryActivity extends ActionBarActivity {
         updateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadCategoryJson();
+                loadSetMenuJson();
+                //loadCategoryJson();
                 getItemForAuotSearch();
             }
         });
+
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (TotalitemArraylist.size() > 0) {
-                    Log.e("VoucherID", VOUNCHER_ID + "");
-                    if (VOUNCHER_ID == null || VOUNCHER_ID.equals("NULL")) {
-                        uploadOrderData();
-                    } else {
-                        CompareItemListsUploadUpdate(categoryItemList, TotalitemArraylist);
-                        uploadUpdateOrderData();
+                    if (TotalitemArraylist.size() > 0) {
+                        Log.e("VoucherID", VOUNCHER_ID + "");
+                        if (VOUNCHER_ID == null || VOUNCHER_ID.equals("NULL")) {
+                            uploadOrderData();
+                        } else {
+                            CompareItemListsUploadUpdate(categoryItemList, TotalitemArraylist);
+                            uploadUpdateOrderData();
 
-                    }
-                } else {
-                    final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
-                            .setPositiveButton(R.string.invitation_ok, null)
-                            .create();
-                    builder.setTitle(R.string.alert);
-                    builder.setMessage("You must specify at least one product.");
-                    builder.setOnShowListener(new DialogInterface.OnShowListener() {
-                        @Override
-                        public void onShow(DialogInterface dialog) {
-                            final Button btnAccept = builder.getButton(AlertDialog.BUTTON_POSITIVE);
-                            btnAccept.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    builder.dismiss();
-                                }
-                            });
                         }
-                    });
-                    builder.show();
-                }
+                    } else {
+                        final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
+                                .setPositiveButton(R.string.invitation_ok, null)
+                                .create();
+                        builder.setTitle(R.string.alert);
+                        builder.setMessage("You must specify at least one product.");
+                        builder.setOnShowListener(new DialogInterface.OnShowListener() {
+                            @Override
+                            public void onShow(DialogInterface dialog) {
+                                final Button btnAccept = builder.getButton(AlertDialog.BUTTON_POSITIVE);
+                                btnAccept.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        builder.dismiss();
+                                    }
+                                });
+                            }
+                        });
+                        builder.show();
+                    }
             }
         });
     }
@@ -1901,6 +1984,7 @@ public class CategoryActivity extends ActionBarActivity {
                                         @Override
                                         public void onClick(View v) {
                                             TotalitemArraylist.remove(position);
+                                            categoryItemList.remove(position);
                                             categoryItemAdapter.notifyDataSetChanged();
                                             double totalValue = 0;
                                             double teValue = 0;
@@ -2187,6 +2271,7 @@ public class CategoryActivity extends ActionBarActivity {
                                             @Override
                                             public void onClick(View v) {
                                                 TotalitemArraylist.remove(position);
+                                                categoryItemList.remove(position);
                                                 categoryItemAdapter.notifyDataSetChanged();
                                                 double totalValue = 0;
                                                 double teValue = 0;
@@ -3251,7 +3336,18 @@ public class CategoryActivity extends ActionBarActivity {
 
 
             Glide.with(mContext)
-                    .load(MainActivity.IMG_URL_PREFIX + album.getImage())
+                    .load(MainActivity.IMG_URL_PREFIX + album.getImage()).listener(new RequestListener<String, GlideDrawable>() {
+                @Override
+                public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                    return false;
+                }
+            })
+                    .error(R.drawable.default_pic)
                     .placeholder(R.drawable.default_pic)
                     .diskCacheStrategy(DiskCacheStrategy.RESULT)
                     .into(holder.thumbnail);
@@ -3958,10 +4054,6 @@ public class CategoryActivity extends ActionBarActivity {
                 }
             }
         }
-
-
     }
-
-
 }
 

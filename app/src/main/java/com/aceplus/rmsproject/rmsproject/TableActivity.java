@@ -48,6 +48,7 @@ import com.aceplus.rmsproject.rmsproject.object.Download_Table;
 import com.aceplus.rmsproject.rmsproject.object.Download_ordertable;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseBooking;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseTable;
+import com.aceplus.rmsproject.rmsproject.object.JsonTest;
 import com.aceplus.rmsproject.rmsproject.object.Success;
 import com.aceplus.rmsproject.rmsproject.utils.Database;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
@@ -137,7 +138,7 @@ public class TableActivity extends ActionBarActivity {
             supmainturl = mainurl.substring(0, mainurl.length() - 4);
         }
         try {
-            String socketurl = supmainturl + "3333";
+            String socketurl = supmainturl + JsonTest.SOCKET_PORT;
             Log.i("SocketUrl", socketurl);
             socket = IO.socket(socketurl);
         } catch (URISyntaxException e) {
@@ -147,13 +148,14 @@ public class TableActivity extends ActionBarActivity {
 
 
         socket.on("tableChange", onNewMessage);
+        socket.on("invoice_update", onNewMessage);
         socket.connect();
 
 
         Interceptor interceptor = new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", "25c512a9b6b76c778e321e35606016f10e95e74b").build();
+                Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", getActivateKeyFromDB()).build();
                 return chain.proceed(newRequest);
             }
         };

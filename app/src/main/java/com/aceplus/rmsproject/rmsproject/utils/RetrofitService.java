@@ -1,5 +1,10 @@
 package com.aceplus.rmsproject.rmsproject.utils;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
 import com.aceplus.rmsproject.rmsproject.MainActivity;
 
 import java.io.IOException;
@@ -47,4 +52,55 @@ public class RetrofitService {
         Retrofit retrofit = builder.client(client).build();
         return retrofit.create(serviceClass);
     }
+
+    public static <T> T createRetrofitService(Class<T> serviceClass, final Context context) {
+        if(!httpClient.interceptors().isEmpty()) {
+            httpClient.interceptors().clear();
+        }
+
+        Interceptor interceptor = new Interceptor() {
+            @Override
+            public okhttp3.Response intercept(Chain chain) throws IOException {
+                Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", getActivateKeyFromDB(context)).build();
+                return chain.proceed(newRequest);
+            }
+        };
+
+        SharedPreferences prefs;
+        prefs = context.getSharedPreferences("MYPRE", context.MODE_PRIVATE);
+        String BACKEND_URL = "";
+
+        if ( prefs.getString("BACKEND_URL","")!=null) {
+            BACKEND_URL = prefs.getString("BACKEND_URL", "");
+        }
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.interceptors().add(interceptor);
+        builder.readTimeout(180, TimeUnit.SECONDS);
+        builder.connectTimeout(180, TimeUnit.SECONDS);
+        OkHttpClient client = builder.build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BACKEND_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
+                .build();
+
+        return retrofit.create(serviceClass);
+    }
+
+    private static String getActivateKeyFromDB(Context context) { // for activation key
+
+        SQLiteDatabase database = new Database(context).getDataBase();;
+        database.beginTransaction();
+        String backend_activate_key = null;
+        Cursor cur = database.rawQuery("SELECT * FROM activate_key", null);
+        while (cur.moveToNext()) {
+            backend_activate_key = cur.getString(cur.getColumnIndex("backend_activation_key"));
+        }
+        cur.close();
+        database.setTransactionSuccessful();
+        database.endTransaction();
+        return backend_activate_key;
+    }
+
 }

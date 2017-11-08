@@ -28,4 +28,7 @@
     <string name="extra_title">Choose Extra</string>
     <string name="title_activity_postmethod">POSTMethodActivity</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
+    <string name="connection_failure">Can\'t Connect to Server</string>
+    <string name="server_error">Server error occurs</string>
+    <string name="download_progress">Downloading...</string>
 </resources>

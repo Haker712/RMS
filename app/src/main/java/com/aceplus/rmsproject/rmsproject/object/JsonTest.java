@@ -13,6 +13,7 @@ public class JsonTest {
     private Download_AddOn[] addon;
     private Download_Item[] item;
 
+    public static String SOCKET_PORT = "3333";
     public Download_Category[] getCategory() {
         return category;
     }
