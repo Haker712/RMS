@@ -18,6 +18,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -1950,6 +1951,8 @@ public class CategoryActivity extends ActionBarActivity {
                     viewHolder.itemNameTxt.setPaintFlags(viewHolder.itemNameTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
                     viewHolder.quantityBtn.setText(categoryItem.getQuantity() + "");
                     viewHolder.quantityBtn.setPaintFlags(viewHolder.quantityBtn.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+                    viewHolder.quantityBtn.setBackgroundColor(ContextCompat.getColor(context, R.color.colorHighlight));
+                    viewHolder.extraBtn.setBackgroundColor(ContextCompat.getColor(context, R.color.colorHighlight));
                     viewHolder.priceTxt.setText(commaSepFormat.format(0));
                     viewHolder.priceTxt.setPaintFlags(viewHolder.priceTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
                     viewHolder.discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
@@ -2059,9 +2062,13 @@ public class CategoryActivity extends ActionBarActivity {
                                                                         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                                                             if (categoryItem.getOrder_type_id().equals("2")) {
                                                                                 Log.e("TakeAway", "true");
+                                                                                Log.e("TakeAwayCheckBox ", isChecked + "");
                                                                             }
+
+                                                                            Log.e("TakeAwayCheckBox ", isChecked + "");
                                                                             categoryItem.setTakeAway(isChecked);
-                                                                            categoryItemAdapter.notifyDataSetChanged();
+                                                                            TotalitemArraylist.set(position, categoryItem);
+                                                                            //categoryItemAdapter.notifyDataSetChanged();
                                                                         }
                                                                     }
                 );
@@ -2220,6 +2227,8 @@ public class CategoryActivity extends ActionBarActivity {
                     viewHolder.itemNameTxt.setPaintFlags(viewHolder.itemNameTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
                     viewHolder.quantityBtn.setText(categoryItem.getQuantity() + "");
                     viewHolder.quantityBtn.setPaintFlags(viewHolder.quantityBtn.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+                    viewHolder.quantityBtn.setBackgroundColor(ContextCompat.getColor(context, R.color.colorHighlight));
+                    viewHolder.extraBtn.setBackgroundColor(ContextCompat.getColor(context, R.color.colorHighlight));
                     viewHolder.priceTxt.setText(commaSepFormat.format(0));
                     viewHolder.priceTxt.setPaintFlags(viewHolder.priceTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
                     viewHolder.discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
@@ -2334,15 +2343,20 @@ public class CategoryActivity extends ActionBarActivity {
                     if (takeiddd.equals("1")) {
                         viewHolder.takeAwayCheck.setEnabled(false);
                     }
+
+                    Log.e("TakeAway", takeiddd);
                     viewHolder.takeAwayCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
                                                                             @Override
                                                                             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                                                                 if (categoryItem.getOrder_type_id().equals("2")) {
                                                                                     Log.e("TakeAway", "true");
+                                                                                    Log.e("TakeAwayCheckBox ", isChecked + "");
                                                                                 }
                                                                                 categoryItem.setTakeAway(isChecked);
-                                                                                categoryItemAdapter.notifyDataSetChanged();
+                                                                                Log.e("TakeAwayCheckBox ", isChecked + "");
+                                                                                TotalitemArraylist.set(position, categoryItem);
+                                                                                //categoryItemAdapter.notifyDataSetChanged();
                                                                             }
                                                                         }
                     );
