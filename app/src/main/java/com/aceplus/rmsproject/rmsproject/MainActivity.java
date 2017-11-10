@@ -389,73 +389,10 @@ public class MainActivity extends Activity {
                 }
                 Log.e("TureOrFalse", hasCategoryDataInDb() + "");
                 if (hasCategoryDataInDb()) {
-                    callDialog("User Login....");
-                    RequestInterface request = RetrofitService.createRetrofitService(RequestInterface.class, MainActivity.this);
-                    Call<Login> call = request.createTask(usernameEdit.getText().toString(), String.valueOf(passwordEdit.getText()), getActivateKeyFromDB());
-                    //Call<Login> call = request.createTask(usernameEdit.getText().toString(), passwordEdit.getText().toString() , getActivateKeyFromDB());
-                    call.enqueue(new Callback<Login>() {
-                        @Override
-                        public void onResponse(Call<Login> call, Response<Login> response) {
-                            try {
-                                progressDialog.dismiss();
-                                Login jsonResponse = response.body();
-                                String message = jsonResponse.getMessage();
-                                if (message.equals("Success")) {
-                                    userLogin = true;
-                                    Log.d("Login", message);
-                                    Log.d("Waiter_ID", jsonResponse.getWaiter_id());
-                                    SharedPreferences.Editor editor = sharedpreferences.edit();
-                                    editor.putString(WAITER_ID, jsonResponse.getWaiter_id());
-                                    editor.commit();
-                                    loadSyncsTable(getVersionList());
-                                } else if (message.equals("Fail")) {
-                                    final android.support.v7.app.AlertDialog builder = new android.support.v7.app.AlertDialog.Builder(MainActivity.this, R.style.InvitationDialog)
-                                            .setPositiveButton(R.string.invitation_ok, null)
-                                            .setNegativeButton(R.string.invitation_cancel, null)
-                                            .create();
-                                    builder.setTitle(R.string.alert);
-                                    builder.setMessage("Username or password is incorrect!");
-                                    builder.setOnShowListener(new DialogInterface.OnShowListener() {
-                                        @Override
-                                        public void onShow(DialogInterface dialog) {
-                                            final Button btnAccept = builder.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
-                                            btnAccept.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    builder.dismiss();
-                                                    passwordEdit.selectAll();
-                                                }
-                                            });
-                                            final Button btnCancle = builder.getButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE);
-                                            btnCancle.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    builder.dismiss();
-                                                }
-                                            });
-                                        }
-                                    });
-                                    builder.show();
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                progressDialog.dismiss();
-                                if(response.message() != null && !response.message().equals("")) {
-                                    callUploadDialog(response.message());
-                                } else{
-                                    callUploadDialog(getResources().getString(R.string.server_error));
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<Login> call, Throwable t) {
-                            progressDialog.dismiss();
-                            callUploadDialog("Please login again!");
-                        }
-                    });
+                    userLogIn();
                 } else {
                     loadTableVersion(0);
+                    userLogIn();
                 }
             }
         });
@@ -465,6 +402,74 @@ public class MainActivity extends Activity {
             public boolean onLongClick(View v) {
                 backupDatabase(MainActivity.this);
                 return false;
+            }
+        });
+    }
+
+    private void userLogIn() {
+        callDialog("User Login....");
+        RequestInterface request = RetrofitService.createRetrofitService(RequestInterface.class, MainActivity.this);
+        Call<Login> call = request.createTask(usernameEdit.getText().toString(), String.valueOf(passwordEdit.getText()), getActivateKeyFromDB());
+        //Call<Login> call = request.createTask(usernameEdit.getText().toString(), passwordEdit.getText().toString() , getActivateKeyFromDB());
+        call.enqueue(new Callback<Login>() {
+            @Override
+            public void onResponse(Call<Login> call, Response<Login> response) {
+                try {
+                    progressDialog.dismiss();
+                    Login jsonResponse = response.body();
+                    String message = jsonResponse.getMessage();
+                    if (message.equals("Success")) {
+                        userLogin = true;
+                        Log.d("Login", message);
+                        Log.d("Waiter_ID", jsonResponse.getWaiter_id());
+                        SharedPreferences.Editor editor = sharedpreferences.edit();
+                        editor.putString(WAITER_ID, jsonResponse.getWaiter_id());
+                        editor.commit();
+                        loadSyncsTable(getVersionList());
+                    } else if (message.equals("Fail")) {
+                        final android.support.v7.app.AlertDialog builder = new android.support.v7.app.AlertDialog.Builder(MainActivity.this, R.style.InvitationDialog)
+                                .setPositiveButton(R.string.invitation_ok, null)
+                                .setNegativeButton(R.string.invitation_cancel, null)
+                                .create();
+                        builder.setTitle(R.string.alert);
+                        builder.setMessage("Username or password is incorrect!");
+                        builder.setOnShowListener(new DialogInterface.OnShowListener() {
+                            @Override
+                            public void onShow(DialogInterface dialog) {
+                                final Button btnAccept = builder.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
+                                btnAccept.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        builder.dismiss();
+                                        passwordEdit.selectAll();
+                                    }
+                                });
+                                final Button btnCancle = builder.getButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE);
+                                btnCancle.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        builder.dismiss();
+                                    }
+                                });
+                            }
+                        });
+                        builder.show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    progressDialog.dismiss();
+                    if(response.message() != null && !response.message().equals("")) {
+                        callUploadDialog(response.message());
+                    } else{
+                        callUploadDialog(getResources().getString(R.string.server_error));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Login> call, Throwable t) {
+                progressDialog.dismiss();
+                callUploadDialog("Please login again!");
             }
         });
     }

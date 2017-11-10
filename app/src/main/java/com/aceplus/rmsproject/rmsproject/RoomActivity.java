@@ -792,7 +792,7 @@ public class RoomActivity extends AppCompatActivity {
                                                             }
 
                                                             //
-                                                            CategoryActivity.VOUNCHER_ID = "NULL";
+                                                            CategoryActivity.VOUNCHER_ID = null;
                                                         } else {
                                                             CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
                                                         }
@@ -884,7 +884,7 @@ public class RoomActivity extends AppCompatActivity {
                                             }
 
                                             //
-                                            CategoryActivity.VOUNCHER_ID = "NULL";
+                                            CategoryActivity.VOUNCHER_ID = null;
                                         } else {
                                             CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
                                         }
