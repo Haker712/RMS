@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,6 +26,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aceplus.rmsproject.rmsproject.CategoryActivity;
 import com.aceplus.rmsproject.rmsproject.MainActivity;
 import com.aceplus.rmsproject.rmsproject.R;
 import com.aceplus.rmsproject.rmsproject.object.Download_OrderStatus;
@@ -271,6 +273,7 @@ public class FragmentMessageComplete extends Fragment {
             viewHolder.takeBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                     int count = 0;
                     Log.e("OrderItemSize", completeArrayList.get(position).getOrder_item().size() + "");
                     JSONObject jsonObject = new JSONObject();
@@ -319,6 +322,18 @@ public class FragmentMessageComplete extends Fragment {
                                     Log.d("TakeStatus", message + "size" + order_complete.getOrder_item().size());
                                     mProgressDialog.dismiss();
                                     if (message.equals("Success")) {
+
+                                        Handler handler = new Handler();
+
+                                        handler.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                socket.emit("taken_by", "Item Taken");
+                                                Toast.makeText(activity, "SocketFire", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+
                                         for (int i = 0; i < completeArrayList.get(position).getOrder_item().size(); i++) {
                                             Order_Item order_item = completeArrayList.get(position).getOrder_item().get(i);
                                             if (order_item.isCheck() == true) {

@@ -16,6 +16,9 @@ public class Download_ForInvoiceDetail {
     @SerializedName("user_id")
     @Expose
     private String userId;
+    @SerializedName("user_name")
+    @Expose
+    private String username;
     @SerializedName("take_id")
     @Expose
     private String takeId;
@@ -99,6 +102,14 @@ public class Download_ForInvoiceDetail {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getTakeId() {
@@ -268,7 +279,6 @@ public class Download_ForInvoiceDetail {
     public void setDeletedAt(String deletedAt) {
         this.deletedAt = deletedAt;
     }
-
 
 
     public ArrayList<Download_ForInvoiveItemDetail> getForInvoiveItemDetail() {
