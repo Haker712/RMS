@@ -76,6 +76,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     SQLiteDatabase database;
     public /*static*/ String vouncherID = null;
     public /*static*/ String userID = null;
+    public String userName=null;
     public /*static*/ String date = null;
     public /*static*/ String tableNo = null;
     public /*static*/ String RommCharge = null;
@@ -96,6 +97,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     InvoiceDetailAdapter invoiceDetailAdapter;
     private Retrofit retrofit;
     private TextView waiterIDTxt;
+    private TextView waiterNameTxt;
     private TextView dateTxt;
     private TextView vouncherTxt;
     private TextView tableNoTxt;
@@ -205,6 +207,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
 
         vouncherID = detailDataMap.get("vouncherID");
         userID = detailDataMap.get("userId");
+        userName=detailDataMap.get("userName");
         date = detailDataMap.get("date");
         tableNo = detailDataMap.get("tableNo");
         if(tableNo.equals("")) {
@@ -233,7 +236,8 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     }
 
     private void registerIDs() {
-        waiterIDTxt = (TextView) findViewById(R.id.name_txt);
+        waiterIDTxt = (TextView) findViewById(R.id.staffid_txt);
+        waiterNameTxt= (TextView) findViewById(R.id.staffname_txt);
         dateTxt = (TextView) findViewById(R.id.date_txt);
         vouncherTxt = (TextView) findViewById(R.id.vouncher_txt);
         tableNoTxt = (TextView) findViewById(R.id.table_txt);
@@ -311,6 +315,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
 
         vouncherTxt.setText(vouncherID);
         waiterIDTxt.setText(userID);
+        waiterNameTxt.setText(userName);
         dateTxt.setText(date);
         tableNoTxt.setText(tableNo);
         totalAmtTxt.setText(totalAmount);

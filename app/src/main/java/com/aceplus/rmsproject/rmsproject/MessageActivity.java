@@ -7,15 +7,23 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.aceplus.rmsproject.rmsproject.fragment.PagerAdapter;
+import com.aceplus.rmsproject.rmsproject.object.JsonTest;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
+
+import java.net.URISyntaxException;
 
 public class MessageActivity extends AppCompatActivity {
     private Toolbar toolbar;
     ViewPager pager;
     TabLayout tabLayout;
+
+    Socket socket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +41,7 @@ public class MessageActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(pager);
         pager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setTabsFromPagerAdapter(adapter);
+
     }
 
     @Override
