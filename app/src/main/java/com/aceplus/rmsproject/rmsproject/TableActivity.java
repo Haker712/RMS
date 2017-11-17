@@ -906,15 +906,19 @@ public class TableActivity extends ActionBarActivity {
                                     Log.i("invoiceee_id", invoiceee_id + "");
                                     if (invoiceee_id.equals(null)) {
                                         CategoryActivity.ADD_INVOICE = "NULL";
-                                        CategoryActivity.VOUNCHER_ID = "NULL";
+//                                        CategoryActivity.VOUNCHER_ID = "NULL";
+                                        CategoryActivity.VOUNCHER_ID = null;
                                     } else {
-                                        CategoryActivity.VOUNCHER_ID = "NULL";
+                                       // CategoryActivity.VOUNCHER_ID = "NULL";
+                                        CategoryActivity.VOUNCHER_ID = null;
                                         if (invoice_id == null || invoice_id.equals("null")) {
                                             String group_invoice_id = getGroupTableInvoiceDataInDB(table.getTableID());
-                                            CategoryActivity.VOUNCHER_ID = "NULL";
+                                            //CategoryActivity.VOUNCHER_ID = "NULL";
+                                            CategoryActivity.VOUNCHER_ID = null;
                                             if (group_invoice_id == null) {
                                                 Log.e("GroupInvoice", group_invoice_id + "");
-                                                CategoryActivity.VOUNCHER_ID = "NULL";
+                                               // CategoryActivity.VOUNCHER_ID = "NULL";
+                                                CategoryActivity.VOUNCHER_ID = null;
                                             } else {
                                                 CategoryActivity.VOUNCHER_ID = group_invoice_id;
                                             }
@@ -982,7 +986,8 @@ public class TableActivity extends ActionBarActivity {
                                         CategoryActivity.TAKE_AWAY = "table";
                                         CategoryActivity.ROOM_ID = null;
                                         CategoryActivity.ADD_INVOICE = "NULL";
-                                        CategoryActivity.VOUNCHER_ID = "NULL";
+                                       // CategoryActivity.VOUNCHER_ID = "NULL";
+                                        CategoryActivity.VOUNCHER_ID=null;
                                         startActivity(new Intent(TableActivity.this, CategoryActivity.class));
                                         finish();
                                     } else {

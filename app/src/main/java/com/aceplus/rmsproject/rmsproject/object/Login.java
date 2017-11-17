@@ -6,6 +6,8 @@ package com.aceplus.rmsproject.rmsproject.object;
 public class Login {
     String message;
     String waiter_id;
+    String username;
+    String role;
 
     public String getMessage() {
         return message;
@@ -13,5 +15,13 @@ public class Login {
 
     public String getWaiter_id() {
         return waiter_id;
+    }
+
+    public String getWaiter_name() {
+        return username;
+    }
+
+    public String getRole() {
+        return role;
     }
 }

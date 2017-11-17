@@ -3,6 +3,7 @@ package com.aceplus.rmsproject.rmsproject;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -32,6 +33,7 @@ import android.widget.Toast;
 
 import com.aceplus.rmsproject.rmsproject.object.InvoiceDetailProduct;
 import com.aceplus.rmsproject.rmsproject.object.InvoiceDetailProductSetItem;
+import com.aceplus.rmsproject.rmsproject.object.JsonTest;
 import com.aceplus.rmsproject.rmsproject.object.SetMenu_Item_for_dialog;
 import com.aceplus.rmsproject.rmsproject.object.Success;
 import com.aceplus.rmsproject.rmsproject.utils.Database;
@@ -40,12 +42,15 @@ import com.aceplus.rmsproject.rmsproject.utils.Download_forShow_tableID;
 import com.aceplus.rmsproject.rmsproject.utils.JsonForShowRoomId;
 import com.aceplus.rmsproject.rmsproject.utils.JsonForShowTableId;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -142,6 +147,8 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     ArrayList<InvoiceDetailProduct> invoiceDetailProductArrayList = new ArrayList<>();
     Map<String, String> detailDataMap = new HashMap<>();
 
+    Socket socket;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +162,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
             public okhttp3.Response intercept(Chain chain) throws IOException {
                 Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", getActivateKeyFromDB()).build();
                 return chain.proceed(newRequest);
+
             }
         };
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -188,6 +196,24 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         getConfigData();
         setAdapter();
         catchEvents();
+
+        String mainurl = MainActivity.URL;
+        String supmainturl = "";
+
+        if (mainurl != null && mainurl.length() > 0) {
+            supmainturl = mainurl.substring(0, mainurl.length() - 4);
+        }
+        try {
+            String socketurl = supmainturl + JsonTest.SOCKET_PORT;
+            Log.i("SocketUrl", socketurl);
+            socket = IO.socket(socketurl);
+        } catch (URISyntaxException e) {
+            Log.e("URL ERR :", e.getMessage());
+
+        }
+
+        socket.connect();
+
     }
 
     /***
@@ -1024,6 +1050,17 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                                         //totalDisTxt.setText(commaSepFormat.format(totalDisValue));
                                                         netAmtTxt.setText(commaSepFormat.format(totalNetValue));
                                                         String arg2[] = {vouncherID};
+
+                                                        Handler handler = new Handler();
+
+                                                        handler.post(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                socket.emit("order_cancel", vouncherID);
+                                                                Toast.makeText(InvoiceDetailActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        });
+
                                                     } else {
                                                         mProgressDialog.dismiss();
                                                         callUploadDialog("This item is cooking now.", InvoiceDetailActivity.this);
