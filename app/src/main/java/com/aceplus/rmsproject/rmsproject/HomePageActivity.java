@@ -15,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.aceplus.rmsproject.rmsproject.object.Download_OrderStatus;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseOrderStatus;
@@ -45,10 +46,21 @@ public class HomePageActivity extends ActionBarActivity {
     private ArrayList<Download_OrderStatus> download_orderStatusArrayList;
     SQLiteDatabase database;
 
+    String waiterName;
+    String userRole;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
+
+         waiterName = getIntent().getStringExtra("WaiterName");
+        userRole=getIntent().getStringExtra("UserRole");
+        TextView txtWaiterName= (TextView) findViewById(R.id.waiternametxt);
+        txtWaiterName.setText(waiterName);
+        TextView txtUserRole=(TextView) findViewById(R.id.roletxt);
+        txtUserRole.setText(userRole);
+
         try {
             database = new Database(HomePageActivity.this).getDataBase();
         } catch (Exception e) {

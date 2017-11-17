@@ -15,6 +15,28 @@
         android:src="@drawable/logo"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="34dp" />
+
+    <TextView
+        android:id="@+id/waiternametxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="50dp"
+        android:text="Hello"
+        android:textColor="#eeeeee"
+        android:layout_marginRight="20dp"/>
+
+    <TextView
+        android:id="@+id/roletxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="70dp"
+        android:text="Hello"
+        android:textColor="#eeeeee"
+        android:layout_marginRight="20dp"/>
+
+
     <LinearLayout
         android:id="@+id/linear_layout"
         android:layout_below="@id/logo_img"

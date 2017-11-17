@@ -981,7 +981,7 @@ public class RoomActivity extends AppCompatActivity {
 //
 //            public void run() {
 //                try {
-//                    while (ContinueThread.get()) {
+//                   while (ContinueThread.get()) {
 //                        Thread.sleep(30000);
 //                        runOnUiThread(new Runnable() {
 //                            @Override

@@ -140,6 +140,9 @@ public class MainActivity extends Activity {
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
 
+    String Waitername="";
+    String UserRole="";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -422,6 +425,10 @@ public class MainActivity extends Activity {
                         userLogin = true;
                         Log.d("Login", message);
                         Log.d("Waiter_ID", jsonResponse.getWaiter_id());
+                        Waitername=jsonResponse.getWaiter_name();
+                        UserRole=jsonResponse.getRole();
+                        Log.i("Role",UserRole);
+                      //  Log.i("WaiterName",Waitername);
                         SharedPreferences.Editor editor = sharedpreferences.edit();
                         editor.putString(WAITER_ID, jsonResponse.getWaiter_id());
                         editor.commit();
@@ -943,8 +950,12 @@ public class MainActivity extends Activity {
                     database.setTransactionSuccessful();
                     database.endTransaction();
                     deleteTableVersion("tableVersion");
-                    loadTableVersion(1);
-                    startActivity(new Intent(MainActivity.this, HomePageActivity.class));
+//                    loadTableVersion(1);
+//                    startActivity(new Intent(MainActivity.this, HomePageActivity.class));
+                    Intent intent=new Intent(MainActivity.this,HomePageActivity.class);
+                    intent.putExtra("WaiterName",Waitername);
+                    intent.putExtra("UserRole",UserRole);
+                    startActivity(intent);
                     finish();
                 } catch (Exception e) {
                     e.printStackTrace();
