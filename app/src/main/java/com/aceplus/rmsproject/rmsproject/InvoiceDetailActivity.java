@@ -48,6 +48,7 @@ import com.github.nkzawa.socketio.client.Socket;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -112,7 +113,9 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     private TextView totalDisTxt;
     private TextView totalMemberDisTxt;
     private TextView taxTxt;
+    private TextView taxpercentTxt;
     private TextView serviceTxt;
+    private TextView servicepercentTxt;
     private TextView netAmtTxt;
     private EditText payAmtEdit;
     @InjectView(R.id.FOC_amount_edit)
@@ -277,7 +280,9 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         //totalDisTxt = (TextView) findViewById(R.id.total_discount_amount_txt);
         totalMemberDisTxt = (TextView) findViewById(R.id.member_discount_txt);
         taxTxt = (TextView) findViewById(R.id.tax_txt);
+        taxpercentTxt= (TextView) findViewById(R.id.tax_percent_txt);
         serviceTxt = (TextView) findViewById(R.id.service_txt);
+        servicepercentTxt= (TextView) findViewById(R.id.service_percent_txt);
         netAmtTxt = (TextView) findViewById(R.id.net_amount_txt);
         refundTxt = (TextView) findViewById(R.id.refund_txt);
         addBtn = (Button) findViewById(R.id.add_btn);
@@ -352,6 +357,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         double total = Double.parseDouble(totalAmount);
         double taxValue = total * taxAmt / 100;
         taxTxt.setText(commaSepFormat.format(taxValue));
+        taxpercentTxt.setText(taxAmt+"%");
         Log.d("TaxValue", taxAmt + "%");
         double serviceValue = 0;
         if (!RommCharge.equals("")) {
@@ -360,6 +366,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
             serviceValue = total * serviceAmt / 100;
         }
         serviceTxt.setText(commaSepFormat.format(serviceValue));
+        servicepercentTxt.setText(serviceAmt+"%");
         Log.d("Service", serviceValue + "%");
         focAmtEdit.setEnabled(false);
         payAmtEdit.addTextChangedListener(new TextWatcher() {
@@ -1057,7 +1064,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                                             @Override
                                                             public void run() {
                                                                 socket.emit("order_cancel", vouncherID);
-                                                                Toast.makeText(InvoiceDetailActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
+                                                              //  Toast.makeText(InvoiceDetailActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
                                                             }
                                                         });
 

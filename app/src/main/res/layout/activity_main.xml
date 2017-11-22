@@ -56,7 +56,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:hint="@string/username"
-            android:text="phyoe lay"
+            android:text="waiter"
             android:singleLine="true"
             android:background="@drawable/editor_selector"
             android:padding="7dp"/>

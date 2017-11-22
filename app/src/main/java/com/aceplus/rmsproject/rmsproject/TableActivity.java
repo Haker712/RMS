@@ -538,7 +538,7 @@ public class TableActivity extends ActionBarActivity {
                                         @Override
                                         public void run() {
                                             socket.emit("table_transfer", "transfer_table");
-                                            Toast.makeText(TableActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
+                                           // Toast.makeText(TableActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
                                         }
                                     });
 
@@ -700,7 +700,7 @@ public class TableActivity extends ActionBarActivity {
                                     @Override
                                     public void run() {
                                         socket.emit("table_message", "TakeTable");
-                                        Toast.makeText(TableActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
+                                      //  Toast.makeText(TableActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
                                     }
                                 });
 
@@ -973,7 +973,7 @@ public class TableActivity extends ActionBarActivity {
                                             @Override
                                             public void run() {
                                                 socket.emit("table_message", "TakeTable");
-                                                Toast.makeText(mContext, "SocketFire", Toast.LENGTH_SHORT).show();
+                                              //  Toast.makeText(mContext, "SocketFire", Toast.LENGTH_SHORT).show();
                                             }
                                         });
 

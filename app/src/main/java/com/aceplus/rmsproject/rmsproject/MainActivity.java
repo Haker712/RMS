@@ -703,7 +703,7 @@ public class MainActivity extends Activity {
                             cv.put("id", download_setMenu.getId());
                             cv.put("set_menu_name", download_setMenu.getSet_menus_name());
                             cv.put("set_menu_price", download_setMenu.getSet_menus_price());
-                            cv.put("image", download_setMenu.getMobile_image());
+                            cv.put("image", download_setMenu.getImage());
                             cv.put("status", download_setMenu.getStatus());
                             database.insert("setMenu", null, cv);
                         }
@@ -719,7 +719,7 @@ public class MainActivity extends Activity {
                                 setMenuCV.put("status", "1");
                                 setMenuCV.put("parent_id", "0");
                                 setMenuCV.put("kitchen_id", "0");
-                                setMenuCV.put("image", imageEncoded);
+                                setMenuCV.put("image", "setmenu.jpg");
                                 database.insert("category", null, setMenuCV);
                             }
                             for (Download_Category download_category : download_categoryArrayList) {
@@ -742,7 +742,7 @@ public class MainActivity extends Activity {
                             ContentValues cv = new ContentValues();
                             cv.put("id", download_item.getId());
                             cv.put("name", download_item.getName());
-                            cv.put("image", download_item.getMobile_image());
+                            cv.put("image", download_item.getImage());
                             cv.put("price", download_item.getPrice());
                             cv.put("status", download_item.getStatus());
                             cv.put("category_id", download_item.getCategory_id());
@@ -758,7 +758,7 @@ public class MainActivity extends Activity {
                             cv.put("id", download_addOn.getId());
                             cv.put("food_name", download_addOn.getFood_name());
                             cv.put("category_id", download_addOn.getCategory_id());
-                            cv.put("image", download_addOn.getMobile_image());
+                            cv.put("image", download_addOn.getImage());
                             cv.put("price", download_addOn.getPrice());
                             database.insert("addOn", null, cv);
                         }
