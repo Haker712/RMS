@@ -439,23 +439,23 @@
                                     android:text="0" />
                             </RelativeLayout>-->
 
-                            <RelativeLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="7dp">
+                            <!--<RelativeLayout-->
+                                <!--android:layout_width="match_parent"-->
+                                <!--android:layout_height="wrap_content"-->
+                                <!--android:padding="7dp">-->
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Member Discount Amount :" />
+                                <!--<TextView-->
+                                    <!--android:layout_width="wrap_content"-->
+                                    <!--android:layout_height="wrap_content"-->
+                                    <!--android:text="Member Discount Amount :" />-->
 
-                                <TextView
-                                    android:id="@+id/member_discount_txt"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_alignParentRight="true"
-                                    android:text="0" />
-                            </RelativeLayout>
+                                <!--<TextView-->
+                                    <!--android:id="@+id/member_discount_txt"-->
+                                    <!--android:layout_width="wrap_content"-->
+                                    <!--android:layout_height="wrap_content"-->
+                                    <!--android:layout_alignParentRight="true"-->
+                                    <!--android:text="0" />-->
+                            <!--</RelativeLayout>-->
 
                             <RelativeLayout
                                 android:layout_width="match_parent"
@@ -466,6 +466,14 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Tax :" />
+
+                                <TextView
+                                    android:id="@+id/tax_percent_txt"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_toLeftOf="@+id/tax_txt"
+                                    android:gravity="center"
+                                    android:layout_marginRight="50dp"/>
 
                                 <TextView
                                     android:id="@+id/tax_txt"
@@ -484,6 +492,14 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Service :" />
+
+                                <TextView
+                                    android:id="@+id/service_percent_txt"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_toLeftOf="@+id/service_txt"
+                                    android:gravity="center"
+                                    android:layout_marginRight="50dp"/>
 
                                 <TextView
                                     android:id="@+id/service_txt"

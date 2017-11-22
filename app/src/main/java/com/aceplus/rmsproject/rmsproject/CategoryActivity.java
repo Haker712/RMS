@@ -133,7 +133,9 @@ public class CategoryActivity extends ActionBarActivity {
     private TextView tPriceTxt;
     private TextView tnetPriceTxt;
     private TextView serviceAmtTxt;
+    private TextView servicePercentTxt;
     private TextView taxAmtTxt;
+    private TextView taxPercentTxt;
     private AutoCompleteTextView searchItemAuto;
     SimpleDateFormat date_format = new SimpleDateFormat("yyyy-MM-dd");
     SimpleDateFormat time_format = new SimpleDateFormat("HH:mm:SS");
@@ -229,6 +231,7 @@ public class CategoryActivity extends ActionBarActivity {
         database = new Database(this).getDataBase();
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
+
         registerIDs();
         catchEvents();
 
@@ -361,7 +364,9 @@ public class CategoryActivity extends ActionBarActivity {
         tPriceTxt = (TextView) findViewById(R.id.tprice);
         tnetPriceTxt = (TextView) findViewById(R.id.namount);
         taxAmtTxt = (TextView) findViewById(R.id.tax_amt_txt);
+        taxPercentTxt= (TextView) findViewById(R.id.tax_percent_txt);
         serviceAmtTxt = (TextView) findViewById(R.id.scharges);
+        servicePercentTxt= (TextView) findViewById(R.id.service_percent_txt);
         searchItemAuto = (AutoCompleteTextView) findViewById(R.id.auto_search_item);
     }
 
@@ -1611,6 +1616,7 @@ public class CategoryActivity extends ActionBarActivity {
             }
         });
 
+
         CategoryArrayAdapter adapter = new CategoryArrayAdapter(this, categoryDataFromDB("0"));
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(mLayoutManager);
@@ -1909,10 +1915,14 @@ public class CategoryActivity extends ActionBarActivity {
                                             while (cursor.moveToNext()) {
 
                                                 String selected_item_id = cursor.getString(cursor.getColumnIndex("id"));
+                                                double selected_item_price=cursor.getDouble(cursor.getColumnIndex("price"));
                                                 categoryItem.setId(selected_item_id);
                                                 String selectd_itemname = cursor.getString(cursor.getColumnIndex("name"));
                                                 viewHolder.itemNameTxt.setText(selected_ContimentName + " " + selectd_itemname);
+                                                viewHolder.priceTxt.setText(selected_item_price+"");
+                                                viewHolder.amountTxt.setText(selected_item_price+"");
                                                 TotalitemArraylist.get(position).setItemName(selected_ContimentName + " " + selectd_itemname);
+                                                TotalitemArraylist.get(position).setPrice(selected_item_price);
 
                                             }
 
@@ -2013,7 +2023,12 @@ public class CategoryActivity extends ActionBarActivity {
                                             tPriceTxt.setText(commaSepFormat.format(totalValue));
                                             tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
                                             taxAmtTxt.setText(commaSepFormat.format(taxValue));
+                                            taxPercentTxt.setText(taxAmt+"%");
                                             serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
+                                            servicePercentTxt.setText(serviceAmt+"%");
+
+
+
                                             builder.dismiss();
                                         }
                                     });
@@ -2093,7 +2108,9 @@ public class CategoryActivity extends ActionBarActivity {
                 tPriceTxt.setText(commaSepFormat.format(totalValue));
                 tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
                 serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
+                servicePercentTxt.setText(serviceAmt+"%");
                 taxAmtTxt.setText(commaSepFormat.format(taxValue));
+                taxPercentTxt.setText(taxAmt+"%");
                 viewHolder.quantityBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -2306,7 +2323,9 @@ public class CategoryActivity extends ActionBarActivity {
                                                 tPriceTxt.setText(commaSepFormat.format(totalValue));
                                                 tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
                                                 taxAmtTxt.setText(commaSepFormat.format(taxValue));
+                                                taxPercentTxt.setText(taxAmt+"%");
                                                 serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
+                                                servicePercentTxt.setText(serviceAmt+"%");
                                                 builder.dismiss();
                                             }
                                         });
@@ -2381,7 +2400,9 @@ public class CategoryActivity extends ActionBarActivity {
                     tPriceTxt.setText(commaSepFormat.format(totalValue));
                     tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
                     serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
+                    servicePercentTxt.setText(serviceAmt+"%");
                     taxAmtTxt.setText(commaSepFormat.format(taxValue));
+                    taxPercentTxt.setText(taxAmt+"%");
                     viewHolder.quantityBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -3299,7 +3320,7 @@ public class CategoryActivity extends ActionBarActivity {
                     @Override
                     public void onClick(View v) {
 
-                        Toast.makeText(mContext, "Here1", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(mContext, "Here1", Toast.LENGTH_SHORT).show();
 
                         ID = albumList.get(getPosition()).getId();
                         parent_ID = albumList.get(getPosition()).getParent_id();
@@ -3395,7 +3416,7 @@ public class CategoryActivity extends ActionBarActivity {
                     public void onClick(View v) {
 
 
-                        Toast.makeText(mContext, "Here2", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(mContext, "Here2", Toast.LENGTH_SHORT).show();
 
                         categoryTxt.setText("Item");
                         Category_Item category_item = new Category_Item();
@@ -3446,7 +3467,7 @@ public class CategoryActivity extends ActionBarActivity {
                         if (VOUNCHER_ID != null) {
 
                             //tempcategoryItemList1.clear();
-                            Toast.makeText(mContext, "add to tempArray", Toast.LENGTH_SHORT).show();
+                           // Toast.makeText(mContext, "add to tempArray", Toast.LENGTH_SHORT).show();
                             // category_item.setState("new");
                             tempcategoryItemList1.add(category_item);
                             //categoryItemList.addAll(tempcategoryItemList1);
@@ -3711,7 +3732,7 @@ public class CategoryActivity extends ActionBarActivity {
                             @Override
                             public void run() {
                                 socket.emit("order", "blah blah");
-                                Toast.makeText(CategoryActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
+                               // Toast.makeText(CategoryActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
                             }
                         });
 

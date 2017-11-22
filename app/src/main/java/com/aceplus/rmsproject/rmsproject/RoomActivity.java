@@ -736,7 +736,7 @@ public class RoomActivity extends AppCompatActivity {
                                     public void onClick(View v) {
 
                                         socket.emit("room_message", "TakeRoom");
-                                        Toast.makeText(mContext, "SocketFire", Toast.LENGTH_SHORT).show();
+                                      //  Toast.makeText(mContext, "SocketFire", Toast.LENGTH_SHORT).show();
 
                                         final String room_id = table.getTableID();
                                         final String status = table.getTableService();

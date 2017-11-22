@@ -15,5 +15,6 @@
         android:singleLine="true"
         android:hint="Type The Quantity"
         android:textColorHint="@color/colorAccent"
-        android:inputType="number" />
+        android:inputType="number"
+        android:maxLength="5"/>
 </RelativeLayout>

@@ -256,16 +256,33 @@ public class FragmentMessageComplete extends Fragment {
         public void onBindViewHolder(final DataAdapter.ViewHolder viewHolder, final int position) {
             final Order_Complete order_complete = orderCompleteList.get(position);
             viewHolder.vouncherTxt.setText(order_complete.getOrder_id());
-            if (order_complete.getTable_no() == null) {
-                Log.e("OComTableID", order_complete.getTable_no() + "");
-            } else {
+//            if (order_complete.getTable_no() == null) {
+//                Log.e("OComTableID", order_complete.getTable_no() + "");
+//            } else {
+//                viewHolder.tableTxt.setText(order_complete.getTable_no());
+//            }
+//            if (order_complete.getRoom_name() == null) {
+//                Log.e("OComRoomID", order_complete.getRoom_name() + "");
+//            } else {
+//                viewHolder.tableTxt.setText(order_complete.getRoom_name());
+//            }
+
+            if (order_complete.getTable_no()!=null){
+
                 viewHolder.tableTxt.setText(order_complete.getTable_no());
-            }
-            if (order_complete.getRoom_name() == null) {
-                Log.e("OComRoomID", order_complete.getRoom_name() + "");
-            } else {
+
+            }else if (order_complete.getRoom_name()!=null){
+
                 viewHolder.tableTxt.setText(order_complete.getRoom_name());
+               viewHolder.txtRoomTable.setText("Room No : ");
+
+            }else {
+
+                viewHolder.tableTxt.setText("Take Away");
+                viewHolder.txtRoomTable.setText("");
+
             }
+
             viewHolder.listView.getLayoutParams().height = 66 * completeArrayList.get(position).getOrder_item().size();//52
             orderItemAdapter = new OrderItemAdapter(getActivity(), completeArrayList.get(position).getOrder_item());
             viewHolder.listView.setAdapter(orderItemAdapter);
@@ -375,12 +392,14 @@ public class FragmentMessageComplete extends Fragment {
             private TextView tableTxt;
             private Button takeBtn;
             private ListView listView;
+            private TextView txtRoomTable;
             public ViewHolder(View view) {
                 super(view);
                 vouncherTxt = (TextView) view.findViewById(R.id.vouncher_txt);
                 tableTxt = (TextView) view.findViewById(R.id.table_txt);
                 takeBtn = (Button) view.findViewById(R.id.take_btn);
                 listView = (ListView) view.findViewById(R.id.complete_list_view);
+                txtRoomTable= (TextView) view.findViewById(R.id.table_view);
             }
         }
     }
@@ -414,6 +433,7 @@ public class FragmentMessageComplete extends Fragment {
             } else {
                 productNameTxt.setText(order_item.getItem_name());
             }
+            Log.i("OrderType",order_item.getOrder_type());
             orderTypeTxt.setText(order_item.getOrder_type());
             statusCheck.setChecked(order_item.isCheck());
             statusCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
