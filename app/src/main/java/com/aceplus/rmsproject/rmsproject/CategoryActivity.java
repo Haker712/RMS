@@ -1747,6 +1747,7 @@ public class CategoryActivity extends ActionBarActivity {
                         });
                         builder.show();
                     }
+                    Log.i("InvoiceID",""+VOUNCHER_ID);
             }
         });
     }
@@ -3766,6 +3767,7 @@ public class CategoryActivity extends ActionBarActivity {
         String todayDate = orderTime.format(todayCal.getTime());
         SharedPreferences prefs = getSharedPreferences(MainActivity.LOGIN_PREFERENCES, MODE_PRIVATE);
         WAITER_ID = prefs.getString(MainActivity.WAITER_ID, "No name defined");
+        //gjhkljh
         String order_id = makeOrderID();
         ContentValues cv = new ContentValues();
         cv.put("id", order_id);

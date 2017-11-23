@@ -1002,20 +1002,20 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                 @Override
                                 public void onClick(View v) {
 
-                                    int a=0;
+//                                    int a=0;
+//
+//                                  for (int i=0;i<detailProductArrayList.size();i++){
+//
+//                                      if (!"7".equals(detailProductArrayList.get(i).getStatus())){
+//
+//                                         a++;
+//
+//                                      }
+//
+//                                  }
 
-                                  for (int i=0;i<detailProductArrayList.size();i++){
 
-                                      if (!"7".equals(detailProductArrayList.get(i).getStatus())){
-
-                                         a++;
-
-                                      }
-
-                                  }
-
-
-                                    if (a > 1 ) {
+                                    if (detailProductArrayList.size() > 1 ) {
                                         double amt = Double.parseDouble(detailProductArrayList.get(position).getAmount().trim().replaceAll(",", ""));
                                         Log.e("IAmount", amt + "");
                                         double exa = Double.parseDouble(detailProductArrayList.get(position).getExtraPrice().trim().replaceAll(",", ""));
