@@ -913,9 +913,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                         }
                         set_MenuID = get_setmenu_id(detailProduct.getItemName());
 
-                        Log.i("set_MenuID>>>>>>>", set_MenuID);
                         ArrayList<SetMenu_Item_for_dialog> arrayList = get_setMeu_item_name(set_MenuID);
-                        Log.i("Arr sixe>>>onclick>>>", arrayList.size() + "");
 
                         final LayoutInflater layoutInflater = context.getLayoutInflater();
                         View setview = layoutInflater.inflate(R.layout.invoice_detail_product_setitem_view, null, true);
@@ -1003,7 +1001,21 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                             btnAccept.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    if (detailProductArrayList.size() > 1) {
+
+                                    int a=0;
+
+                                  for (int i=0;i<detailProductArrayList.size();i++){
+
+                                      if (!"7".equals(detailProductArrayList.get(i).getStatus())){
+
+                                         a++;
+
+                                      }
+
+                                  }
+
+
+                                    if (a > 1 ) {
                                         double amt = Double.parseDouble(detailProductArrayList.get(position).getAmount().trim().replaceAll(",", ""));
                                         Log.e("IAmount", amt + "");
                                         double exa = Double.parseDouble(detailProductArrayList.get(position).getExtraPrice().trim().replaceAll(",", ""));

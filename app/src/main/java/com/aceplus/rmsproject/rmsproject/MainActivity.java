@@ -160,7 +160,7 @@ public class MainActivity extends Activity {
 
         final String tablet_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        prefs = getSharedPreferences("MYPRE", MODE_PRIVATE);
+         prefs = getSharedPreferences("MYPRE", MODE_PRIVATE);
          editor = prefs.edit();
 
         if (getActivateKeyStatus() == true) {  // get ket from backend
@@ -182,6 +182,7 @@ public class MainActivity extends Activity {
                     activationRequestData.setTablet_id(tablet_id);
 
                     String param_Data = getJsonFromObject(activationRequestData);
+                    Log.i("Activation_PD",param_Data);
 
                     ActivationRequestInterface activationRequestInterface = RetrofitService.createService(ActivationRequestInterface.class);
                     Call<ActivateKey> call = activationRequestInterface.getActivation(param_Data);
