@@ -3582,7 +3582,7 @@ public class CategoryActivity extends ActionBarActivity {
                             try {
                                 setitemJsonObject.put("id", setItem.getId());
                                 setitemJsonObject.put("item_id", setItem.getItem_id());
-                                setitemJsonObject.put("item_id", setItem.getItem_id());
+//                                setitemJsonObject.put("item_id", setItem.getItem_id());
                                 setitemJsonObject.put("set_menu_id", setItem.getSet_menu_id());
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -3591,6 +3591,7 @@ public class CategoryActivity extends ActionBarActivity {
                         }
                     }
                     detail_object.put("set_item", setItemJsonArray);
+                    Log.i("setItemJS",setItemJsonArray+"");
 
                     Log.e("SetID", category_item.getId() + "");
                 } else {

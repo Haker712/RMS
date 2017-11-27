@@ -69,6 +69,7 @@ public class FragmentMessageComplete extends Fragment {
     public FragmentMessageComplete() {
         // Required empty public constructor
     }
+
     String WAITER_ID;
     //AtomicBoolean ContinueThread;
     private Retrofit retrofit;
@@ -101,6 +102,7 @@ public class FragmentMessageComplete extends Fragment {
 
         }
         socket.on("cooking_done", onMessageCompete);
+        socket.on("take", onMessageCompete);
         socket.connect();
     }
 
@@ -190,7 +192,7 @@ public class FragmentMessageComplete extends Fragment {
                 Order_Item oitem = new Order_Item();
                 String itemOrderID = item.getOrder_id();
                 String status = item.getStatus();
-                Log.i("statusss>>>>>>>>>>>",item.getStatus() +"");
+                Log.i("statusss>>>>>>>>>>>", item.getStatus() + "");
                 if (itemOrderID.equals(order_id) && status.equals("3")) {
                     oitem.setOrder_id(item.getOrder_id());
                     oitem.setOrder_detail_id(item.getOrder_detail_id());
@@ -201,8 +203,7 @@ public class FragmentMessageComplete extends Fragment {
                     oitem.setCooking_time(item.getCooking_time());
                     itemList.add(oitem);
                     canAdd = true;
-                }
-                else {
+                } else {
                     canAdd = false;
                 }
             }
@@ -211,7 +212,7 @@ public class FragmentMessageComplete extends Fragment {
                 ocompleteList.add(com);
             }
         }
-        Log.i("ocompleteList>>>>>>" , ocompleteList.size() +"");
+        Log.i("ocompleteList>>>>>>", ocompleteList.size() + "");
         finalCompleteList.clear();
         for (Order_Complete order_complete : ocompleteList) {
             Order_Complete complete = new Order_Complete();
@@ -222,10 +223,10 @@ public class FragmentMessageComplete extends Fragment {
                 complete.setRoom_name(order_complete.getRoom_name());
                 complete.setOrder_item(order_complete.getOrder_item());
                 finalCompleteList.add(complete);
-                Log.i("for_showing_data.............",complete.getOrder_item()+"");
-                Log.i("for_showing_data.............",complete.getOrder_id()+"");
-                Log.i("for_showing_data.............",complete.getTable_no()+"");
-                Log.i("for_showing_data.............",complete.getRoom_name()+"");
+                Log.i("for_showing_data.............", complete.getOrder_item() + "");
+                Log.i("for_showing_data.............", complete.getOrder_id() + "");
+                Log.i("for_showing_data.............", complete.getTable_no() + "");
+                Log.i("for_showing_data.............", complete.getRoom_name() + "");
             }
         }
         adapter = new DataAdapter(completeArrayList);
@@ -235,23 +236,27 @@ public class FragmentMessageComplete extends Fragment {
 
     public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         private ArrayList<Order_Complete> orderCompleteList;
+
         public DataAdapter(ArrayList<Order_Complete> orderCompleteList) {
             this.orderCompleteList = orderCompleteList;
         }
+
         @Override
         public DataAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
             View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.message_order_complete_cardview, viewGroup, false);
             return new ViewHolder(view);
         }
-        private String getSetMenuId (String setMenuName){
+
+        private String getSetMenuId(String setMenuName) {
             String returnMenuID = "";
-            Cursor cursor = database.rawQuery("SELECT * FROM setMenu WHERE set_menu_name = '"+setMenuName+"'", null);
-            while (cursor.moveToNext()){
+            Cursor cursor = database.rawQuery("SELECT * FROM setMenu WHERE set_menu_name = '" + setMenuName + "'", null);
+            while (cursor.moveToNext()) {
                 returnMenuID = cursor.getString(cursor.getColumnIndex("id"));
-                Log.i("gettingSetID_for_take",returnMenuID+"");
+                Log.i("gettingSetID_for_take", returnMenuID + "");
             }
             return returnMenuID;
         }
+
         @Override
         public void onBindViewHolder(final DataAdapter.ViewHolder viewHolder, final int position) {
             final Order_Complete order_complete = orderCompleteList.get(position);
@@ -267,16 +272,16 @@ public class FragmentMessageComplete extends Fragment {
 //                viewHolder.tableTxt.setText(order_complete.getRoom_name());
 //            }
 
-            if (order_complete.getTable_no()!=null){
+            if (order_complete.getTable_no() != null) {
 
                 viewHolder.tableTxt.setText(order_complete.getTable_no());
 
-            }else if (order_complete.getRoom_name()!=null){
+            } else if (order_complete.getRoom_name() != null) {
 
                 viewHolder.tableTxt.setText(order_complete.getRoom_name());
-               viewHolder.txtRoomTable.setText("Room No : ");
+                viewHolder.txtRoomTable.setText("Room No : ");
 
-            }else {
+            } else {
 
                 viewHolder.tableTxt.setText("Take Away");
                 viewHolder.txtRoomTable.setText("");
@@ -301,24 +306,23 @@ public class FragmentMessageComplete extends Fragment {
                             if (order_item.isCheck() == true) {
                                 JSONObject orderDetailID = new JSONObject();
                                 orderDetailID.put("detail_id", order_item.getId() + "");
-                                if (order_item.getSub_menu() != null){
+                                if (order_item.getSub_menu() != null) {
                                     String gettingsetID = order_item.getSub_menu();
-                                    String setMenuID =  getSetMenuId(gettingsetID);
+                                    String setMenuID = getSetMenuId(gettingsetID);
                                     orderDetailID.put("set_id", setMenuID);
                                     orderDetailID.put("set_item_id", order_item.getSet_item_id());
-                                }
-                                else {
+                                } else {
                                     orderDetailID.put("set_id", "null");
                                     orderDetailID.put("set_item_id", "null");
                                 }
-                                Log.i("Set_menu_Name_.........",order_item.getItem_name() +"");
-                                Log.i("Set_menu_id_.........",order_item.getSet_item_id() +"");
+                                Log.i("Set_menu_Name_.........", order_item.getItem_name() + "");
+                                Log.i("Set_menu_id_.........", order_item.getSet_item_id() + "");
                                 jsonArray.put(orderDetailID);
                                 count++;
                             }
                         }
                         jsonObject.put("order_detail_id", jsonArray);
-                        } catch (JSONException e) {
+                    } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     Log.e("UploadingTake", jsonObject + "");
@@ -355,7 +359,7 @@ public class FragmentMessageComplete extends Fragment {
                                             Order_Item order_item = completeArrayList.get(position).getOrder_item().get(i);
                                             if (order_item.isCheck() == true) {
                                                 String arg[] = {order_item.getOrder_detail_id()};
-                                              Log.e("UpdateID", order_item.getOrder_detail_id() + "");
+                                                Log.e("UpdateID", order_item.getOrder_detail_id() + "");
                                             }
                                         }
                                         loadOrderStatusJson();
@@ -371,6 +375,7 @@ public class FragmentMessageComplete extends Fragment {
                                     mProgressDialog.dismiss();
                                 }
                             }
+
                             @Override
                             public void onFailure(Call<Success> call, Throwable t) {
                                 Log.d("RoomStatus", t.getMessage());
@@ -383,23 +388,26 @@ public class FragmentMessageComplete extends Fragment {
                 }
             });
         }
+
         @Override
         public int getItemCount() {
             return orderCompleteList.size();
         }
+
         public class ViewHolder extends RecyclerView.ViewHolder {
             private TextView vouncherTxt;
             private TextView tableTxt;
             private Button takeBtn;
             private ListView listView;
             private TextView txtRoomTable;
+
             public ViewHolder(View view) {
                 super(view);
                 vouncherTxt = (TextView) view.findViewById(R.id.vouncher_txt);
                 tableTxt = (TextView) view.findViewById(R.id.table_txt);
                 takeBtn = (Button) view.findViewById(R.id.take_btn);
                 listView = (ListView) view.findViewById(R.id.complete_list_view);
-                txtRoomTable= (TextView) view.findViewById(R.id.table_view);
+                txtRoomTable = (TextView) view.findViewById(R.id.table_view);
             }
         }
     }
@@ -407,19 +415,22 @@ public class FragmentMessageComplete extends Fragment {
     private class OrderItemAdapter extends ArrayAdapter<Order_Item> {
         public final Activity context;
         ArrayList<Order_Item> orderItemArrayList;
+
         public OrderItemAdapter(Activity context, ArrayList<Order_Item> orderItemArrayList) {
             super(context, R.layout.message_complete_list_view, orderItemArrayList);
             this.context = context;
             this.orderItemArrayList = orderItemArrayList;
         }
-        private String getSetMenuItemName (String Set_Item_Name){
-            String SetItemReturn ="";
-            Cursor cursor = database.rawQuery("SELECT * FROM Item WHERE id = '"+Set_Item_Name+"'", null);
-            while (cursor.moveToNext()){
+
+        private String getSetMenuItemName(String Set_Item_Name) {
+            String SetItemReturn = "";
+            Cursor cursor = database.rawQuery("SELECT * FROM Item WHERE id = '" + Set_Item_Name + "'", null);
+            while (cursor.moveToNext()) {
                 SetItemReturn = cursor.getString(cursor.getColumnIndex("name"));
             }
             return SetItemReturn;
         }
+
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
             LayoutInflater layoutInflater = context.getLayoutInflater();
@@ -433,7 +444,7 @@ public class FragmentMessageComplete extends Fragment {
             } else {
                 productNameTxt.setText(order_item.getItem_name());
             }
-            Log.i("OrderType",order_item.getOrder_type());
+            Log.i("OrderType", order_item.getOrder_type());
             orderTypeTxt.setText(order_item.getOrder_type());
             statusCheck.setChecked(order_item.isCheck());
             statusCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -467,7 +478,7 @@ public class FragmentMessageComplete extends Fragment {
                     download_orderStatusArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getOrder_status()));
                     mProgressDialog.dismiss();
                     completeArrayList.clear();
-                    Log.i("download_orderStatusArrayListdownload_orderStatusArrayList",download_orderStatusArrayList.size()+"");
+                    Log.i("download_orderStatusArrayListdownload_orderStatusArrayList", download_orderStatusArrayList.size() + "");
                     for (Download_OrderStatus download_orderStatus : download_orderStatusArrayList) {
                         Order_Complete complete = new Order_Complete();
                         complete.setOrder_id(download_orderStatus.getVoucher_no());
@@ -508,6 +519,7 @@ public class FragmentMessageComplete extends Fragment {
                     callUploadDialog("Kitchen complete is null.");
                 }
             }
+
             @Override
             public void onFailure(Call<JSONResponseOrderStatus> call, Throwable t) {
                 Log.d("ErrorCategory", t.getMessage());
@@ -525,9 +537,10 @@ public class FragmentMessageComplete extends Fragment {
             @SuppressLint("LongLogTag")
             @Override
             public void onResponse(Call<JSONResponseOrderStatus> call, Response<JSONResponseOrderStatus> response) {
-                try {JSONResponseOrderStatus jsonResponse = response.body();
+                try {
+                    JSONResponseOrderStatus jsonResponse = response.body();
                     download_orderStatusArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getOrder_status()));
-                    Log.i("download_orderStatusArrayListdownload_orderStatusArrayList",download_orderStatusArrayList.size()+"");
+                    Log.i("download_orderStatusArrayListdownload_orderStatusArrayList", download_orderStatusArrayList.size() + "");
                     completeArrayList.clear();
                     for (Download_OrderStatus download_orderStatus : download_orderStatusArrayList) {
                         Order_Complete complete = new Order_Complete();
@@ -567,6 +580,7 @@ public class FragmentMessageComplete extends Fragment {
                     callUploadDialog("Kitchen complete is null.");
                 }
             }
+
             @Override
             public void onFailure(Call<JSONResponseOrderStatus> call, Throwable t) {
                 Log.d("ErrorCategory", t.getMessage());
