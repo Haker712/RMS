@@ -576,6 +576,7 @@ public class MainActivity extends Activity {
                     JSONResponseTableVersion jsonResponse = response.body();
                     download_tableVersionArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getSyncsTable()));
                     database.beginTransaction();
+
                     for (Download_TableVersion download_tableVersion : download_tableVersionArrayList) {
                         ContentValues cv = new ContentValues();
                         cv.put("id", download_tableVersion.getId());
@@ -585,11 +586,14 @@ public class MainActivity extends Activity {
                         } else {
                             cv.put("version", download_tableVersion.getVersion());
                         }
+                        Log.i("b4 insert : ",download_tableVersionArrayList.size()+"");
                         database.insert("tableVersion", null, cv);
+                        Log.i("After insert : ",download_tableVersionArrayList.size()+"");
                     }
                     database.setTransactionSuccessful();
                     database.endTransaction();
                 } catch (Exception e) {
+                    Log.i("EXCEPTION insert : ",download_tableVersionArrayList.size()+"");
                     e.printStackTrace();
                     if(response.message() != null && !response.message().equals("")) {
                         callUploadDialog(response.message());
@@ -712,8 +716,8 @@ public class MainActivity extends Activity {
 
                         if (jsonResponse.getCategory() != null) {
                             download_categoryArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getCategory()));
+                            deleteTableVersion("category");
                             if (download_setMenuArrayList.size() > 0) {
-                                deleteTableVersion("category");
                                 ContentValues setMenuCV = new ContentValues();
                                 setMenuCV.put("id", "set_menu");
                                 setMenuCV.put("name", "SetMenu");

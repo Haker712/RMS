@@ -82,7 +82,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     SQLiteDatabase database;
     public /*static*/ String vouncherID = null;
     public /*static*/ String userID = null;
-    public String userName=null;
+    public String userName = null;
     public /*static*/ String date = null;
     public /*static*/ String tableNo = null;
     public /*static*/ String RommCharge = null;
@@ -236,10 +236,10 @@ public class InvoiceDetailActivity extends ActionBarActivity {
 
         vouncherID = detailDataMap.get("vouncherID");
         userID = detailDataMap.get("userId");
-        userName=detailDataMap.get("userName");
+        userName = detailDataMap.get("userName");
         date = detailDataMap.get("date");
         tableNo = detailDataMap.get("tableNo");
-        if(tableNo.equals("")) {
+        if (tableNo.equals("")) {
             tableNo = "TAKE AWAY";
         }
         RommCharge = detailDataMap.get("RommCharge");
@@ -266,7 +266,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
 
     private void registerIDs() {
         waiterIDTxt = (TextView) findViewById(R.id.staffid_txt);
-        waiterNameTxt= (TextView) findViewById(R.id.staffname_txt);
+        waiterNameTxt = (TextView) findViewById(R.id.staffname_txt);
         dateTxt = (TextView) findViewById(R.id.date_txt);
         vouncherTxt = (TextView) findViewById(R.id.vouncher_txt);
         tableNoTxt = (TextView) findViewById(R.id.table_txt);
@@ -280,9 +280,9 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         //totalDisTxt = (TextView) findViewById(R.id.total_discount_amount_txt);
         totalMemberDisTxt = (TextView) findViewById(R.id.member_discount_txt);
         taxTxt = (TextView) findViewById(R.id.tax_txt);
-        taxpercentTxt= (TextView) findViewById(R.id.tax_percent_txt);
+        taxpercentTxt = (TextView) findViewById(R.id.tax_percent_txt);
         serviceTxt = (TextView) findViewById(R.id.service_txt);
-        servicepercentTxt= (TextView) findViewById(R.id.service_percent_txt);
+        servicepercentTxt = (TextView) findViewById(R.id.service_percent_txt);
         netAmtTxt = (TextView) findViewById(R.id.net_amount_txt);
         refundTxt = (TextView) findViewById(R.id.refund_txt);
         addBtn = (Button) findViewById(R.id.add_btn);
@@ -357,7 +357,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         double total = Double.parseDouble(totalAmount);
         double taxValue = total * taxAmt / 100;
         taxTxt.setText(commaSepFormat.format(taxValue));
-        taxpercentTxt.setText(taxAmt+"%");
+        taxpercentTxt.setText(taxAmt + "%");
         Log.d("TaxValue", taxAmt + "%");
         double serviceValue = 0;
         if (!RommCharge.equals("")) {
@@ -366,7 +366,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
             serviceValue = total * serviceAmt / 100;
         }
         serviceTxt.setText(commaSepFormat.format(serviceValue));
-        servicepercentTxt.setText(serviceAmt+"%");
+        servicepercentTxt.setText(serviceAmt + "%");
         Log.d("Service", serviceValue + "%");
         focAmtEdit.setEnabled(false);
         payAmtEdit.addTextChangedListener(new TextWatcher() {
@@ -471,21 +471,21 @@ public class InvoiceDetailActivity extends ActionBarActivity {
             }
         });
 
-            addBtn.setOnClickListener(new View.OnClickListener()
+        addBtn.setOnClickListener(new View.OnClickListener()
 
-                                      {
-                                          @SuppressLint("LongLogTag")
-                                          @Override
-                                          public void onClick(View v) {   // add btn which lead to category activity !
-                                              CategoryActivity.VOUNCHER_ID = vouncherID;
-                                              CategoryActivity.TAKE_AWAY = "add_invoice";
-                                              CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
-                                              Log.i("CategoryActivity.VOUNCHER_ID", CategoryActivity.VOUNCHER_ID + "");
-                                              startActivity(new Intent(InvoiceDetailActivity.this, CategoryActivity.class));
-                                              finish();
-                                          }
+                                  {
+                                      @SuppressLint("LongLogTag")
+                                      @Override
+                                      public void onClick(View v) {   // add btn which lead to category activity !
+                                          CategoryActivity.VOUNCHER_ID = vouncherID;
+                                          CategoryActivity.TAKE_AWAY = "add_invoice";
+                                          CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
+                                          Log.i("CategoryActivity.VOUNCHER_ID", CategoryActivity.VOUNCHER_ID + "");
+                                          startActivity(new Intent(InvoiceDetailActivity.this, CategoryActivity.class));
+                                          finish();
                                       }
-            );
+                                  }
+        );
 
 //        printBtn.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -1002,20 +1002,23 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                 @Override
                                 public void onClick(View v) {
 
-//                                    int a=0;
-//
-//                                  for (int i=0;i<detailProductArrayList.size();i++){
-//
-//                                      if (!"7".equals(detailProductArrayList.get(i).getStatus())){
-//
-//                                         a++;
-//
-//                                      }
-//
-//                                  }
+
+                                    /*** Fixing to left at least One Item while item cancel***/
+
+                                    int a = 0;
+
+                                    for (int i = 0; i < detailProductArrayList.size(); i++) {
+
+                                        if (!"7".equals(detailProductArrayList.get(i).getStatus())) {
+
+                                            a++;
+
+                                        }
+
+                                    }
 
 
-                                    if (detailProductArrayList.size() > 1 ) {
+                                    if (a > 1) {
                                         double amt = Double.parseDouble(detailProductArrayList.get(position).getAmount().trim().replaceAll(",", ""));
                                         Log.e("IAmount", amt + "");
                                         double exa = Double.parseDouble(detailProductArrayList.get(position).getExtraPrice().trim().replaceAll(",", ""));
@@ -1076,7 +1079,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                                             @Override
                                                             public void run() {
                                                                 socket.emit("order_cancel", vouncherID);
-                                                              //  Toast.makeText(InvoiceDetailActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
+                                                                //  Toast.makeText(InvoiceDetailActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
                                                             }
                                                         });
 

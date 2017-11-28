@@ -1003,4 +1003,13 @@ public class RoomActivity extends AppCompatActivity {
         super.onStop();
         ContinueThread.set(false);
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        startActivity(new Intent(RoomActivity.this, HomePageActivity.class));
+        finish();
+
+    }
 }

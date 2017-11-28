@@ -376,6 +376,7 @@ public class CategoryActivity extends ActionBarActivity {
             database.beginTransaction();
             Cursor cur = database.rawQuery("SELECT * FROM category WHERE parent_id = \"" + parent_id + "\"", null);
             while (cur.moveToNext()) {
+
                 Category category = new Category();
                 category.setId(cur.getString(cur.getColumnIndex("id")));
                 category.setName(cur.getString(cur.getColumnIndex("name")));
@@ -396,7 +397,9 @@ public class CategoryActivity extends ActionBarActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Log.i("CategoryListSize",categoryList.size()+"");
         return categoryList;
+
     }
 
     private ArrayList<Category> cateDataFromDB(String id) {
@@ -1002,7 +1005,7 @@ public class CategoryActivity extends ActionBarActivity {
                             JSONObject extra_object = new JSONObject();
                             try {
                                 extra_object.put("extra_id", addOn.getId());
-                                extra_object.put("quantity", "1");
+                                extra_object.put("quantity", category_item.getQuantity());
                                 extra_object.put("amount", addOn.getPrice());
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -1058,6 +1061,7 @@ public class CategoryActivity extends ActionBarActivity {
                     e.printStackTrace();
                 }
                 orderDetailJsonArray.put(detail_object);
+
             }
         }
         JSONArray jsonArray = new JSONArray();
@@ -1092,7 +1096,7 @@ public class CategoryActivity extends ActionBarActivity {
             e.printStackTrace();
         }
         jsonArray.put(orderjsonObject);
-        Log.e("OrderJson2", jsonArray + "");
+        Log.i("OrderJson2", jsonArray + "");
         callDialog("Uploading order add data....");
         RequestInterface request = retrofit.create(RequestInterface.class);
         Call<Success> call = request.postOrderAddInvoice(jsonArray + "");
@@ -1104,6 +1108,17 @@ public class CategoryActivity extends ActionBarActivity {
                     String message = jsonResponse.getMessage();
                     if (message.equals("Success")) {
                         Log.d("Order", message);
+
+                        Handler handler = new Handler();
+
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                socket.emit("order_edit", "blah blah");
+                                // Toast.makeText(CategoryActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
                         mProgressDialog.dismiss();
                         saveUpdateOrderData();
                         startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
@@ -1216,10 +1231,13 @@ public class CategoryActivity extends ActionBarActivity {
                     bm.compress(Bitmap.CompressFormat.PNG, 100, baos); //bm is the bitmap object
                     byte[] b = baos.toByteArray();
                     String imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
+
+
                     JSONResponseCategory jsonResponse = response.body();
                     mProgressDialog.dismiss();
                     deleteTableVersion("category");
                     download_categoryArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getCategory()));
+                    Log.i("DownloadCategorylist",download_categoryArrayList.size()+"");
                     database.beginTransaction();
 
                     if(download_setMenuArrayList.size() > 0) {
@@ -1232,6 +1250,7 @@ public class CategoryActivity extends ActionBarActivity {
                         setMenuCV.put("image", "setmenu.jpg");
                         database.insert("category", null, setMenuCV);
                     }
+
 
                     for (Download_Category download_category : download_categoryArrayList) {
                         ContentValues cv = new ContentValues();
@@ -3630,7 +3649,7 @@ public class CategoryActivity extends ActionBarActivity {
                             //kslllllll//
                             extra_object.put("category_id", addOn.getCategory_id());
                             //
-                            extra_object.put("quantity", "1");
+                            extra_object.put("quantity", category_item.getQuantity());
                             extra_object.put("amount", addOn.getPrice());
                         } catch (JSONException e) {
                             e.printStackTrace();
