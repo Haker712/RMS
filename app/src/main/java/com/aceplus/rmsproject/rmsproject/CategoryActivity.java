@@ -1005,7 +1005,7 @@ public class CategoryActivity extends ActionBarActivity {
                             JSONObject extra_object = new JSONObject();
                             try {
                                 extra_object.put("extra_id", addOn.getId());
-                                extra_object.put("quantity", category_item.getQuantity());
+                                extra_object.put("quantity", category_item.getQuantity());//set the same Quantity of OrderItem
                                 extra_object.put("amount", addOn.getPrice());
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -3646,10 +3646,8 @@ public class CategoryActivity extends ActionBarActivity {
                         JSONObject extra_object = new JSONObject();
                         try {
                             extra_object.put("extra_id", addOn.getId());
-                            //kslllllll//
                             extra_object.put("category_id", addOn.getCategory_id());
-                            //
-                            extra_object.put("quantity", category_item.getQuantity());
+                            extra_object.put("quantity", category_item.getQuantity()); //set the same Quantity of OrderItem
                             extra_object.put("amount", addOn.getPrice());
                         } catch (JSONException e) {
                             e.printStackTrace();

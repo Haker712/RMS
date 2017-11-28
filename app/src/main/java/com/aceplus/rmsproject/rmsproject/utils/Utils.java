@@ -4,10 +4,14 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
 
+import com.aceplus.rmsproject.rmsproject.HomePageActivity;
+import com.aceplus.rmsproject.rmsproject.MainActivity;
 import com.aceplus.rmsproject.rmsproject.R;
 
 /**
@@ -72,4 +76,5 @@ public class Utils {
         });
         builder.show();
     }
+
 }

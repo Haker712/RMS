@@ -118,7 +118,7 @@ public class MainActivity extends Activity {
     //public static String URL = "http://192.168.11.57:8900";
     //public static String URL = "http://192.168.195.1:8900";
     public static String URL = "";
-//    public static String ACTIVATED_URL = "http://aceplusactivation.com";
+    //    public static String ACTIVATED_URL = "http://aceplusactivation.com";
     public static String IMG_URL_PREFIX = "http://192.168.11.201:8080/uploads/";
     //public static String URL = "http://192.168.7.176:8080";
 
@@ -140,8 +140,8 @@ public class MainActivity extends Activity {
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
 
-    String Waitername="";
-    String UserRole="";
+    String Waitername = "";
+    String UserRole = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,8 +160,8 @@ public class MainActivity extends Activity {
 
         final String tablet_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
-         prefs = getSharedPreferences("MYPRE", MODE_PRIVATE);
-         editor = prefs.edit();
+        prefs = getSharedPreferences("MYPRE", MODE_PRIVATE);
+        editor = prefs.edit();
 
         if (getActivateKeyStatus() == true) {  // get ket from backend
             loginLayout.setVisibility(View.GONE);
@@ -182,7 +182,7 @@ public class MainActivity extends Activity {
                     activationRequestData.setTablet_id(tablet_id);
 
                     String param_Data = getJsonFromObject(activationRequestData);
-                    Log.i("Activation_PD",param_Data);
+                    Log.i("Activation_PD", param_Data);
 
                     ActivationRequestInterface activationRequestInterface = RetrofitService.createService(ActivationRequestInterface.class);
                     Call<ActivateKey> call = activationRequestInterface.getActivation(param_Data);
@@ -213,9 +213,9 @@ public class MainActivity extends Activity {
                                     catchEvents();
                                 } else {
                                     mProgressDialog.dismiss();
-                                    if(response.body().getMessage() != null && !response.body().getMessage().equals("")) {
+                                    if (response.body().getMessage() != null && !response.body().getMessage().equals("")) {
                                         callUploadDialog(response.body().getMessage());
-                                    } else{
+                                    } else {
                                         callUploadDialog(getResources().getString(R.string.server_error));
                                     }
                                 }
@@ -357,10 +357,10 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-                if ( prefs.getString("BACKEND_URL","")!=null){
-                    String BACKEND_URL = prefs.getString("BACKEND_URL","");
-                    URL=BACKEND_URL;
-                    IMG_URL_PREFIX=BACKEND_URL+"/uploads/";
+                if (prefs.getString("BACKEND_URL", "") != null) {
+                    String BACKEND_URL = prefs.getString("BACKEND_URL", "");
+                    URL = BACKEND_URL;
+                    IMG_URL_PREFIX = BACKEND_URL + "/uploads/";
                 }
 
 
@@ -426,10 +426,10 @@ public class MainActivity extends Activity {
                         userLogin = true;
                         Log.d("Login", message);
                         Log.d("Waiter_ID", jsonResponse.getWaiter_id());
-                        Waitername=jsonResponse.getWaiter_name();
-                        UserRole=jsonResponse.getRole();
-                        Log.i("Role",UserRole);
-                      //  Log.i("WaiterName",Waitername);
+                        Waitername = jsonResponse.getWaiter_name();
+                        UserRole = jsonResponse.getRole();
+                        Log.i("Role", UserRole);
+                        //  Log.i("WaiterName",Waitername);
                         SharedPreferences.Editor editor = sharedpreferences.edit();
                         editor.putString(WAITER_ID, jsonResponse.getWaiter_id());
                         editor.commit();
@@ -466,9 +466,9 @@ public class MainActivity extends Activity {
                 } catch (Exception e) {
                     e.printStackTrace();
                     progressDialog.dismiss();
-                    if(response.message() != null && !response.message().equals("")) {
+                    if (response.message() != null && !response.message().equals("")) {
                         callUploadDialog(response.message());
-                    } else{
+                    } else {
                         callUploadDialog(getResources().getString(R.string.server_error));
                     }
                 }
@@ -484,6 +484,7 @@ public class MainActivity extends Activity {
 
     /**
      * Back-up current database
+     *
      * @param context current activity
      */
     public static void backupDatabase(Context context) {
@@ -586,18 +587,18 @@ public class MainActivity extends Activity {
                         } else {
                             cv.put("version", download_tableVersion.getVersion());
                         }
-                        Log.i("b4 insert : ",download_tableVersionArrayList.size()+"");
+                        Log.i("b4 insert : ", download_tableVersionArrayList.size() + "");
                         database.insert("tableVersion", null, cv);
-                        Log.i("After insert : ",download_tableVersionArrayList.size()+"");
+                        Log.i("After insert : ", download_tableVersionArrayList.size() + "");
                     }
                     database.setTransactionSuccessful();
                     database.endTransaction();
                 } catch (Exception e) {
-                    Log.i("EXCEPTION insert : ",download_tableVersionArrayList.size()+"");
+                    Log.i("EXCEPTION insert : ", download_tableVersionArrayList.size() + "");
                     e.printStackTrace();
-                    if(response.message() != null && !response.message().equals("")) {
+                    if (response.message() != null && !response.message().equals("")) {
                         callUploadDialog(response.message());
-                    } else{
+                    } else {
                         callUploadDialog(getResources().getString(R.string.connection_failure));
                     }
                 }
@@ -751,6 +752,11 @@ public class MainActivity extends Activity {
                             cv.put("price", download_item.getPrice());
                             cv.put("status", download_item.getStatus());
                             cv.put("category_id", download_item.getCategory_id());
+                            cv.put("contiment_id", download_item.getContiment_id());
+                            cv.put("group_id", download_item.getGroup_id());
+                            cv.put("isdefault", download_item.getIsdefault());
+                            cv.put("has_contiment", download_item.getHas_contiment());
+
                             database.insert("item", null, cv);
                         }
                         Log.d("Demo Item", download_itemArrayList.size() + "");
@@ -957,9 +963,9 @@ public class MainActivity extends Activity {
                     deleteTableVersion("tableVersion");
 //                    loadTableVersion(1);
 //                    startActivity(new Intent(MainActivity.this, HomePageActivity.class));
-                    Intent intent=new Intent(MainActivity.this,HomePageActivity.class);
-                    intent.putExtra("WaiterName",Waitername);
-                    intent.putExtra("UserRole",UserRole);
+                    Intent intent = new Intent(MainActivity.this, HomePageActivity.class);
+                    intent.putExtra("WaiterName", Waitername);
+                    intent.putExtra("UserRole", UserRole);
                     startActivity(intent);
                     finish();
                 } catch (Exception e) {
