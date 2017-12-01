@@ -888,7 +888,7 @@ public class RoomActivity extends AppCompatActivity {
                                         } else {
                                             CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
                                         }
-                                        CategoryActivity.check_check = "null";
+                                        CategoryActivity.check_check = "room";
                                         startActivity(new Intent(RoomActivity.this, CategoryActivity.class));
                                         finish();
                                     }

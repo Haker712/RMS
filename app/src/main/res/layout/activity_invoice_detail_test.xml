@@ -489,6 +489,28 @@
                                 android:padding="7dp">
 
                                 <TextView
+                                    android:id="@+id/Roomcharges"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Room Charges :" />
+
+
+
+                                <TextView
+                                    android:id="@+id/Roomcharges_amt"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentRight="true"
+                                    android:text="0" />
+                            </RelativeLayout>
+
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="7dp">
+
+                                <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Service :" />

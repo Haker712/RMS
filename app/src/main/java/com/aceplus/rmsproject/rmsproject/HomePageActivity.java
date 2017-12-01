@@ -207,6 +207,7 @@ public class HomePageActivity extends ActionBarActivity {
                 CategoryActivity.TABLE_ID = null;
                 CategoryActivity.ROOM_ID = null;
                 CategoryActivity.groupTableArrayList = null;
+                CategoryActivity.check_check="null";
                 startActivity(new Intent(HomePageActivity.this, CategoryActivity.class));
                 finish();
             }

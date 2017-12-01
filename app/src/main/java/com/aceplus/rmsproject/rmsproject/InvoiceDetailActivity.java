@@ -31,6 +31,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aceplus.rmsproject.rmsproject.object.Category;
 import com.aceplus.rmsproject.rmsproject.object.InvoiceDetailProduct;
 import com.aceplus.rmsproject.rmsproject.object.InvoiceDetailProductSetItem;
 import com.aceplus.rmsproject.rmsproject.object.JsonTest;
@@ -116,6 +117,8 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     private TextView taxpercentTxt;
     private TextView serviceTxt;
     private TextView servicepercentTxt;
+    private TextView roomChargesTxt;
+    private TextView roomChargesAmtTxt;
     private TextView netAmtTxt;
     private EditText payAmtEdit;
     @InjectView(R.id.FOC_amount_edit)
@@ -281,6 +284,8 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         totalMemberDisTxt = (TextView) findViewById(R.id.member_discount_txt);
         taxTxt = (TextView) findViewById(R.id.tax_txt);
         taxpercentTxt = (TextView) findViewById(R.id.tax_percent_txt);
+        roomChargesTxt = (TextView) findViewById(R.id.Roomcharges);
+        roomChargesAmtTxt = (TextView) findViewById(R.id.Roomcharges_amt);
         serviceTxt = (TextView) findViewById(R.id.service_txt);
         servicepercentTxt = (TextView) findViewById(R.id.service_percent_txt);
         netAmtTxt = (TextView) findViewById(R.id.net_amount_txt);
@@ -359,11 +364,17 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         taxTxt.setText(commaSepFormat.format(taxValue));
         taxpercentTxt.setText(taxAmt + "%");
         Log.d("TaxValue", taxAmt + "%");
-        double serviceValue = 0;
+        double serviceValue = total * serviceAmt / 100;
+//        if (!RommCharge.equals("")) {
+//            serviceValue = (total * serviceAmt / 100) + roomchargeAmt;
+//        } else {
+//            serviceValue = total * serviceAmt / 100;
+//        }
         if (!RommCharge.equals("")) {
-            serviceValue = (total * serviceAmt / 100) + roomchargeAmt;
+            roomChargesAmtTxt.setText(String.valueOf(roomchargeAmt));
         } else {
-            serviceValue = total * serviceAmt / 100;
+            roomChargesAmtTxt.setVisibility(View.GONE);
+            roomChargesTxt.setVisibility(View.GONE);
         }
         serviceTxt.setText(commaSepFormat.format(serviceValue));
         servicepercentTxt.setText(serviceAmt + "%");
@@ -481,6 +492,11 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                           CategoryActivity.TAKE_AWAY = "add_invoice";
                                           CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
                                           Log.i("CategoryActivity.VOUNCHER_ID", CategoryActivity.VOUNCHER_ID + "");
+                                          if (!RommCharge.equals("")){
+                                              CategoryActivity.check_check="room";
+                                          }else {
+                                              CategoryActivity.check_check="null";
+                                          }
                                           startActivity(new Intent(InvoiceDetailActivity.this, CategoryActivity.class));
                                           finish();
                                       }

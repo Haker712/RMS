@@ -928,7 +928,7 @@ public class TableActivity extends ActionBarActivity {
                                         }
                                         CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
                                     }
-                                    CategoryActivity.check_check = "null";
+                                    CategoryActivity.check_check = "table";
                                     startActivity(new Intent(TableActivity.this, CategoryActivity.class));
                                     finish();
                                 }

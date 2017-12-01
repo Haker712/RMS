@@ -18,11 +18,13 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
@@ -93,6 +95,7 @@ import com.github.nkzawa.socketio.client.Socket;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -124,7 +127,7 @@ public class CategoryActivity extends ActionBarActivity {
     private Toolbar toolbar;
     private RecyclerView recyclerView;
     private RecyclerView recycleritemView;
-    private ListView listView;
+    private RecyclerView listView;
     private Button previousBtn;
     private Button nextBtn;
     private TextView categoryTxt;
@@ -136,6 +139,8 @@ public class CategoryActivity extends ActionBarActivity {
     private TextView servicePercentTxt;
     private TextView taxAmtTxt;
     private TextView taxPercentTxt;
+    private TextView roomchargesTxt;
+    private TextView roomchargesAmtTxt;
     private AutoCompleteTextView searchItemAuto;
     SimpleDateFormat date_format = new SimpleDateFormat("yyyy-MM-dd");
     SimpleDateFormat time_format = new SimpleDateFormat("HH:mm:SS");
@@ -355,7 +360,7 @@ public class CategoryActivity extends ActionBarActivity {
     private void registerIDs() {
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recycleritemView = (RecyclerView) findViewById(R.id.recycler_item_view);
-        listView = (ListView) findViewById(R.id.list_view);
+        listView = (RecyclerView) findViewById(R.id.list_view);
         previousBtn = (Button) findViewById(R.id.previous_btn);
         nextBtn = (Button) findViewById(R.id.next_btn);
         categoryTxt = (TextView) findViewById(R.id.category_txt);
@@ -364,9 +369,11 @@ public class CategoryActivity extends ActionBarActivity {
         tPriceTxt = (TextView) findViewById(R.id.tprice);
         tnetPriceTxt = (TextView) findViewById(R.id.namount);
         taxAmtTxt = (TextView) findViewById(R.id.tax_amt_txt);
-        taxPercentTxt= (TextView) findViewById(R.id.tax_percent_txt);
+        taxPercentTxt = (TextView) findViewById(R.id.tax_percent_txt);
         serviceAmtTxt = (TextView) findViewById(R.id.scharges);
-        servicePercentTxt= (TextView) findViewById(R.id.service_percent_txt);
+        servicePercentTxt = (TextView) findViewById(R.id.service_percent_txt);
+        roomchargesTxt = (TextView) findViewById(R.id.roomservice_charges);
+        roomchargesAmtTxt = (TextView) findViewById(R.id.roomservice_chargesAmt);
         searchItemAuto = (AutoCompleteTextView) findViewById(R.id.auto_search_item);
     }
 
@@ -397,7 +404,7 @@ public class CategoryActivity extends ActionBarActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Log.i("CategoryListSize",categoryList.size()+"");
+        Log.i("CategoryListSize", categoryList.size() + "");
         return categoryList;
 
     }
@@ -1078,8 +1085,10 @@ public class CategoryActivity extends ActionBarActivity {
             orderjsonObject.put("total_price", tvalue);
             orderjsonObject.put("extra_price", totalExtraAmt);
             orderjsonObject.put("discount_amount", totalDisAmt);
-            if (ROOM_ID != null /*|| !ROOM_ID.equals("")*/) {
 
+            // if (ROOM_ID != null /*|| !ROOM_ID.equals("")*/) { //  NEED TO CHECK LATER
+
+            if (!check_check.equals("null")) {
                 totalcharge = (serviceamont + roomchargeAmt);
                 orderjsonObject.put("service_amount", totalcharge);
                 Log.i("totalcharge111", totalcharge + "");
@@ -1087,6 +1096,7 @@ public class CategoryActivity extends ActionBarActivity {
                 totalcharge = serviceamont;
                 orderjsonObject.put("service_amount", serviceamont);
             }
+
             orderjsonObject.put("tax_amount", taxamount);
             netcharge = (tvalue + totalcharge + taxamount);
 
@@ -1237,10 +1247,10 @@ public class CategoryActivity extends ActionBarActivity {
                     mProgressDialog.dismiss();
                     deleteTableVersion("category");
                     download_categoryArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getCategory()));
-                    Log.i("DownloadCategorylist",download_categoryArrayList.size()+"");
+                    Log.i("DownloadCategorylist", download_categoryArrayList.size() + "");
                     database.beginTransaction();
 
-                    if(download_setMenuArrayList.size() > 0) {
+                    if (download_setMenuArrayList.size() > 0) {
                         ContentValues setMenuCV = new ContentValues();
                         setMenuCV.put("id", "set_menu");
                         setMenuCV.put("name", "SetMenu");
@@ -1650,14 +1660,19 @@ public class CategoryActivity extends ActionBarActivity {
 
         categoryItemAdapter = new CategoryItemAdapter(CategoryActivity.this);
         listView.setAdapter(categoryItemAdapter);
+        categoryItemAdapter = new CategoryItemAdapter(this);
+        layoutManager=new LinearLayoutManager(this);
+        listView.setLayoutManager(layoutManager);
+        listView.setItemAnimator(new DefaultItemAnimator());
+        listView.setAdapter(categoryItemAdapter);
         categoryItemAdapter.notifyDataSetChanged();
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        /*listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(CategoryActivity.this, "", Toast.LENGTH_SHORT).show();
                 return false;
             }
-        });
+        });*/
         previousBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1737,36 +1752,36 @@ public class CategoryActivity extends ActionBarActivity {
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    if (TotalitemArraylist.size() > 0) {
-                        Log.e("VoucherID", VOUNCHER_ID + "");
-                        if (VOUNCHER_ID == null || VOUNCHER_ID.equals("NULL")) {
-                            uploadOrderData();
-                        } else {
-                            CompareItemListsUploadUpdate(categoryItemList, TotalitemArraylist);
-                            uploadUpdateOrderData();
-
-                        }
+                if (TotalitemArraylist.size() > 0) {
+                    Log.e("VoucherID", VOUNCHER_ID + "");
+                    if (VOUNCHER_ID == null || VOUNCHER_ID.equals("NULL")) {
+                        uploadOrderData();
                     } else {
-                        final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
-                                .setPositiveButton(R.string.invitation_ok, null)
-                                .create();
-                        builder.setTitle(R.string.alert);
-                        builder.setMessage("You must specify at least one product.");
-                        builder.setOnShowListener(new DialogInterface.OnShowListener() {
-                            @Override
-                            public void onShow(DialogInterface dialog) {
-                                final Button btnAccept = builder.getButton(AlertDialog.BUTTON_POSITIVE);
-                                btnAccept.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        builder.dismiss();
-                                    }
-                                });
-                            }
-                        });
-                        builder.show();
+                        CompareItemListsUploadUpdate(categoryItemList, TotalitemArraylist);
+                        uploadUpdateOrderData();
+
                     }
-                    Log.i("InvoiceID",""+VOUNCHER_ID);
+                } else {
+                    final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
+                            .setPositiveButton(R.string.invitation_ok, null)
+                            .create();
+                    builder.setTitle(R.string.alert);
+                    builder.setMessage("You must specify at least one product.");
+                    builder.setOnShowListener(new DialogInterface.OnShowListener() {
+                        @Override
+                        public void onShow(DialogInterface dialog) {
+                            final Button btnAccept = builder.getButton(AlertDialog.BUTTON_POSITIVE);
+                            btnAccept.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    builder.dismiss();
+                                }
+                            });
+                        }
+                    });
+                    builder.show();
+                }
+                Log.i("InvoiceID", "" + VOUNCHER_ID);
             }
         });
     }
@@ -1824,33 +1839,47 @@ public class CategoryActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class CategoryItemAdapter extends ArrayAdapter<Category_Item> {
-        public final Activity context;
+    private class CategoryItemAdapter extends RecyclerView.Adapter<CategoryItemAdapter.ViewHolder>{
 
-        public CategoryItemAdapter(Activity context) {
-            super(context, R.layout.category_list_item, TotalitemArraylist);
-            // Log.i("categoryItemList", categoryItemList.size() + "");
-            this.context = context;
+
+        LayoutInflater inflater;
+        Context context;
+
+        public CategoryItemAdapter(Context context){
+
+            inflater = LayoutInflater.from(context);
+            this.context=context;
+
+        }
+
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+            View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.category_list_item,parent,false);
+            ViewHolder viewHolder = new ViewHolder(view);
+            return viewHolder;
         }
 
         @Override
-        public View getView(final int position, View convertView, ViewGroup parent) {
-            View view = convertView;
-            final CategoryItemViewHolder viewHolder;
-
-            if (view == null) {
+        public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
+            viewHolder.setIsRecyclable(false);
+            /*if (convertView == null) {
                 LayoutInflater layoutInflater = context.getLayoutInflater();
-                view = layoutInflater.inflate(R.layout.category_list_item, null, true);
-                viewHolder = new CategoryItemViewHolder(view);
-                view.setTag(viewHolder);
+                convertView = layoutInflater.inflate(R.layout.category_list_item, null, true);
+                viewHolder = new CategoryItemViewHolder(convertView);
+                convertView.setTag(viewHolder);
+
             } else {
-                viewHolder = (CategoryItemViewHolder) view.getTag();
-            }
+                viewHolder = (CategoryItemViewHolder) convertView.getTag();
+            }*/
 
             categoryTxt.setText("Item");
             final Category_Item categoryItem = TotalitemArraylist.get(position);
             String takeiddd = categoryItem.getTakeid();
-            String statusiddd = categoryItem.getStatusid();
+            //String statusiddd = categoryItem.getStatusid();
+
+            Log.i("Current position => ",position+"");
 
             /***
              * PhoneLinAung 11.9.17 Start
@@ -1935,12 +1964,12 @@ public class CategoryActivity extends ActionBarActivity {
                                             while (cursor.moveToNext()) {
 
                                                 String selected_item_id = cursor.getString(cursor.getColumnIndex("id"));
-                                                double selected_item_price=cursor.getDouble(cursor.getColumnIndex("price"));
+                                                double selected_item_price = cursor.getDouble(cursor.getColumnIndex("price"));
                                                 categoryItem.setId(selected_item_id);
                                                 String selectd_itemname = cursor.getString(cursor.getColumnIndex("name"));
                                                 viewHolder.itemNameTxt.setText(selected_ContimentName + " " + selectd_itemname);
-                                                viewHolder.priceTxt.setText(selected_item_price+"");
-                                                viewHolder.amountTxt.setText(selected_item_price+"");
+                                                viewHolder.priceTxt.setText(selected_item_price + "");
+                                                viewHolder.amountTxt.setText(selected_item_price + "");
                                                 TotalitemArraylist.get(position).setItemName(selected_ContimentName + " " + selectd_itemname);
                                                 TotalitemArraylist.get(position).setPrice(selected_item_price);
 
@@ -1974,7 +2003,7 @@ public class CategoryActivity extends ActionBarActivity {
             /***
              * PhoneLinAung 12.9.17 End
              */
-
+            String statusiddd = TotalitemArraylist.get(position).getStatusid();
             if (TAKE_AWAY == "table" || TAKE_AWAY == "room") {     // for from room and table including new invoice and exiting invoice
                 if ((statusiddd == "6" || statusiddd.equals("6")) || (statusiddd == "7" || statusiddd.equals("7"))) {
                     viewHolder.itemNameTxt.setText(categoryItem.getItemName());
@@ -2041,12 +2070,23 @@ public class CategoryActivity extends ActionBarActivity {
                                             totalTaxAmt = taxValue;
                                             totalServiceAmt = serviceValue;
                                             tPriceTxt.setText(commaSepFormat.format(totalValue));
-                                            tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
                                             taxAmtTxt.setText(commaSepFormat.format(taxValue));
-                                            taxPercentTxt.setText(taxAmt+"%");
+                                            taxPercentTxt.setText(taxAmt + "%");
                                             serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
-                                            servicePercentTxt.setText(serviceAmt+"%");
+                                            servicePercentTxt.setText(serviceAmt + "%");
 
+                                            if (check_check.equals("room")) {
+
+                                                roomchargesAmtTxt.setText(commaSepFormat.format(roomchargeAmt));
+                                                tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges + roomchargeAmt));
+
+                                            } else {
+
+                                                roomchargesTxt.setVisibility(View.GONE);
+                                                roomchargesAmtTxt.setVisibility(View.GONE);
+                                                tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
+
+                                            }
 
 
                                             builder.dismiss();
@@ -2088,7 +2128,7 @@ public class CategoryActivity extends ActionBarActivity {
                 }
                 viewHolder.extraPriceTxt.setText(commaSepFormat.format(extraVlaue));
                 categoryItem.setExtraPrice(extraVlaue);
-                categoryItemAdapter.notifyDataSetChanged();
+//                categoryItemAdapter.notifyDataSetChanged();
                 viewHolder.amountTxt.setText(commaSepFormat.format(categoryItem.getTotalAmount()));
                 Log.e("TakeAway", TAKE_AWAY + "");
                 viewHolder.takeAwayCheck.setChecked(categoryItem.getTakeAway());
@@ -2126,11 +2166,23 @@ public class CategoryActivity extends ActionBarActivity {
                 totalDisAmt = tdValue;
                 totalExtraAmt = teValue;
                 tPriceTxt.setText(commaSepFormat.format(totalValue));
-                tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
                 serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
-                servicePercentTxt.setText(serviceAmt+"%");
+                servicePercentTxt.setText(serviceAmt + "%");
                 taxAmtTxt.setText(commaSepFormat.format(taxValue));
-                taxPercentTxt.setText(taxAmt+"%");
+                taxPercentTxt.setText(taxAmt + "%");
+
+                if (check_check.equals("room")) {
+
+                    roomchargesAmtTxt.setText(commaSepFormat.format(roomchargeAmt));
+                    tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges + roomchargeAmt));
+
+                } else {
+
+                    roomchargesTxt.setVisibility(View.GONE);
+                    roomchargesAmtTxt.setVisibility(View.GONE);
+                    tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
+
+                }
                 viewHolder.quantityBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -2341,11 +2393,24 @@ public class CategoryActivity extends ActionBarActivity {
                                                 totalTaxAmt = taxValue;
                                                 totalServiceAmt = serviceValue;
                                                 tPriceTxt.setText(commaSepFormat.format(totalValue));
-                                                tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
                                                 taxAmtTxt.setText(commaSepFormat.format(taxValue));
-                                                taxPercentTxt.setText(taxAmt+"%");
+                                                taxPercentTxt.setText(taxAmt + "%");
                                                 serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
-                                                servicePercentTxt.setText(serviceAmt+"%");
+                                                servicePercentTxt.setText(serviceAmt + "%");
+
+                                                if (check_check.equals("room")) {
+
+                                                    roomchargesAmtTxt.setText(commaSepFormat.format(roomchargeAmt));
+                                                    tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges + roomchargeAmt));
+
+                                                } else {
+
+                                                    roomchargesTxt.setVisibility(View.GONE);
+                                                    roomchargesAmtTxt.setVisibility(View.GONE);
+                                                    tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
+
+                                                }
+
                                                 builder.dismiss();
                                             }
                                         });
@@ -2375,7 +2440,7 @@ public class CategoryActivity extends ActionBarActivity {
                     }
                     viewHolder.extraPriceTxt.setText(commaSepFormat.format(extraVlaue));
                     categoryItem.setExtraPrice(extraVlaue);
-                    categoryItemAdapter.notifyDataSetChanged();
+//                    categoryItemAdapter.notifyDataSetChanged();
                     viewHolder.amountTxt.setText(commaSepFormat.format(categoryItem.getTotalAmount()));
                     Log.e("TakeAway", TAKE_AWAY + "");
                     viewHolder.takeAwayCheck.setChecked(categoryItem.getTakeAway());
@@ -2418,11 +2483,24 @@ public class CategoryActivity extends ActionBarActivity {
                     totalDisAmt = tdValue;
                     totalExtraAmt = teValue;
                     tPriceTxt.setText(commaSepFormat.format(totalValue));
-                    tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
                     serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
-                    servicePercentTxt.setText(serviceAmt+"%");
+                    servicePercentTxt.setText(serviceAmt + "%");
                     taxAmtTxt.setText(commaSepFormat.format(taxValue));
-                    taxPercentTxt.setText(taxAmt+"%");
+                    taxPercentTxt.setText(taxAmt + "%");
+
+                    if (check_check.equals("room")) {
+
+                        roomchargesAmtTxt.setText(commaSepFormat.format(roomchargeAmt));
+                        tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges + roomchargeAmt));
+
+                    } else {
+
+                        roomchargesTxt.setVisibility(View.GONE);
+                        roomchargesAmtTxt.setVisibility(View.GONE);
+                        tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
+
+                    }
+
                     viewHolder.quantityBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -2542,10 +2620,15 @@ public class CategoryActivity extends ActionBarActivity {
                     });
                 }
             }
-            return view;
         }
 
-        public class CategoryItemViewHolder extends RecyclerView.ViewHolder {
+        @Override
+        public int getItemCount() {
+            return TotalitemArraylist.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+
 
             public TextView itemNameTxt;
             Button quantityBtn;
@@ -2557,8 +2640,9 @@ public class CategoryActivity extends ActionBarActivity {
             CheckBox takeAwayCheck;
             ImageView clearBtn;
 
-            public CategoryItemViewHolder(View view) {
+            public ViewHolder(View view) {
                 super(view);
+
                 itemNameTxt = (TextView) view.findViewById(R.id.item_name_txt);
                 quantityBtn = (Button) view.findViewById(R.id.quantity_btn);
                 priceTxt = (TextView) view.findViewById(R.id.price_txt);
@@ -2568,9 +2652,812 @@ public class CategoryActivity extends ActionBarActivity {
                 amountTxt = (TextView) view.findViewById(R.id.amount_txt);
                 takeAwayCheck = (CheckBox) view.findViewById(R.id.take_away_check);
                 clearBtn = (ImageView) view.findViewById(R.id.clear_btn);
+
             }
         }
     }
+
+//    private class CategoryItemAdapter extends ArrayAdapter<Category_Item> {
+//        public final Activity context;
+//
+//        public CategoryItemAdapter(Activity context) {
+//            super(context, R.layout.category_list_item, TotalitemArraylist);
+//            // Log.i("categoryItemList", categoryItemList.size() + "");
+//            this.context = context;
+//        }
+//
+//        @Override
+//        public View getView(final int position, View convertView, ViewGroup parent) {
+//            final CategoryItemViewHolder viewHolder;
+//            if (convertView == null) {
+//                LayoutInflater layoutInflater = context.getLayoutInflater();
+//                convertView = layoutInflater.inflate(R.layout.category_list_item, null, true);
+//                viewHolder = new CategoryItemViewHolder(convertView);
+//                convertView.setTag(viewHolder);
+//
+//            } else {
+//                viewHolder = (CategoryItemViewHolder) convertView.getTag();
+//            }
+//
+//            categoryTxt.setText("Item");
+//            final Category_Item categoryItem = TotalitemArraylist.get(position);
+//            String takeiddd = categoryItem.getTakeid();
+//            //String statusiddd = categoryItem.getStatusid();
+//
+//            Log.i("Current position => ",position+"");
+//
+//            /***
+//             * PhoneLinAung 11.9.17 Start
+//             */
+//            viewHolder.itemNameTxt.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//
+//                    contimentforItemSelectList.clear();
+//
+//                    String item_id = TotalitemArraylist.get(position).getId();
+//
+//                    Cursor cursor = database.rawQuery("SELECT * FROM item where id='" + item_id + "'", null);
+//
+//                    while (cursor.moveToNext()) {
+//
+//                        int has_contiment = cursor.getInt(cursor.getColumnIndex("has_contiment"));
+//
+//                        if (has_contiment == 1) {
+//
+//                            group_id = cursor.getString(cursor.getColumnIndex("group_id"));
+//
+//                            Cursor cursor1 = database.rawQuery("SELECT * FROM item WHERE group_id='" + group_id + "'", null);
+//
+//                            while (cursor1.moveToNext()) {
+//                                contimet = new ContimentforItemSelect();
+//                                String name = cursor1.getString(cursor1.getColumnIndex("name"));
+//                                contiment_id = cursor1.getInt(cursor1.getColumnIndex("contiment_id"));
+//
+//                                Cursor cursor2 = database.rawQuery("SELECT * FROM contiment where id=" + contiment_id, null);
+//
+//                                while (cursor2.moveToNext()) {
+//
+//                                    contiment_name = cursor2.getString(cursor2.getColumnIndex("name"));
+//
+//                                }
+//                                contimet.setContiment_id(contiment_id);
+//                                contimet.setContiment_name(contiment_name);
+//                                contimentforItemSelectList.add(contimet);
+//                            }
+//
+//                            Toast.makeText(CategoryActivity.this, categoryItem.getItemName(), Toast.LENGTH_SHORT).show();
+//                            final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
+//                                    .setPositiveButton(R.string.invitation_ok, null)
+//                                    .setNegativeButton(R.string.invitation_cancel, null)
+//                                    .create();
+//                            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//                            final View view1 = layoutInflater.inflate(R.layout.category_contiment_dialog, null);
+//
+//                            contimentnameList.clear();
+//                            for (ContimentforItemSelect c : contimentforItemSelectList) {
+//
+//                                contimentnameList.add(c.getContiment_name());
+//
+//                            }
+//                            final Spinner contimentSpinner = (Spinner) view1.findViewById(R.id.contimentSpinner);
+//                            ArrayAdapter<String> stringAdapter = new ArrayAdapter<String>(CategoryActivity.this, android.R.layout.simple_spinner_item, contimentnameList);
+//                            stringAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//                            contimentSpinner.setAdapter(stringAdapter);
+//                            builder.setView(view1);
+//                            builder.setTitle(categoryItem.getItemName());
+//                            builder.setMessage("Choose ContimentforItemSelect");
+//                            builder.show();
+//
+//                            contimentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//                                @Override
+//                                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+//
+//                                    String selected_ContimentName = contimentnameList.get(i);
+//                                    Toast.makeText(CategoryActivity.this, selected_ContimentName, Toast.LENGTH_SHORT).show();
+//
+//                                    // itemNameTxt.setText(selected_ContimentName + categoryItem.getItemName());
+//
+//                                    for (i = 0; i < contimentnameList.size(); i++) {
+//
+//                                        if (selected_ContimentName.equals(contimentforItemSelectList.get(i).getContiment_name())) {
+//
+//                                            selected_Contiment_id = contimentforItemSelectList.get(i).getContiment_id();
+//
+//                                            Cursor cursor = database.rawQuery("SELECT * FROM item where contiment_id='" + selected_Contiment_id + "' and group_id='" + group_id + "'", null);
+//
+//                                            while (cursor.moveToNext()) {
+//
+//                                                String selected_item_id = cursor.getString(cursor.getColumnIndex("id"));
+//                                                double selected_item_price = cursor.getDouble(cursor.getColumnIndex("price"));
+//                                                categoryItem.setId(selected_item_id);
+//                                                String selectd_itemname = cursor.getString(cursor.getColumnIndex("name"));
+//                                                viewHolder.itemNameTxt.setText(selected_ContimentName + " " + selectd_itemname);
+//                                                viewHolder.priceTxt.setText(selected_item_price + "");
+//                                                viewHolder.amountTxt.setText(selected_item_price + "");
+//                                                TotalitemArraylist.get(position).setItemName(selected_ContimentName + " " + selectd_itemname);
+//                                                TotalitemArraylist.get(position).setPrice(selected_item_price);
+//
+//                                            }
+//
+//                                        }
+//
+//                                    }
+//
+//
+//                                }
+//
+//                                @Override
+//                                public void onNothingSelected(AdapterView<?> adapterView) {
+//
+//                                }
+//                            });
+//
+//
+//                        } else {
+//
+//                            Toast.makeText(CategoryActivity.this, "This item has no contiment", Toast.LENGTH_SHORT).show();
+//
+//                        }
+//
+//                    }
+//
+//                }
+//            });
+//
+//            /***
+//             * PhoneLinAung 12.9.17 End
+//             */
+//            String statusiddd = TotalitemArraylist.get(position).getStatusid();
+//            if (TAKE_AWAY == "table" || TAKE_AWAY == "room") {     // for from room and table including new invoice and exiting invoice
+//                if ((statusiddd == "6" || statusiddd.equals("6")) || (statusiddd == "7" || statusiddd.equals("7"))) {
+//                    viewHolder.itemNameTxt.setText(categoryItem.getItemName());
+//                    viewHolder.itemNameTxt.setPaintFlags(viewHolder.itemNameTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+//                    viewHolder.quantityBtn.setText(categoryItem.getQuantity() + "");
+//                    viewHolder.quantityBtn.setPaintFlags(viewHolder.quantityBtn.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+//                    viewHolder.quantityBtn.setBackgroundColor(ContextCompat.getColor(context, R.color.colorHighlight));
+//                    viewHolder.extraBtn.setBackgroundColor(ContextCompat.getColor(context, R.color.colorHighlight));
+//                    viewHolder.priceTxt.setText(commaSepFormat.format(0));
+//                    viewHolder.priceTxt.setPaintFlags(viewHolder.priceTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+//                    viewHolder.discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
+//                    viewHolder.discountTxt.setPaintFlags(viewHolder.discountTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+//                    viewHolder.extraPriceTxt.setText(commaSepFormat.format(0));
+//                    viewHolder.extraPriceTxt.setPaintFlags(viewHolder.extraPriceTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+//                    viewHolder.amountTxt.setText(commaSepFormat.format(0));
+//                    viewHolder.amountTxt.setPaintFlags(viewHolder.amountTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+//                    viewHolder.takeAwayCheck.setEnabled(false);
+//
+//                } else {
+//                    viewHolder.itemNameTxt.setText(categoryItem.getItemName());
+//                    viewHolder.quantityBtn.setText(categoryItem.getQuantity() + "");
+//                    viewHolder.priceTxt.setText(commaSepFormat.format(categoryItem.getPrice()));
+//                    viewHolder.discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
+//                }
+//                if (ADD_INVOICE.equals("NULL") || ADD_INVOICE == null) {
+//                    viewHolder.clearBtn.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
+//                                    .setPositiveButton(R.string.invitation_ok, null)
+//                                    .setNegativeButton(R.string.invitation_cancel, null)
+//                                    .create();
+//                            builder.setTitle(R.string.clear);
+//                            builder.setMessage("Do you want to clear this item?");
+//                            builder.setOnShowListener(new DialogInterface.OnShowListener() {
+//                                @Override
+//                                public void onShow(DialogInterface dialog) {
+//                                    final Button btnAccept = builder.getButton(AlertDialog.BUTTON_POSITIVE);
+//                                    btnAccept.setOnClickListener(new View.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(View v) {
+//                                            TotalitemArraylist.remove(position);
+//                                            categoryItemList.remove(position);
+//                                            categoryItemAdapter.notifyDataSetChanged();
+//                                            double totalValue = 0;
+//                                            double teValue = 0;
+//                                            double tdValue = 0;
+//                                            double servicecharges = 0;
+//                                            for (Category_Item catItem : TotalitemArraylist) {
+//                                                totalValue += catItem.getTotalAmount();
+//                                                teValue += catItem.getTotalExtraPrice();
+//                                                tdValue += catItem.getTotalDiscount();
+//                                            }
+//                                            if (TotalitemArraylist.size() > 0) {
+//                                                taxValue = totalValue * taxAmt / 100;
+//                                                serviceValue = totalValue * serviceAmt / 100;
+//                                                servicecharges = taxValue + serviceValue;
+//                                            } else {
+//                                                servicecharges = 0;
+//                                            }
+//                                            totalAmt = totalValue;
+//                                            totalDisAmt = tdValue;
+//                                            totalExtraAmt = teValue;
+//                                            totalTaxAmt = taxValue;
+//                                            totalServiceAmt = serviceValue;
+//                                            tPriceTxt.setText(commaSepFormat.format(totalValue));
+//                                            taxAmtTxt.setText(commaSepFormat.format(taxValue));
+//                                            taxPercentTxt.setText(taxAmt + "%");
+//                                            serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
+//                                            servicePercentTxt.setText(serviceAmt + "%");
+//
+//                                            if (check_check.equals("room")) {
+//
+//                                                roomchargesAmtTxt.setText(commaSepFormat.format(roomchargeAmt));
+//                                                tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges + roomchargeAmt));
+//
+//                                            } else {
+//
+//                                                roomchargesTxt.setVisibility(View.GONE);
+//                                                roomchargesAmtTxt.setVisibility(View.GONE);
+//                                                tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
+//
+//                                            }
+//
+//
+//                                            builder.dismiss();
+//                                        }
+//                                    });
+//                                    final Button btnDecline = builder.getButton(DialogInterface.BUTTON_NEGATIVE);
+//                                    btnDecline.setOnClickListener(new View.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(View v) {
+//                                            Log.d("Clear", "Item");
+//                                            builder.dismiss();
+//                                        }
+//                                    });
+//                                }
+//                            });
+//                            builder.show();
+//                        }
+//
+//                    });
+//
+//
+//                } else if (ADD_INVOICE == "EDITING_INVOICE" || ADD_INVOICE.equals("EDITING_INVOICE") || ADD_INVOICE.equals("status1")) {
+//                    viewHolder.clearBtn.setEnabled(false);
+//                    viewHolder.clearBtn.setColorFilter(Color.argb(220, 220, 220, 220));
+//                    viewHolder.clearBtn.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            Toast.makeText(CategoryActivity.this, "Can't Cancel NOW !", Toast.LENGTH_SHORT).show();
+//                            Log.e("Can't Cancel NOW !", "Can't Cancel NOW !Can't Cancel NOW !");
+//                        }
+//                    });
+//                }
+//                double extraVlaue = 0;
+//                for (AddOn addOn : categoryItem.getAddOnArrayList()) {
+//
+//                    if (addOn.isSelected() == true) {
+//                        extraVlaue += addOn.getPrice();
+//                    }
+//                }
+//                viewHolder.extraPriceTxt.setText(commaSepFormat.format(extraVlaue));
+//                categoryItem.setExtraPrice(extraVlaue);
+//                categoryItemAdapter.notifyDataSetChanged();
+//                viewHolder.amountTxt.setText(commaSepFormat.format(categoryItem.getTotalAmount()));
+//                Log.e("TakeAway", TAKE_AWAY + "");
+//                viewHolder.takeAwayCheck.setChecked(categoryItem.getTakeAway());
+//                viewHolder.takeAwayCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//                                                                        @Override
+//                                                                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                                                                            if (categoryItem.getOrder_type_id().equals("2")) {
+//                                                                                Log.e("TakeAway", "true");
+//                                                                                Log.e("TakeAwayCheckBox ", isChecked + "");
+//                                                                            }
+//
+//                                                                            Log.e("TakeAwayCheckBox ", isChecked + "");
+//                                                                            categoryItem.setTakeAway(isChecked);
+//                                                                            TotalitemArraylist.set(position, categoryItem);
+//                                                                            //categoryItemAdapter.notifyDataSetChanged();
+//                                                                        }
+//                                                                    }
+//                );
+//                double totalValue = 0;
+//                double teValue = 0;
+//                double tdValue = 0;
+//                for (Category_Item catItem : TotalitemArraylist) {
+//                    Log.i("ggggggggg>>>>>>>>", catItem.getStatusid() + "");
+//                    if ((catItem.getStatusid() == "6" || catItem.getStatusid().equals("6")) || (catItem.getStatusid() == "7" || catItem.getStatusid().equals("7"))) {
+//                        Log.i("ggwp", "ggggggggg>>>>>>>>");
+//                    } else if (catItem.getStatusid().equals("1") || catItem.getStatusid().equals("2") || catItem.getStatusid().equals("3") || catItem.getStatusid().equals("4") || catItem.getStatusid().equals("5")) {
+//                        totalValue += catItem.getTotalAmount();
+//                        teValue += catItem.getTotalExtraPrice();
+//                        tdValue += catItem.getTotalDiscount();
+//                    }
+//                }
+//                double taxValue = totalValue * taxAmt / 100;
+//                double serviceValue = totalValue * serviceAmt / 100;
+//                double servicecharges = taxValue + serviceValue;
+//                totalDisAmt = tdValue;
+//                totalExtraAmt = teValue;
+//                tPriceTxt.setText(commaSepFormat.format(totalValue));
+//                serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
+//                servicePercentTxt.setText(serviceAmt + "%");
+//                taxAmtTxt.setText(commaSepFormat.format(taxValue));
+//                taxPercentTxt.setText(taxAmt + "%");
+//
+//                if (check_check.equals("room")) {
+//
+//                    roomchargesAmtTxt.setText(commaSepFormat.format(roomchargeAmt));
+//                    tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges + roomchargeAmt));
+//
+//                } else {
+//
+//                    roomchargesTxt.setVisibility(View.GONE);
+//                    roomchargesAmtTxt.setVisibility(View.GONE);
+//                    tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
+//
+//                }
+//                viewHolder.quantityBtn.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
+//                                .setPositiveButton(R.string.invitation_ok, null)
+//                                .setNegativeButton(R.string.invitation_cancel, null)
+//                                .create();
+//                        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//                        final View view = layoutInflater.inflate(R.layout.category_quantity_dialog, null);
+//                        final EditText qtyEdit = (EditText) view.findViewById(R.id.qty_edit);
+//                        builder.setView(view);
+//                        builder.setTitle(R.string.quantity_title);
+//                        builder.setOnShowListener(new DialogInterface.OnShowListener() {
+//                            @Override
+//                            public void onShow(DialogInterface dialog) {
+//                                final Button btnAccept = builder.getButton(AlertDialog.BUTTON_POSITIVE);
+//                                btnAccept.setOnClickListener(new View.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(View v) {
+//                                        if (qtyEdit.getText().toString().isEmpty()) {
+//                                            qtyEdit.setError("Quantity is required.");
+//                                            qtyEdit.requestFocus();
+//                                        } else {
+//                                            int qty = Integer.parseInt(qtyEdit.getText().toString());
+//                                            String idid;
+//                                            if (categoryItem.getId().equals(null)) {
+//                                                idid = categoryItem.getSetid();
+//                                                getPromotionDataInDBforsetmenu(idid);
+//                                            } else {
+//                                                idid = categoryItem.getId();
+//                                                getPromotionDataInDB(/*categoryItem.getId()*/ idid);
+//                                            }
+//
+//                                            if (from_date == null && to_date == null && from_time == null && to_time == null) {
+//                                                Log.e("PromotionItem", "This item is not promotion.");
+//                                            } else {
+//                                                try {
+//                                                    Date CurrentDate = date_format.parse(date_format.format(new Date()));
+//                                                    if (CurrentDate.equals(from_date) || CurrentDate.after(from_date) && CurrentDate.before(to_date)) {
+//                                                        Log.e("CurrentDate", CurrentDate + ",From" + from_date + ",To" + to_date);
+//                                                        Date currentTime = time_format.parse(time_format.format(new Date()));
+//                                                        Log.e("CurrentTime", currentTime + ",from" + from_time + ",to" + to_time);
+//                                                        if (currentTime.equals(from_time) || currentTime.equals(to_time) || currentTime.after(from_time) && currentTime.before(to_time)) {// && currentTime.before(to_time)
+//                                                            Log.e("Promotion", promotion_id);
+//                                                            if (qty >= sell_quantity) {
+//                                                                Log.e("SellQuantity", sell_quantity + "");
+//                                                                categoryItem.setPromotion_id(promotion_id);
+//                                                            }
+//                                                        } else {
+//                                                            Log.e("Promotions", promotion_id);
+//                                                        }
+//                                                    }
+//                                                } catch (ParseException e) {
+//                                                    e.printStackTrace();
+//                                                }
+//                                            }
+//                                            Log.e("ItemID", categoryItem.getId());
+//                                            if (qty == 0) {
+//                                                qtyEdit.setError("Quantity is required.");
+//                                            } else {
+//                                                categoryItem.setQuantity(qty);
+//                                            }
+//
+//                                            Log.d("Quantity", "You have entered: " + qty);
+//                                            builder.dismiss();
+//                                            categoryItemAdapter.notifyDataSetChanged();
+//                                        }
+//                                    }
+//                                });
+//                                final Button btnDecline = builder.getButton(DialogInterface.BUTTON_NEGATIVE);
+//                                btnDecline.setOnClickListener(new View.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(View v) {
+//                                        Log.d("Quantity", "Invitation declined");
+//                                        builder.dismiss();
+//                                    }
+//                                });
+//                            }
+//                        });
+//                        builder.show();
+//                    }
+//                });
+//                viewHolder.extraBtn.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(final View v) {
+//                        final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
+//                                .setPositiveButton(R.string.invitation_ok, null)
+//                                .setNegativeButton(R.string.invitation_cancel, null)
+//                                .create();
+//                        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//                        final View view = layoutInflater.inflate(R.layout.category_extra_dialog, null);
+//                        ListView addListView = (ListView) view.findViewById(R.id.list_view);
+//                        final EditText remarkEdit = (EditText) view.findViewById(R.id.remark_edit);
+//                        AddOnAdapter addOnAdapter = new AddOnAdapter(CategoryActivity.this, categoryItem.getAddOnArrayList());
+//                        addListView.setAdapter(addOnAdapter);
+//                        addOnAdapter.notifyDataSetChanged();
+//                        remarkEdit.setText(categoryItem.getUserRemark());
+//                        builder.setView(view);
+//                        builder.setTitle(R.string.extra_title);
+//                        builder.setOnShowListener(new DialogInterface.OnShowListener() {
+//                            @Override
+//                            public void onShow(DialogInterface dialog) {
+//                                final Button btnAccept = builder.getButton(AlertDialog.BUTTON_POSITIVE);
+//                                btnAccept.setOnClickListener(new View.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(View v) {
+//                                        categoryItem.setUserRemark(remarkEdit.getText().toString());
+//                                        Log.d("Quantity", "You have entered: " + remarkEdit.getText().toString());
+//                                        builder.dismiss();
+//                                        categoryItemAdapter.notifyDataSetChanged();
+//                                    }
+//                                });
+//                                final Button btnDecline = builder.getButton(DialogInterface.BUTTON_NEGATIVE);
+//                                btnDecline.setOnClickListener(new View.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(View v) {
+//                                        Log.d("Quantity", "Invitation declined");
+//                                        builder.dismiss();
+//                                    }
+//                                });
+//                            }
+//                        });
+//                        builder.show();
+//                    }
+//                });
+//                //ADD_INVOICE = null;
+//            } else {
+//                Log.i("takeaway!!!!!", TAKE_AWAY + "");      // for from  take away including new invoice and exiting invoice
+//                if ((statusiddd == "6" || statusiddd.equals("6")) || (statusiddd == "7" || statusiddd.equals("7"))) {
+//                    viewHolder.itemNameTxt.setText(categoryItem.getItemName());
+//                    viewHolder.itemNameTxt.setPaintFlags(viewHolder.itemNameTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+//                    viewHolder.quantityBtn.setText(categoryItem.getQuantity() + "");
+//                    viewHolder.quantityBtn.setPaintFlags(viewHolder.quantityBtn.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+//                    viewHolder.quantityBtn.setBackgroundColor(ContextCompat.getColor(context, R.color.colorHighlight));
+//                    viewHolder.extraBtn.setBackgroundColor(ContextCompat.getColor(context, R.color.colorHighlight));
+//                    viewHolder.priceTxt.setText(commaSepFormat.format(0));
+//                    viewHolder.priceTxt.setPaintFlags(viewHolder.priceTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+//                    viewHolder.discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
+//                    viewHolder.discountTxt.setPaintFlags(viewHolder.discountTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+//                    viewHolder.extraPriceTxt.setText(commaSepFormat.format(0));
+//                    viewHolder.extraPriceTxt.setPaintFlags(viewHolder.extraPriceTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+//                    viewHolder.amountTxt.setText(commaSepFormat.format(0));
+//                    viewHolder.amountTxt.setPaintFlags(viewHolder.amountTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
+//                    viewHolder.clearBtn.setEnabled(false);
+//                    viewHolder.clearBtn.setColorFilter(Color.argb(220, 220, 220, 220));
+//                    viewHolder.clearBtn.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            Toast.makeText(CategoryActivity.this, "Can't Cancel NOW !", Toast.LENGTH_SHORT).show();
+//                            Log.e("Can't Cancel NOW !", "Can't Cancel NOW !Can't Cancel NOW !");
+//                        }
+//                    });
+//                    viewHolder.takeAwayCheck.setEnabled(false);
+//                } else {
+//                    viewHolder.itemNameTxt.setText(categoryItem.getItemName());
+//                    viewHolder.quantityBtn.setText(categoryItem.getQuantity() + "");
+//                    viewHolder.priceTxt.setText(commaSepFormat.format(categoryItem.getPrice()));
+//                    viewHolder.discountTxt.setText(commaSepFormat.format(categoryItem.getDiscount()));
+//                    if (ADD_INVOICE == "EDITING_INVOICE") {
+//                        viewHolder.clearBtn.setEnabled(false);
+//                        viewHolder.clearBtn.setColorFilter(Color.argb(220, 220, 220, 220));
+//                        viewHolder.clearBtn.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                Toast.makeText(CategoryActivity.this, "Can't Cancel NOW !", Toast.LENGTH_SHORT).show();
+//                                Log.e("Can't Cancel NOW !", "Can't Cancel NOW !Can't Cancel NOW !");
+//                            }
+//                        });
+//                    } else if (ADD_INVOICE == "NULL" || ADD_INVOICE == null) {
+//                        viewHolder.clearBtn.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
+//                                        .setPositiveButton(R.string.invitation_ok, null)
+//                                        .setNegativeButton(R.string.invitation_cancel, null)
+//                                        .create();
+//                                builder.setTitle(R.string.clear);
+//                                builder.setMessage("Do you want to clear this item?");
+//                                builder.setOnShowListener(new DialogInterface.OnShowListener() {
+//                                    @Override
+//                                    public void onShow(DialogInterface dialog) {
+//                                        final Button btnAccept = builder.getButton(AlertDialog.BUTTON_POSITIVE);
+//                                        btnAccept.setOnClickListener(new View.OnClickListener() {
+//                                            @Override
+//                                            public void onClick(View v) {
+//                                                TotalitemArraylist.remove(position);
+//                                                categoryItemList.remove(position);
+//                                                categoryItemAdapter.notifyDataSetChanged();
+//                                                double totalValue = 0;
+//                                                double teValue = 0;
+//                                                double tdValue = 0;
+//                                                double servicecharges = 0;
+//                                                for (Category_Item catItem : TotalitemArraylist) {
+//                                                    totalValue += catItem.getTotalAmount();
+//                                                    teValue += catItem.getTotalExtraPrice();
+//                                                    tdValue += catItem.getTotalDiscount();
+//                                                }
+//                                                if (TotalitemArraylist.size() > 0) {
+//                                                    taxValue = totalValue * taxAmt / 100;
+//                                                    serviceValue = totalValue * serviceAmt / 100;
+//                                                    servicecharges = taxValue + serviceValue;
+//                                                } else {
+//                                                    servicecharges = 0;
+//                                                }
+//                                                totalAmt = totalValue;
+//                                                totalDisAmt = tdValue;
+//                                                totalExtraAmt = teValue;
+//                                                totalTaxAmt = taxValue;
+//                                                totalServiceAmt = serviceValue;
+//                                                tPriceTxt.setText(commaSepFormat.format(totalValue));
+//                                                taxAmtTxt.setText(commaSepFormat.format(taxValue));
+//                                                taxPercentTxt.setText(taxAmt + "%");
+//                                                serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
+//                                                servicePercentTxt.setText(serviceAmt + "%");
+//
+//                                                if (check_check.equals("room")) {
+//
+//                                                    roomchargesAmtTxt.setText(commaSepFormat.format(roomchargeAmt));
+//                                                    tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges + roomchargeAmt));
+//
+//                                                } else {
+//
+//                                                    roomchargesTxt.setVisibility(View.GONE);
+//                                                    roomchargesAmtTxt.setVisibility(View.GONE);
+//                                                    tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
+//
+//                                                }
+//
+//                                                builder.dismiss();
+//                                            }
+//                                        });
+//                                        final Button btnDecline = builder.getButton(DialogInterface.BUTTON_NEGATIVE);
+//                                        btnDecline.setOnClickListener(new View.OnClickListener() {
+//                                            @Override
+//                                            public void onClick(View v) {
+//                                                Log.d("Clear", "Item");
+//                                                builder.dismiss();
+//                                            }
+//                                        });
+//                                    }
+//                                });
+//                                builder.show();
+//                            }
+//                        });
+//                    }
+//                    double extraVlaue = 0;
+//
+//                    if (categoryItem.getAddOnArrayList() != null) {
+//
+//                        for (AddOn addOn : categoryItem.getAddOnArrayList()) {
+//                            if (addOn.isSelected() == true) {
+//                                extraVlaue += addOn.getPrice();
+//                            }
+//                        }
+//                    }
+//                    viewHolder.extraPriceTxt.setText(commaSepFormat.format(extraVlaue));
+//                    categoryItem.setExtraPrice(extraVlaue);
+//                    categoryItemAdapter.notifyDataSetChanged();
+//                    viewHolder.amountTxt.setText(commaSepFormat.format(categoryItem.getTotalAmount()));
+//                    Log.e("TakeAway", TAKE_AWAY + "");
+//                    viewHolder.takeAwayCheck.setChecked(categoryItem.getTakeAway());
+//                    if (takeiddd.equals("1")) {
+//                        viewHolder.takeAwayCheck.setEnabled(false);
+//                    }
+//
+//                    Log.e("TakeAway", takeiddd);
+//                    viewHolder.takeAwayCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//
+//                                                                            @Override
+//                                                                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                                                                                if (categoryItem.getOrder_type_id().equals("2")) {
+//                                                                                    Log.e("TakeAway", "true");
+//                                                                                    Log.e("TakeAwayCheckBox ", isChecked + "");
+//                                                                                }
+//                                                                                categoryItem.setTakeAway(isChecked);
+//                                                                                Log.e("TakeAwayCheckBox ", isChecked + "");
+//                                                                                TotalitemArraylist.set(position, categoryItem);
+//                                                                                //categoryItemAdapter.notifyDataSetChanged();
+//                                                                            }
+//                                                                        }
+//                    );
+//                    double totalValue = 0;
+//                    double teValue = 0;
+//                    double tdValue = 0;
+//                    for (Category_Item catItem : TotalitemArraylist) {
+//                        Log.i("ggggggggg>>>>>>>>", catItem.getStatusid() + "");
+//                        if ((catItem.getStatusid() == "6" || catItem.getStatusid().equals("6")) || (catItem.getStatusid() == "7" || catItem.getStatusid().equals("7"))) {
+//                            Log.i("ggwp", "ggggggggg>>>>>>>>");
+//                        } else if (catItem.getStatusid().equals("1") || catItem.getStatusid().equals("2") || catItem.getStatusid().equals("3") || catItem.getStatusid().equals("4") || catItem.getStatusid().equals("5")) {
+//                            totalValue += catItem.getTotalAmount();
+//                            teValue += catItem.getTotalExtraPrice();
+//                            tdValue += catItem.getTotalDiscount();
+//                        }
+//                    }
+//                    double taxValue = totalValue * taxAmt / 100;
+//                    double serviceValue = totalValue * serviceAmt / 100;
+//                    double servicecharges = taxValue + serviceValue;
+//                    totalDisAmt = tdValue;
+//                    totalExtraAmt = teValue;
+//                    tPriceTxt.setText(commaSepFormat.format(totalValue));
+//                    serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
+//                    servicePercentTxt.setText(serviceAmt + "%");
+//                    taxAmtTxt.setText(commaSepFormat.format(taxValue));
+//                    taxPercentTxt.setText(taxAmt + "%");
+//
+//                    if (check_check.equals("room")) {
+//
+//                        roomchargesAmtTxt.setText(commaSepFormat.format(roomchargeAmt));
+//                        tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges + roomchargeAmt));
+//
+//                    } else {
+//
+//                        roomchargesTxt.setVisibility(View.GONE);
+//                        roomchargesAmtTxt.setVisibility(View.GONE);
+//                        tnetPriceTxt.setText(commaSepFormat.format(totalValue + servicecharges));
+//
+//                    }
+//
+//                    viewHolder.quantityBtn.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
+//                                    .setPositiveButton(R.string.invitation_ok, null)
+//                                    .setNegativeButton(R.string.invitation_cancel, null)
+//                                    .create();
+//                            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//                            final View view = layoutInflater.inflate(R.layout.category_quantity_dialog, null);
+//                            final EditText qtyEdit = (EditText) view.findViewById(R.id.qty_edit);
+//                            builder.setView(view);
+//                            builder.setTitle(R.string.quantity_title);
+//                            builder.setOnShowListener(new DialogInterface.OnShowListener() {
+//                                @Override
+//                                public void onShow(DialogInterface dialog) {
+//                                    final Button btnAccept = builder.getButton(AlertDialog.BUTTON_POSITIVE);
+//                                    btnAccept.setOnClickListener(new View.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(View v) {
+//                                            if (qtyEdit.getText().toString().isEmpty()) {
+//                                                qtyEdit.setError("Quantity is required.");
+//                                                qtyEdit.requestFocus();
+//                                            } else {
+//                                                int qty = Integer.valueOf(qtyEdit.getText().toString());
+//                                                getPromotionDataInDB(categoryItem.getId());
+//                                                if (from_date == null && to_date == null && from_time == null && to_time == null) {
+//                                                    Log.e("PromotionItem", "This item is not promotion.");
+//                                                } else {
+//                                                    try {
+//                                                        Date CurrentDate = date_format.parse(date_format.format(new Date()));
+//                                                        if (CurrentDate.equals(from_date) || CurrentDate.after(from_date) && CurrentDate.before(to_date)) {
+//                                                            Log.e("CurrentDate", CurrentDate + ",From" + from_date + ",To" + to_date);
+//                                                            Date currentTime = time_format.parse(time_format.format(new Date()));
+//                                                            Log.e("CurrentTime", currentTime + ",from" + from_time + ",to" + to_time);
+//                                                            if (currentTime.equals(from_time) || currentTime.equals(to_time) || currentTime.after(from_time) && currentTime.before(to_time)) {// && currentTime.before(to_time)
+//                                                                Log.e("Promotion", promotion_id);
+//                                                                if (qty >= sell_quantity) {
+//                                                                    Log.e("SellQuantity", sell_quantity + "");
+//                                                                    categoryItem.setPromotion_id(promotion_id);
+//                                                                }
+//                                                            } else {
+//                                                                Log.e("Promotions", promotion_id);
+//                                                            }
+//                                                        }
+//                                                    } catch (ParseException e) {
+//                                                        e.printStackTrace();
+//                                                    }
+//                                                }
+//                                                //Log.e("ItemID", categoryItem.getId());
+//                                                if (qty == 0) {
+//                                                    qtyEdit.setError("Quantity is required.");
+//                                                } else {
+//                                                    categoryItem.setQuantity(qty);
+//                                                    //adapterList.get(position).setQuantity(qty);
+//                                                }
+//                                                Log.d("Quantity", "You have entered: " + qty);
+//                                                builder.dismiss();
+//                                                categoryItemAdapter.notifyDataSetChanged();
+//                                            }
+//                                        }
+//                                    });
+//                                    final Button btnDecline = builder.getButton(DialogInterface.BUTTON_NEGATIVE);
+//                                    btnDecline.setOnClickListener(new View.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(View v) {
+//                                            Log.d("Quantity", "Invitation declined");
+//                                            builder.dismiss();
+//                                        }
+//                                    });
+//                                }
+//                            });
+//                            builder.show();
+//                        }
+//                    });
+//                    viewHolder.extraBtn.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(final View v) {
+//                            final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
+//                                    .setPositiveButton(R.string.invitation_ok, null)
+//                                    .setNegativeButton(R.string.invitation_cancel, null)
+//                                    .create();
+//                            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//                            final View view = layoutInflater.inflate(R.layout.category_extra_dialog, null);
+//                            ListView addListView = (ListView) view.findViewById(R.id.list_view);
+//                            final EditText remarkEdit = (EditText) view.findViewById(R.id.remark_edit);
+//                            AddOnAdapter addOnAdapter = new AddOnAdapter(CategoryActivity.this, categoryItem.getAddOnArrayList());
+//                            addListView.setAdapter(addOnAdapter);
+//                            addOnAdapter.notifyDataSetChanged();
+//                            remarkEdit.setText(categoryItem.getUserRemark());
+//                            builder.setView(view);
+//                            builder.setTitle(R.string.extra_title);
+//                            builder.setOnShowListener(new DialogInterface.OnShowListener() {
+//                                @Override
+//                                public void onShow(DialogInterface dialog) {
+//                                    final Button btnAccept = builder.getButton(AlertDialog.BUTTON_POSITIVE);
+//                                    btnAccept.setOnClickListener(new View.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(View v) {
+//                                            categoryItem.setUserRemark(remarkEdit.getText().toString());
+//                                            Log.d("Quantity", "You have entered: " + remarkEdit.getText().toString());
+//                                            builder.dismiss();
+//                                            categoryItemAdapter.notifyDataSetChanged();
+//                                        }
+//                                    });
+//                                    final Button btnDecline = builder.getButton(DialogInterface.BUTTON_NEGATIVE);
+//                                    btnDecline.setOnClickListener(new View.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(View v) {
+//                                            Log.d("Quantity", "Invitation declined");
+//                                            builder.dismiss();
+//                                        }
+//                                    });
+//                                }
+//                            });
+//                            builder.show();
+//                        }
+//                    });
+//                }
+//            }
+//            return convertView;
+//        }
+//
+////        public class CategoryItemViewHolder extends RecyclerView.ViewHolder{
+////
+////            public TextView itemNameTxt;
+////            Button quantityBtn;
+////            TextView priceTxt;
+////            TextView discountTxt;
+////            Button extraBtn;
+////            TextView extraPriceTxt;
+////            TextView amountTxt;
+////            CheckBox takeAwayCheck;
+////            ImageView clearBtn;
+////
+////            /*public CategoryItemViewHolder(View itemView) {
+////                super(itemView);
+////            }*/
+////
+////            public CategoryItemViewHolder(View view) {
+////                super(view);
+////                itemNameTxt = (TextView) view.findViewById(R.id.item_name_txt);
+////                quantityBtn = (Button) view.findViewById(R.id.quantity_btn);
+////                priceTxt = (TextView) view.findViewById(R.id.price_txt);
+////                discountTxt = (TextView) view.findViewById(R.id.discount_txt);
+////                extraBtn = (Button) view.findViewById(R.id.extra_btn);
+////                extraPriceTxt = (TextView) view.findViewById(R.id.extra_price_txt);
+////                amountTxt = (TextView) view.findViewById(R.id.amount_txt);
+////                takeAwayCheck = (CheckBox) view.findViewById(R.id.take_away_check);
+////                clearBtn = (ImageView) view.findViewById(R.id.clear_btn);
+////            }
+////        }
+//    }
 
 /*    private class CategoryItemAdapter extends ArrayAdapter<Category_Item> {
         public final Activity context;
@@ -3487,7 +4374,7 @@ public class CategoryActivity extends ActionBarActivity {
                         if (VOUNCHER_ID != null) {
 
                             //tempcategoryItemList1.clear();
-                           // Toast.makeText(mContext, "add to tempArray", Toast.LENGTH_SHORT).show();
+                            // Toast.makeText(mContext, "add to tempArray", Toast.LENGTH_SHORT).show();
                             // category_item.setState("new");
                             tempcategoryItemList1.add(category_item);
                             //categoryItemList.addAll(tempcategoryItemList1);
@@ -3610,7 +4497,7 @@ public class CategoryActivity extends ActionBarActivity {
                         }
                     }
                     detail_object.put("set_item", setItemJsonArray);
-                    Log.i("setItemJS",setItemJsonArray+"");
+                    Log.i("setItemJS", setItemJsonArray + "");
 
                     Log.e("SetID", category_item.getId() + "");
                 } else {
@@ -3724,6 +4611,17 @@ public class CategoryActivity extends ActionBarActivity {
             orderjsonObject.put("order_detail", orderDetailJsonArray);
             netcharge = (tvalue + totalcharge + tax_value);
             orderjsonObject.put("net_price", netcharge);
+
+            if (check_check.equals("room")) {
+
+                orderjsonObject.put("room_charge", roomchargeAmt);
+
+            } else {
+
+                orderjsonObject.put("room_charge", 0);
+
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -3751,7 +4649,7 @@ public class CategoryActivity extends ActionBarActivity {
                             @Override
                             public void run() {
                                 socket.emit("order", "blah blah");
-                               // Toast.makeText(CategoryActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
+                                // Toast.makeText(CategoryActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
                             }
                         });
 
@@ -3970,8 +4868,69 @@ public class CategoryActivity extends ActionBarActivity {
             finish();
         } else {
             check_check = "null";
-            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
-            finish();
+
+            Handler handler = new Handler();
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (activity.isFinishing()) {
+                        return;
+                    } else {
+
+                        if (TotalitemArraylist.size() > 0) {
+
+                            final android.support.v7.app.AlertDialog builder = new android.support.v7.app.AlertDialog.Builder(
+                                    CategoryActivity.this, R.style.InvitationDialog)
+                                    .setPositiveButton(R.string.invitation_ok, null)
+                                    .setNegativeButton(R.string.invitation_cancel, null)
+                                    .create();
+                            builder.setTitle(R.string.alert);
+                            builder.setMessage("Do You Want to create this Order?");
+                            builder.setOnShowListener(new DialogInterface.OnShowListener() {
+                                @Override
+                                public void onShow(DialogInterface dialog) {
+                                    final Button btnAccept = builder.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
+                                    btnAccept.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            builder.dismiss();
+                                            Log.e("VoucherID", VOUNCHER_ID + "");
+                                            if (VOUNCHER_ID == null || VOUNCHER_ID.equals("NULL")) {
+                                                uploadOrderData();
+                                            } else {
+                                                CompareItemListsUploadUpdate(categoryItemList, TotalitemArraylist);
+                                                uploadUpdateOrderData();
+
+                                            }
+
+                                        }
+                                    });
+
+                                    final Button btnDecline = builder.getButton(AlertDialog.BUTTON_NEGATIVE);
+                                    btnDecline.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
+                                            finish();
+                                        }
+                                    });
+                                }
+                            });
+                            builder.show();
+                        }else {
+
+                            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
+                            finish();
+
+                        }
+                    }
+                }
+            });
+
+
+//            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
+//            finish();
         }
 
 
