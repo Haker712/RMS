@@ -858,6 +858,7 @@ public class TableActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View v) {  // when you enter the table !
 
+                    CategoryActivity.check_check="table";
                     if (table.getTableService().equals("1")) {
                         final JSONArray tableListJsonArray = new JSONArray();
                         JSONObject product = new JSONObject();
@@ -946,7 +947,7 @@ public class TableActivity extends ActionBarActivity {
                         JSONObject product = new JSONObject();
                         try {
                             product.put("booking_id", table.getBookingID() + "");
-                            product.put("status", "1");
+                            product.put("status", "0");
                             product.put("table_id", table.getTableID() + "");
                             product.put("old", "0");
                         } catch (JSONException e) {

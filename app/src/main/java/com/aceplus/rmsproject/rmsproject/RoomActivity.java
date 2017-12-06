@@ -743,7 +743,7 @@ public class RoomActivity extends AppCompatActivity {
                                         JSONObject jsonObject = new JSONObject();
                                         try {
                                             jsonObject.put("room_id", room_id + "");
-                                            jsonObject.put("status", "1");
+                                            jsonObject.put("status", "0");
                                             jsonObject.put("old", "0");
                                             String booking_id = table.getBookingID();
                                             if (booking_id == null) {

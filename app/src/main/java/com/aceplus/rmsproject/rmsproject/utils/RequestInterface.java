@@ -22,6 +22,7 @@ import com.aceplus.rmsproject.rmsproject.object.JsonResponseSyncs;
 import com.aceplus.rmsproject.rmsproject.object.JsonResponseforInvoice;
 import com.aceplus.rmsproject.rmsproject.object.JsonResponseforInvoiceDetail;
 import com.aceplus.rmsproject.rmsproject.object.Login;
+import com.aceplus.rmsproject.rmsproject.object.LoginOrderIdRequest;
 import com.aceplus.rmsproject.rmsproject.object.Success;
 
 import retrofit2.Call;
@@ -99,8 +100,8 @@ public interface RequestInterface {
 
     @FormUrlEncoded
     @POST("api/v1/download_voucher_detail")
-    Call<JsonResponseforInvoiceDetail> getforInvoiceDetail (@Field("site_activation_key") String activate_key,
-                                                            @Field("order_id") String order_id);
+    Call<JsonResponseforInvoiceDetail> getforInvoiceDetail(@Field("site_activation_key") String activate_key,
+                                                           @Field("order_id") String order_id);
 
     @FormUrlEncoded
     @POST("api/v1/login")
@@ -132,12 +133,10 @@ public interface RequestInterface {
     );
 
 
-
-
     @FormUrlEncoded
     @POST("api/v1/order_table")
     Call<Download_ordertable> getOrderTable(@Field("site_activation_key") String activate_key,
-                                               @Field("table_id") String table_id );
+                                            @Field("table_id") String table_id);
 
     @FormUrlEncoded
     @POST("api/v1/order_room")
@@ -147,13 +146,13 @@ public interface RequestInterface {
     @FormUrlEncoded
     @POST("api/v1/download_order_table_with_order_id")
     Call<JsonForShowTableId> getforshowOrderTable(@Field("site_activation_key") String activate_key,
-                                                      @Field("order_id") String orderID
+                                                  @Field("order_id") String orderID
     );
 
     @FormUrlEncoded
     @POST("api/v1/download_order_room_with_order_id")
     Call<JsonForShowRoomId> getforshowOrderRoom(@Field("site_activation_key") String activate_key,
-                                                  @Field("order_id") String orderID
+                                                @Field("order_id") String orderID
     );
 
     @FormUrlEncoded
@@ -167,7 +166,7 @@ public interface RequestInterface {
 
     @FormUrlEncoded
     @POST("api/v1/table_transfer")
-    Call<Success> postTableTransfer( @Field("order_id") String order_id,
+    Call<Success> postTableTransfer(@Field("order_id") String order_id,
                                     @Field("transfer_from_table_id") String transfer_from_table_id,
                                     @Field("transfer_to_table_id") String transfer_to_table_id);
 
@@ -213,4 +212,9 @@ public interface RequestInterface {
     @FormUrlEncoded
     @POST("api/activate")
     Call<ActivateKey> activateKey(@Field("param_data") String id);
+
+    @FormUrlEncoded
+    @POST("api/v1/first_time_login")
+    Call<LoginOrderIdRequest> LOGIN_ORDER_ID_REQUEST_CALL(@Field("tabletId") String username,
+                                                          @Field("site_activation_key") String activate_key);
 }

@@ -176,6 +176,7 @@ public class CategoryActivity extends ActionBarActivity {
     public int sell_quantity = 0;
     public String promotion_id = null;
     private int invoicecount;
+    private int backend_tablet_id;
     private double taxAmt = 0.0;
     private double serviceAmt = 0.0;
     private double roomchargeAmt = 0.0;
@@ -936,6 +937,7 @@ public class CategoryActivity extends ActionBarActivity {
             Cursor cur = database.rawQuery("SELECT * FROM voucher", null);
             while (cur.moveToNext()) {
                 invoicecount = cur.getInt(cur.getColumnIndex("voucher_count"));
+                backend_tablet_id=cur.getInt(cur.getColumnIndex("id"));
             }
             cur.close();
             database.setTransactionSuccessful();
@@ -943,9 +945,15 @@ public class CategoryActivity extends ActionBarActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Calendar todayCal = Calendar.getInstance();
-        String todayDate = orderDate.format(todayCal.getTime());
-        String orderID = WAITER_ID + todayDate + orderFormat.format(invoicecount + 1);
+       // Calendar todayCal = Calendar.getInstance();
+        //String todayDate = orderDate.format(todayCal.getTime());
+//        String orderID = tablet_id+ "-" + orderFormat.format(invoicecount + 1);
+        int totalWord = 11;
+        String pre_orderID = String.format("%0" + (totalWord - String.valueOf(invoicecount).length()) + "d", invoicecount+1);
+        String orderID=backend_tablet_id+"-"+pre_orderID;
+        Log.i("GenerateOrderId",orderID);
+
+
         return orderID;
     }
 
@@ -1862,8 +1870,14 @@ public class CategoryActivity extends ActionBarActivity {
         }
 
         @Override
+        public int getItemViewType(int position) {
+            return position;
+        }
+
+        @Override
         public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
-            viewHolder.setIsRecyclable(false);
+//            viewHolder.setIsRecyclable(false);
+
             /*if (convertView == null) {
                 LayoutInflater layoutInflater = context.getLayoutInflater();
                 convertView = layoutInflater.inflate(R.layout.category_list_item, null, true);
@@ -4560,6 +4574,7 @@ public class CategoryActivity extends ActionBarActivity {
                 JSONObject table = new JSONObject();
                 try {
                     table.put("table_id", tableName);
+                    table.put("table_status", "1");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -4573,6 +4588,7 @@ public class CategoryActivity extends ActionBarActivity {
             JSONObject room = new JSONObject();
             try {
                 room.put("room_id", ROOM_ID);
+                room.put("room_status","1");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -4621,6 +4637,8 @@ public class CategoryActivity extends ActionBarActivity {
                 orderjsonObject.put("room_charge", 0);
 
             }
+            orderjsonObject.put("tablet_id",MainActivity.tablet_id);
+
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -4796,40 +4814,42 @@ public class CategoryActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        if (check_check.equals("table")) {
-            final JSONArray tableListJsonArray = new JSONArray();
-            JSONObject product = new JSONObject();
-            try {
-                product.put("booking_id", "");
-                product.put("status", "0");
-                product.put("table_id", TABLE_ID + "");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            tableListJsonArray.put(product);
-            Log.e("TableList", tableListJsonArray.toString());
-            RequestInterface request = retrofit.create(RequestInterface.class);
-            Call<Success> call = request.postTableStatus(tableListJsonArray.toString());
-            call.enqueue(new Callback<Success>() {
-                @Override
-                public void onResponse(Call<Success> call, Response<Success> response) {
-                    try {
-                        Success jsonResponse = response.body();
-                        String message = jsonResponse.getMessage();
-                        if (message.equals("Success")) {
-                            Log.d("TableStatus", message);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Log.d("fail!!", "");
-                    }
-                }
+        if (check_check.equals("table") ) {
 
-                @Override
-                public void onFailure(Call<Success> call, Throwable t) {
-                    Log.d("TableStatuscatt", t.getMessage());
-                }
-            });
+//            Toast.makeText(activity, "Here", Toast.LENGTH_SHORT).show();
+//            final JSONArray tableListJsonArray = new JSONArray();
+//            JSONObject product = new JSONObject();
+//            try {
+//                product.put("booking_id", "");
+//                product.put("status", "0");
+//                product.put("table_id", TABLE_ID + "");
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//            tableListJsonArray.put(product);
+//            Log.e("TableList", tableListJsonArray.toString());
+//            RequestInterface request = retrofit.create(RequestInterface.class);
+//            Call<Success> call = request.postTableStatus(tableListJsonArray.toString());
+//            call.enqueue(new Callback<Success>() {
+//                @Override
+//                public void onResponse(Call<Success> call, Response<Success> response) {
+//                    try {
+//                        Success jsonResponse = response.body();
+//                        String message = jsonResponse.getMessage();
+//                        if (message.equals("Success")) {
+//                            Log.d("TableStatus", message);
+//                        }
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        Log.d("fail!!", "");
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Call<Success> call, Throwable t) {
+//                    Log.d("TableStatuscatt", t.getMessage());
+//                }
+//            });
             startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
             finish();
         } else if (check_check.equals("room")) {

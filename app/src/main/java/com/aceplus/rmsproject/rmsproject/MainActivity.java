@@ -51,6 +51,7 @@ import com.aceplus.rmsproject.rmsproject.object.JSONResponseDiscount;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseTableVersion;
 import com.aceplus.rmsproject.rmsproject.object.JsonResponseSyncs;
 import com.aceplus.rmsproject.rmsproject.object.Login;
+import com.aceplus.rmsproject.rmsproject.object.LoginOrderIdRequest;
 import com.aceplus.rmsproject.rmsproject.utils.ActivationRequestInterface;
 import com.aceplus.rmsproject.rmsproject.utils.Database;
 import com.aceplus.rmsproject.rmsproject.utils.JsonForShowTableId;
@@ -143,6 +144,8 @@ public class MainActivity extends Activity {
     String Waitername = "";
     String UserRole = "";
 
+    public static String tablet_id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,7 +161,7 @@ public class MainActivity extends Activity {
             StrictMode.setThreadPolicy(policy);
         }
 
-        final String tablet_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+        tablet_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
         prefs = getSharedPreferences("MYPRE", MODE_PRIVATE);
         editor = prefs.edit();
@@ -397,6 +400,8 @@ public class MainActivity extends Activity {
                 } else {
                     loadTableVersion(0);
                     userLogIn();
+                    requestLastOrderId();
+
                 }
             }
         });
@@ -480,6 +485,54 @@ public class MainActivity extends Activity {
                 callUploadDialog("Please login again!");
             }
         });
+
+    }
+
+    private void requestLastOrderId() {
+
+
+        callDialog("Request LastOrderId...");
+        RequestInterface request = RetrofitService.createRetrofitService(RequestInterface.class, MainActivity.this);
+        final Call<LoginOrderIdRequest> call1 = request.LOGIN_ORDER_ID_REQUEST_CALL(tablet_id, getActivateKeyFromDB());
+        call1.enqueue(new Callback<LoginOrderIdRequest>() {
+            @Override
+            public void onResponse(Call<LoginOrderIdRequest> call, Response<LoginOrderIdRequest> response) {
+
+                try {
+                    LoginOrderIdRequest loginOrderIdRequest = response.body();
+
+                    database.beginTransaction();
+
+                    database.execSQL("DELETE FROM voucher");
+
+                    ContentValues cv = new ContentValues();
+                    cv.put("id", loginOrderIdRequest.getTablet_generated_id());
+                    cv.put("voucher_count", loginOrderIdRequest.getOrder_id());
+                    database.insert("voucher", null, cv);
+
+
+                    database.setTransactionSuccessful();
+                    database.endTransaction();
+
+                } catch (Exception e) {
+
+                    e.printStackTrace();
+                    progressDialog.dismiss();
+//                   if (response.message() != null && !response.message().equals("")) {
+//                       callUploadDialog(response.message());
+//                   } else {
+//                       callUploadDialog(getResources().getString(R.string.server_error));
+//                   }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<LoginOrderIdRequest> call, Throwable t) {
+
+            }
+        });
+
     }
 
     /**
