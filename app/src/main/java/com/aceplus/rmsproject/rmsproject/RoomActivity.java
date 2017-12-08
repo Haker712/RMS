@@ -82,6 +82,7 @@ public class RoomActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private RecyclerView recyclerView;
+    private Button roomReloadbtn;
     private Button transferBtn;
     SQLiteDatabase database;
     private RoomAdapter adapter;
@@ -285,6 +286,7 @@ public class RoomActivity extends AppCompatActivity {
 
     private void registerIDs() {
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        roomReloadbtn= (Button) findViewById(R.id.roomReload_btn);
         transferBtn = (Button) findViewById(R.id.room_transfer_btn);
     }
 
@@ -447,49 +449,61 @@ public class RoomActivity extends AppCompatActivity {
             bookTable.setBooking_service(bookingTable.getBooking_service());
             bookTable.setBooking_waiting(bookingTable.getBooking_waiting());
             bookTable.setBooking_warning(bookingTable.getBooking_warning());
-            if (bookingTable.getTableService().equals("1")) {
-                Log.e("Table_Service", "true");
-                bookTable.setTableService(bookingTable.getTableService());
-            } else if (bookingTable.getTableService().equals("0")) {
-                Log.e("Table_Service", "false");
-                if (bookingTable.getBooking_time().equals("00:00:00")) {
-                    bookTable.setBackgroundColor("");
-                    Log.e("booking_time", bookingTable.getBooking_time() + "");
-                } else {
-                    try {
-                        Date booking_time = timeFormat.parse(bookingTable.getBooking_time());
-                        Log.e("room_booking_time1", booking_time + "");
-                        int booking_hour = booking_time.getHours();
-                        int booking_minute = booking_time.getMinutes();
-                        int booking_second = booking_time.getSeconds();
-                        Date warning_time = timeFormat.parse(bookingTable.getBooking_warning());
-                        int warning_hour = warning_time.getHours();
-                        int warning_minute = warning_time.getMinutes();
-                        int warning_second = warning_time.getSeconds();
-                        Date waiting_time = timeFormat.parse(bookingTable.getBooking_waiting());
-                        int waiting_hour = waiting_time.getHours();
-                        int waiting_minute = waiting_time.getMinutes();
-                        int waiting_second = waiting_time.getSeconds();
-                        int to_hour = booking_hour + waiting_hour;
-                        int to_minute = booking_minute + waiting_minute;
-                        int to_second = booking_second + waiting_second;
-                        toTime = timeFormat.parse(to_hour + ":" + to_minute + ":" + to_second);
-                        int from_hour = booking_hour - warning_hour;
-                        int from_minute = booking_minute - warning_minute;
-                        int from_second = booking_second - warning_second;
-                        fromTime = timeFormat.parse(from_hour + ":" + from_minute + ":" + from_second);
-                        Log.e("room_booking_time2", booking_time + " " + fromTime + " " + toTime);
-                        Date CurrentTime = timeFormat.parse(timeFormat.format(new Date()));
-                        if (CurrentTime.equals(fromTime) || CurrentTime.after(fromTime) && CurrentTime.before(booking_time)) {
-                            bookTable.setTableService("2");
-                        } else if (CurrentTime.equals(booking_time) || CurrentTime.after(booking_time) && CurrentTime.before(toTime)) {
-                            bookTable.setTableService("3");
-                        }
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                }
+
+            if (bookingTable.getTableStatus().equals("1")) {
+                Log.e("ServiceTableID", bookingTable.getTableID() + "");
+                bookTable.setTableService("1");
+            } else if (bookingTable.getTableStatus().equals("0")) {
+                bookTable.setTableService("0");
+            }else if (bookingTable.getTableStatus().equals("2")){
+                bookTable.setTableService("2");
             }
+            else if (bookingTable.getTableStatus().equals("3")){
+                bookTable.setTableService("3");
+            }
+//            if (bookingTable.getTableService().equals("1")) {
+//                Log.e("Table_Service", "true");
+//                bookTable.setTableService(bookingTable.getTableService());
+//            } else if (bookingTable.getTableService().equals("0")) {
+//                Log.e("Table_Service", "false");
+//                if (bookingTable.getBooking_time().equals("00:00:00")) {
+//                    bookTable.setBackgroundColor("");
+//                    Log.e("booking_time", bookingTable.getBooking_time() + "");
+//                } else {
+//                    try {
+//                        Date booking_time = timeFormat.parse(bookingTable.getBooking_time());
+//                        Log.e("room_booking_time1", booking_time + "");
+//                        int booking_hour = booking_time.getHours();
+//                        int booking_minute = booking_time.getMinutes();
+//                        int booking_second = booking_time.getSeconds();
+//                        Date warning_time = timeFormat.parse(bookingTable.getBooking_warning());
+//                        int warning_hour = warning_time.getHours();
+//                        int warning_minute = warning_time.getMinutes();
+//                        int warning_second = warning_time.getSeconds();
+//                        Date waiting_time = timeFormat.parse(bookingTable.getBooking_waiting());
+//                        int waiting_hour = waiting_time.getHours();
+//                        int waiting_minute = waiting_time.getMinutes();
+//                        int waiting_second = waiting_time.getSeconds();
+//                        int to_hour = booking_hour + waiting_hour;
+//                        int to_minute = booking_minute + waiting_minute;
+//                        int to_second = booking_second + waiting_second;
+//                        toTime = timeFormat.parse(to_hour + ":" + to_minute + ":" + to_second);
+//                        int from_hour = booking_hour - warning_hour;
+//                        int from_minute = booking_minute - warning_minute;
+//                        int from_second = booking_second - warning_second;
+//                        fromTime = timeFormat.parse(from_hour + ":" + from_minute + ":" + from_second);
+//                        Log.e("room_booking_time2", booking_time + " " + fromTime + " " + toTime);
+//                        Date CurrentTime = timeFormat.parse(timeFormat.format(new Date()));
+//                        if (CurrentTime.equals(fromTime) || CurrentTime.after(fromTime) && CurrentTime.before(booking_time)) {
+//                            bookTable.setTableService("2");
+//                        } else if (CurrentTime.equals(booking_time) || CurrentTime.after(booking_time) && CurrentTime.before(toTime)) {
+//                            bookTable.setTableService("3");
+//                        }
+//                    } catch (ParseException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
             bookingTableArrayList.add(bookTable);
         }
         adapter = new RoomAdapter(this, bookingTableArrayList);
@@ -501,6 +515,15 @@ public class RoomActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.addItemDecoration(new GridSpacingItemDecoration(5, dpToPx(10), true));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        roomReloadbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadRoomJson();
+            }
+        });
+
+
         transferBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -578,69 +601,74 @@ public class RoomActivity extends AppCompatActivity {
                     @Override
                     public void onShow(DialogInterface dialog) {
                         final Button btnAccept = builder.getButton(AlertDialog.BUTTON_POSITIVE);
-                        btnAccept.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
+                        if (roomName.size() == 0) {
+                            btnAccept.setEnabled(false);
+                        } else {
 
-                                socket.emit("room_transfer", "transfer_room");
+                            btnAccept.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
 
-                                String arg[] = {fromRoom};
-                                ContentValues cv = new ContentValues();
-                                cv.put("room_id", toRoom);
+                                    socket.emit("room_transfer", "transfer_room");
+
+                                    String arg[] = {fromRoom};
+                                    ContentValues cv = new ContentValues();
+                                    cv.put("room_id", toRoom);
 //                                bookingTableArrayList.get(fromPos).setTableService("0");
 //                                bookingTableArrayList.get(toPos - 1).setTableService("1");
 //                                adapter.notifyDataSetChanged();
-                                JSONObject jsonObject = new JSONObject();
-                                try {
-                                    jsonObject.put("transfer_from_room_id", fromRoom);
-                                    Log.i("FromRoomId", fromRoom);
-                                    jsonObject.put("transfer_to_room_id", toRoom);
-                                    Toast.makeText(RoomActivity.this, toRoom, Toast.LENGTH_SHORT).show();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                Log.e("TransferRoom", jsonObject.toString());
-                                String transferInvoice;
-                                transferInvoice = getRoomInvoiceDetail(fromRoom);
-                                callDialog("Uploading room transfer....");
-                                mProgressDialog.dismiss();
-                                RequestInterface request = retrofit.create(RequestInterface.class);
-                                Call<Success> call = request.postRoomTransfer(transferInvoice, fromRoom, toRoom);
-                                Log.i("transferInvoice", transferInvoice + "");
-                                Log.i("fromRoom", fromRoom + "");
-                                Log.i("toRoom", toRoom + "");
-                                call.enqueue(new Callback<Success>() {
-                                    @Override
-                                    public void onResponse(Call<Success> call, Response<Success> response) {
-                                        try {
-                                            Success jsonResponse = response.body();
-                                            String message = jsonResponse.getMessage();
-                                            if (message.equals("Success")) {
-                                                Log.d("RoomTransfer", message);
+                                    JSONObject jsonObject = new JSONObject();
+                                    try {
+                                        jsonObject.put("transfer_from_room_id", fromRoom);
+//                                    Log.i("FromRoomId", fromRoom);
+                                        jsonObject.put("transfer_to_room_id", toRoom);
+                                        Toast.makeText(RoomActivity.this, toRoom, Toast.LENGTH_SHORT).show();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    Log.e("TransferRoom", jsonObject.toString());
+                                    String transferInvoice;
+                                    transferInvoice = getRoomInvoiceDetail(fromRoom);
+                                    callDialog("Uploading room transfer....");
+                                    mProgressDialog.dismiss();
+                                    RequestInterface request = retrofit.create(RequestInterface.class);
+                                    Call<Success> call = request.postRoomTransfer(transferInvoice, fromRoom, toRoom);
+                                    Log.i("transferInvoice", transferInvoice + "");
+                                    Log.i("fromRoom", fromRoom + "");
+                                    Log.i("toRoom", toRoom + "");
+                                    call.enqueue(new Callback<Success>() {
+                                        @Override
+                                        public void onResponse(Call<Success> call, Response<Success> response) {
+                                            try {
+                                                Success jsonResponse = response.body();
+                                                String message = jsonResponse.getMessage();
+                                                if (message.equals("Success")) {
+                                                    Log.d("RoomTransfer", message);
+                                                    mProgressDialog.dismiss();
+                                                    builder.dismiss();
+                                                } else {
+
+                                                    Toast.makeText(RoomActivity.this, "U can't transfer", Toast.LENGTH_SHORT).show();
+
+                                                }
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
                                                 mProgressDialog.dismiss();
-                                                builder.dismiss();
-                                            } else {
-
-                                                Toast.makeText(RoomActivity.this, "U can't transfer", Toast.LENGTH_SHORT).show();
-
+                                                callUploadDialog("Room transfer is null.");
                                             }
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                            mProgressDialog.dismiss();
-                                            callUploadDialog("Room transfer is null.");
+                                            // loadRoomJson();
                                         }
-                                        // loadRoomJson();
-                                    }
 
-                                    @Override
-                                    public void onFailure(Call<Success> call, Throwable t) {
-                                        Log.d("RoomTransfer", t.getMessage());
-                                        mProgressDialog.dismiss();
-                                        callUploadDialog("Please upload again!");
-                                    }
-                                });
-                            }
-                        });
+                                        @Override
+                                        public void onFailure(Call<Success> call, Throwable t) {
+                                            Log.d("RoomTransfer", t.getMessage());
+                                            mProgressDialog.dismiss();
+                                            callUploadDialog("Please upload again!");
+                                        }
+                                    });
+                                }
+                            });
+                        }
                         final Button btnDecline = builder.getButton(DialogInterface.BUTTON_NEGATIVE);
                         btnDecline.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -736,7 +764,7 @@ public class RoomActivity extends AppCompatActivity {
                                     public void onClick(View v) {
 
                                         socket.emit("room_message", "TakeRoom");
-                                      //  Toast.makeText(mContext, "SocketFire", Toast.LENGTH_SHORT).show();
+                                        //  Toast.makeText(mContext, "SocketFire", Toast.LENGTH_SHORT).show();
 
                                         final String room_id = table.getTableID();
                                         final String status = table.getTableService();

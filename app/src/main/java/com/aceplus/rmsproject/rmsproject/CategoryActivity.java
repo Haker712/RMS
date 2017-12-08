@@ -949,7 +949,22 @@ public class CategoryActivity extends ActionBarActivity {
         //String todayDate = orderDate.format(todayCal.getTime());
 //        String orderID = tablet_id+ "-" + orderFormat.format(invoicecount + 1);
         int totalWord = 11;
-        String pre_orderID = String.format("%0" + (totalWord - String.valueOf(invoicecount).length()) + "d", invoicecount+1);
+        int a=invoicecount+1;
+        String pre_orderID = String.format("%0" + (totalWord - String.valueOf(invoicecount).length()) + "d", a);
+
+       try {
+           database.beginTransaction();
+
+           database.execSQL("UPDATE voucher set voucher_count = "+a+"");
+
+           database.setTransactionSuccessful();
+           database.endTransaction();
+       }catch (Exception e){
+
+           Log.i("Excep",e.getMessage());
+
+       }
+
         String orderID=backend_tablet_id+"-"+pre_orderID;
         Log.i("GenerateOrderId",orderID);
 
@@ -1210,7 +1225,6 @@ public class CategoryActivity extends ActionBarActivity {
                 content.put("remark", category_item.getUserRemark());
             }
         }
-        Log.d("OrderList", makeOrderID());
         database.setTransactionSuccessful();
         database.endTransaction();
     }
@@ -4462,7 +4476,7 @@ public class CategoryActivity extends ActionBarActivity {
         double tvalue = Double.parseDouble(tPriceTxt.getText().toString().trim().replaceAll(",", ""));
         double tax_value = tvalue * taxAmt / 100;
         double service_value = tvalue * serviceAmt / 100;
-        String order_id = makeOrderID();
+        final String order_id = makeOrderID();
         Log.e("InvoiceOrderID", order_id + "");
         JSONObject orderjsonObject = new JSONObject();
         JSONArray orderDetailJsonArray = new JSONArray();
@@ -4565,7 +4579,6 @@ public class CategoryActivity extends ActionBarActivity {
             invoiceDetailID++;
             //}
         }
-        Log.d("OrderList", makeOrderID());
 
         if (groupTableArrayList == null) {
             Log.e("GroupTableArray", "null");
@@ -4673,7 +4686,7 @@ public class CategoryActivity extends ActionBarActivity {
 
 
                         mProgressDialog.dismiss();
-                        saveOrderData();
+                        saveOrderData(order_id);
                         startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
                         finish();
                     } else {
@@ -4694,7 +4707,7 @@ public class CategoryActivity extends ActionBarActivity {
         });
     }
 
-    private void saveOrderData() {
+    private void saveOrderData(String order_id) {
         Log.e("Save", "yes");
         database.beginTransaction();
         Calendar todayCal = Calendar.getInstance();
@@ -4702,7 +4715,7 @@ public class CategoryActivity extends ActionBarActivity {
         SharedPreferences prefs = getSharedPreferences(MainActivity.LOGIN_PREFERENCES, MODE_PRIVATE);
         WAITER_ID = prefs.getString(MainActivity.WAITER_ID, "No name defined");
         //gjhkljh
-        String order_id = makeOrderID();
+//        String order_id = makeOrderID();
         ContentValues cv = new ContentValues();
         cv.put("id", order_id);
         cv.put("user_id", WAITER_ID);
@@ -4814,7 +4827,7 @@ public class CategoryActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        if (check_check.equals("table") ) {
+      //  if (check_check.equals("table") ) {
 
 //            Toast.makeText(activity, "Here", Toast.LENGTH_SHORT).show();
 //            final JSONArray tableListJsonArray = new JSONArray();
@@ -4850,9 +4863,9 @@ public class CategoryActivity extends ActionBarActivity {
 //                    Log.d("TableStatuscatt", t.getMessage());
 //                }
 //            });
-            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
-            finish();
-        } else if (check_check.equals("room")) {
+        //    startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
+        //    finish();
+       // } else if (check_check.equals("room")) {
 //            JSONObject jsonObject = new JSONObject();
 //            try {
 //                jsonObject.put("room_id", ROOM_ID + "");
@@ -4884,10 +4897,10 @@ public class CategoryActivity extends ActionBarActivity {
 //                    Log.d("TableStatuscatt", t.getMessage());
 //                }
 //            });
-            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
-            finish();
-        } else {
-            check_check = "null";
+        //    startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
+       //     finish();
+      //  } else {
+       //     check_check = "null";
 
             Handler handler = new Handler();
 
@@ -4951,7 +4964,7 @@ public class CategoryActivity extends ActionBarActivity {
 
 //            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
 //            finish();
-        }
+       // }
 
 
     }

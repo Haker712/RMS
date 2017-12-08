@@ -86,6 +86,7 @@ public class TableActivity extends ActionBarActivity {
     Call<Success> callc;
     private Toolbar toolbar;
     private RecyclerView recyclerView;
+    private Button tableReloadBtn;
     private Button transferBtn;
     private Button groupBtn;
     SQLiteDatabase database;
@@ -315,6 +316,7 @@ public class TableActivity extends ActionBarActivity {
 
     private void registerIDs() {
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        tableReloadBtn= (Button) findViewById(R.id.tableReload_btn);
         transferBtn = (Button) findViewById(R.id.transfer_btn);
         groupBtn = (Button) findViewById(R.id.group_btn);
     }
@@ -388,45 +390,52 @@ public class TableActivity extends ActionBarActivity {
                 Log.e("ServiceTableID", bookingTable.getTableID() + "");
                 bookTable.setTableService("1");
             } else if (bookingTable.getTableStatus().equals("0")) {
-                if (bookingTable.getBooking_time().equals("00:00:00")) {
-                    bookTable.setBackgroundColor("");
-                } else {
-                    try {
-                        Log.e("Booking_TableID", bookingTable.getTableID() + "");
-                        Date booking_time = timeFormat.parse(bookingTable.getBooking_time());
-                        int booking_hour = booking_time.getHours();
-                        int booking_minute = booking_time.getMinutes();
-                        int booking_second = booking_time.getSeconds();
-                        Date warning_time = timeFormat.parse(bookingTable.getBooking_warning());
-                        int warning_hour = warning_time.getHours();
-                        int warning_minute = warning_time.getMinutes();
-                        int warning_second = warning_time.getSeconds();
-                        Date waiting_time = timeFormat.parse(bookingTable.getBooking_waiting());
-                        int waiting_hour = waiting_time.getHours();
-                        int waiting_minute = waiting_time.getMinutes();
-                        int waiting_second = waiting_time.getSeconds();
-                        int to_hour = booking_hour + waiting_hour;
-                        int to_minute = booking_minute + waiting_minute;
-                        int to_second = booking_second + waiting_second;
-                        toTime = timeFormat.parse(to_hour + ":" + to_minute + ":" + to_second);
-                        int from_hour = booking_hour - warning_hour;
-                        int from_minute = booking_minute - warning_minute;
-                        int from_second = booking_second - warning_second;
-                        fromTime = timeFormat.parse(from_hour + ":" + from_minute + ":" + from_second);
-                        Date CurrentTime = timeFormat.parse(timeFormat.format(new Date()));
-                        Log.e("booking_time3", CurrentTime + "" + fromTime + "," + booking_time + "," + toTime);
-                        if (CurrentTime.equals(fromTime) || CurrentTime.after(fromTime) && CurrentTime.before(booking_time)) {
-                            bookTable.setTableService("2");
-                            Log.e("TableService", "2");
-                        } else if (CurrentTime.equals(booking_time) || CurrentTime.after(booking_time) && CurrentTime.before(toTime)) {
-                            bookTable.setTableService("3");
-                            Log.e("TableService", "3");
-                        }
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                }
+                bookTable.setTableService("0");
+            }else if (bookingTable.getTableStatus().equals("2")){
+                bookTable.setTableService("2");
             }
+            else if (bookingTable.getTableStatus().equals("3")){
+                bookTable.setTableService("3");
+            }
+//                if (bookingTable.getBooking_time().equals("00:00:00")) {
+//                    bookTable.setBackgroundColor("");
+//                } else {
+//                    try {
+//                        Log.e("Booking_TableID", bookingTable.getTableID() + "");
+//                        Date booking_time = timeFormat.parse(bookingTable.getBooking_time());
+//                        int booking_hour = booking_time.getHours();
+//                        int booking_minute = booking_time.getMinutes();
+//                        int booking_second = booking_time.getSeconds();
+//                        Date warning_time = timeFormat.parse(bookingTable.getBooking_warning());
+//                        int warning_hour = warning_time.getHours();
+//                        int warning_minute = warning_time.getMinutes();
+//                        int warning_second = warning_time.getSeconds();
+//                        Date waiting_time = timeFormat.parse(bookingTable.getBooking_waiting());
+//                        int waiting_hour = waiting_time.getHours();
+//                        int waiting_minute = waiting_time.getMinutes();
+//                        int waiting_second = waiting_time.getSeconds();
+//                        int to_hour = booking_hour + waiting_hour;
+//                        int to_minute = booking_minute + waiting_minute;
+//                        int to_second = booking_second + waiting_second;
+//                        toTime = timeFormat.parse(to_hour + ":" + to_minute + ":" + to_second);
+//                        int from_hour = booking_hour - warning_hour;
+//                        int from_minute = booking_minute - warning_minute;
+//                        int from_second = booking_second - warning_second;
+//                        fromTime = timeFormat.parse(from_hour + ":" + from_minute + ":" + from_second);
+//                        Date CurrentTime = timeFormat.parse(timeFormat.format(new Date()));
+//                        Log.e("booking_time3", CurrentTime + "" + fromTime + "," + booking_time + "," + toTime);
+//                        if (CurrentTime.equals(fromTime) || CurrentTime.after(fromTime) && CurrentTime.before(booking_time)) {
+//                            bookTable.setTableService("2");
+//                            Log.e("TableService", "2");
+//                        } else if (CurrentTime.equals(booking_time) || CurrentTime.after(booking_time) && CurrentTime.before(toTime)) {
+//                            bookTable.setTableService("3");
+//                            Log.e("TableService", "3");
+//                        }
+//                    } catch (ParseException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
             bookingTableArrayList.add(bookTable);
         }
         adapter = new TableAdapter(this, bookingTableArrayList);
@@ -439,6 +448,17 @@ public class TableActivity extends ActionBarActivity {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.addItemDecoration(new GridSpacingItemDecoration(5, dpToPx(10), true));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+
+        tableReloadBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadTableJson();
+            }
+        });
+
+
+
         transferBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
