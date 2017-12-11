@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
@@ -155,6 +156,8 @@ public class InvoiceDetailActivity extends ActionBarActivity {
 
     Socket socket;
 
+    Typeface font;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -219,6 +222,10 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         }
 
         socket.connect();
+
+        font = Typeface.createFromAsset(
+                this.getAssets(),
+                "fonts/zawgyi.ttf");
 
     }
 
@@ -899,6 +906,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
             Button statusBtn = (Button) view.findViewById(R.id.status_btn);
             final InvoiceDetailProduct detailProduct = detailProductArrayList.get(position);
             Log.i("detailProductArrayList>>>>hak>>>>", detailProductArrayList.size() + "");
+            itemNameTxt.setTypeface(font);
             itemNameTxt.setText(detailProduct.getItemName());
             priceTxt.setText(detailProduct.getPrice());
             quantityTxt.setText(detailProduct.getQuantity());

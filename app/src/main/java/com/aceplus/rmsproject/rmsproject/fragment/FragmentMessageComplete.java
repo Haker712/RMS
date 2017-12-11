@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -84,6 +85,8 @@ public class FragmentMessageComplete extends Fragment {
     Socket socket;
     Activity activity;
 
+    Typeface font;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +107,11 @@ public class FragmentMessageComplete extends Fragment {
         socket.on("cooking_done", onMessageCompete);
         socket.on("take", onMessageCompete);
         socket.connect();
+
+        font = Typeface.createFromAsset(
+                getActivity().getAssets(),
+                "fonts/zawgyi.ttf");
+
     }
 
     private Emitter.Listener onMessageCompete = new Emitter.Listener() {
@@ -288,7 +296,7 @@ public class FragmentMessageComplete extends Fragment {
 
             }
 
-            viewHolder.listView.getLayoutParams().height = 66 * completeArrayList.get(position).getOrder_item().size();//52
+          //  viewHolder.listView.getLayoutParams().height = 66 * completeArrayList.get(position).getOrder_item().size();//52
             orderItemAdapter = new OrderItemAdapter(getActivity(), completeArrayList.get(position).getOrder_item());
             viewHolder.listView.setAdapter(orderItemAdapter);
             orderItemAdapter.notifyDataSetChanged();
@@ -439,6 +447,9 @@ public class FragmentMessageComplete extends Fragment {
             TextView productNameTxt = (TextView) view.findViewById(R.id.product_txt);
             TextView orderTypeTxt = (TextView) view.findViewById(R.id.order_type_txt);
             CheckBox statusCheck = (CheckBox) view.findViewById(R.id.status_check);
+
+            productNameTxt.setTypeface(font);
+
             if (order_item.getItem_name() == null) {
                 productNameTxt.setText(getSetMenuItemName(order_item.getSet_item_id()));
             } else {

@@ -15,6 +15,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
@@ -227,6 +228,8 @@ public class CategoryActivity extends ActionBarActivity {
     Invoice invoice;
     Socket socket;
 
+    Typeface font;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -259,6 +262,10 @@ public class CategoryActivity extends ActionBarActivity {
         socket.on("order_remove", onNewMessage);
         socket.on("invoice_payment", invoicePaidSocket);
         socket.connect();
+
+       font = Typeface.createFromAsset(
+                activity.getAssets(),
+                "fonts/zawgyi.ttf");
 
     }
 
@@ -937,7 +944,7 @@ public class CategoryActivity extends ActionBarActivity {
             Cursor cur = database.rawQuery("SELECT * FROM voucher", null);
             while (cur.moveToNext()) {
                 invoicecount = cur.getInt(cur.getColumnIndex("voucher_count"));
-                backend_tablet_id=cur.getInt(cur.getColumnIndex("id"));
+                backend_tablet_id = cur.getInt(cur.getColumnIndex("id"));
             }
             cur.close();
             database.setTransactionSuccessful();
@@ -945,28 +952,28 @@ public class CategoryActivity extends ActionBarActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-       // Calendar todayCal = Calendar.getInstance();
+        // Calendar todayCal = Calendar.getInstance();
         //String todayDate = orderDate.format(todayCal.getTime());
 //        String orderID = tablet_id+ "-" + orderFormat.format(invoicecount + 1);
         int totalWord = 11;
-        int a=invoicecount+1;
+        int a = invoicecount + 1;
         String pre_orderID = String.format("%0" + (totalWord - String.valueOf(invoicecount).length()) + "d", a);
 
-       try {
-           database.beginTransaction();
+        try {
+            database.beginTransaction();
 
-           database.execSQL("UPDATE voucher set voucher_count = "+a+"");
+            database.execSQL("UPDATE voucher set voucher_count = " + a + "");
 
-           database.setTransactionSuccessful();
-           database.endTransaction();
-       }catch (Exception e){
+            database.setTransactionSuccessful();
+            database.endTransaction();
+        } catch (Exception e) {
 
-           Log.i("Excep",e.getMessage());
+            Log.i("Excep", e.getMessage());
 
-       }
+        }
 
-        String orderID=backend_tablet_id+"-"+pre_orderID;
-        Log.i("GenerateOrderId",orderID);
+        String orderID = backend_tablet_id + "-" + pre_orderID;
+        Log.i("GenerateOrderId", orderID);
 
 
         return orderID;
@@ -1683,7 +1690,7 @@ public class CategoryActivity extends ActionBarActivity {
         categoryItemAdapter = new CategoryItemAdapter(CategoryActivity.this);
         listView.setAdapter(categoryItemAdapter);
         categoryItemAdapter = new CategoryItemAdapter(this);
-        layoutManager=new LinearLayoutManager(this);
+        layoutManager = new LinearLayoutManager(this);
         listView.setLayoutManager(layoutManager);
         listView.setItemAnimator(new DefaultItemAnimator());
         listView.setAdapter(categoryItemAdapter);
@@ -1861,16 +1868,16 @@ public class CategoryActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class CategoryItemAdapter extends RecyclerView.Adapter<CategoryItemAdapter.ViewHolder>{
+    private class CategoryItemAdapter extends RecyclerView.Adapter<CategoryItemAdapter.ViewHolder> {
 
 
         LayoutInflater inflater;
         Context context;
 
-        public CategoryItemAdapter(Context context){
+        public CategoryItemAdapter(Context context) {
 
             inflater = LayoutInflater.from(context);
-            this.context=context;
+            this.context = context;
 
         }
 
@@ -1878,7 +1885,7 @@ public class CategoryActivity extends ActionBarActivity {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-            View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.category_list_item,parent,false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.category_list_item, parent, false);
             ViewHolder viewHolder = new ViewHolder(view);
             return viewHolder;
         }
@@ -1907,11 +1914,12 @@ public class CategoryActivity extends ActionBarActivity {
             String takeiddd = categoryItem.getTakeid();
             //String statusiddd = categoryItem.getStatusid();
 
-            Log.i("Current position => ",position+"");
+            Log.i("Current position => ", position + "");
 
             /***
              * PhoneLinAung 11.9.17 Start
              */
+            viewHolder.itemNameTxt.setTypeface(font);
             viewHolder.itemNameTxt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -4324,6 +4332,9 @@ public class CategoryActivity extends ActionBarActivity {
 
 
             //holder.thumbnail.setImageBitmap(mBitmap);
+
+            holder.title.setTypeface(font);
+
             holder.title.setText(album.getName());
         }
 
@@ -4452,6 +4463,10 @@ public class CategoryActivity extends ActionBarActivity {
             }
             Log.e("ParentID", parent_ID);
             Category item = itemList.get(position);
+
+
+            holder.title.setTypeface(font);
+
             holder.title.setText(item.getName());
             //byte[] ImageShow = Base64.decode(item.getImage(), Base64.DEFAULT);
             //Bitmap mBitmap = BitmapFactory.decodeByteArray(ImageShow, 0, ImageShow.length);
@@ -4601,7 +4616,7 @@ public class CategoryActivity extends ActionBarActivity {
             JSONObject room = new JSONObject();
             try {
                 room.put("room_id", ROOM_ID);
-                room.put("room_status","1");
+                room.put("room_status", "1");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -4650,7 +4665,7 @@ public class CategoryActivity extends ActionBarActivity {
                 orderjsonObject.put("room_charge", 0);
 
             }
-            orderjsonObject.put("tablet_id",MainActivity.tablet_id);
+            orderjsonObject.put("tablet_id", MainActivity.tablet_id);
 
 
         } catch (JSONException e) {
@@ -4827,7 +4842,7 @@ public class CategoryActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-      //  if (check_check.equals("table") ) {
+        //  if (check_check.equals("table") ) {
 
 //            Toast.makeText(activity, "Here", Toast.LENGTH_SHORT).show();
 //            final JSONArray tableListJsonArray = new JSONArray();
@@ -4865,7 +4880,7 @@ public class CategoryActivity extends ActionBarActivity {
 //            });
         //    startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
         //    finish();
-       // } else if (check_check.equals("room")) {
+        // } else if (check_check.equals("room")) {
 //            JSONObject jsonObject = new JSONObject();
 //            try {
 //                jsonObject.put("room_id", ROOM_ID + "");
@@ -4898,73 +4913,73 @@ public class CategoryActivity extends ActionBarActivity {
 //                }
 //            });
         //    startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
-       //     finish();
-      //  } else {
-       //     check_check = "null";
+        //     finish();
+        //  } else {
+        //     check_check = "null";
 
-            Handler handler = new Handler();
+        Handler handler = new Handler();
 
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (activity.isFinishing()) {
-                        return;
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (activity.isFinishing()) {
+                    return;
+                } else {
+
+                    if (TotalitemArraylist.size() > 0) {
+
+                        final android.support.v7.app.AlertDialog builder = new android.support.v7.app.AlertDialog.Builder(
+                                CategoryActivity.this, R.style.InvitationDialog)
+                                .setPositiveButton(R.string.invitation_ok, null)
+                                .setNegativeButton(R.string.invitation_cancel, null)
+                                .create();
+                        builder.setTitle(R.string.alert);
+                        builder.setMessage("Do You Want to create this Order?");
+                        builder.setOnShowListener(new DialogInterface.OnShowListener() {
+                            @Override
+                            public void onShow(DialogInterface dialog) {
+                                final Button btnAccept = builder.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
+                                btnAccept.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        builder.dismiss();
+                                        Log.e("VoucherID", VOUNCHER_ID + "");
+                                        if (VOUNCHER_ID == null || VOUNCHER_ID.equals("NULL")) {
+                                            uploadOrderData();
+                                        } else {
+                                            CompareItemListsUploadUpdate(categoryItemList, TotalitemArraylist);
+                                            uploadUpdateOrderData();
+
+                                        }
+
+                                    }
+                                });
+
+                                final Button btnDecline = builder.getButton(AlertDialog.BUTTON_NEGATIVE);
+                                btnDecline.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
+                                        finish();
+                                    }
+                                });
+                            }
+                        });
+                        builder.show();
                     } else {
 
-                        if (TotalitemArraylist.size() > 0) {
+                        startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
+                        finish();
 
-                            final android.support.v7.app.AlertDialog builder = new android.support.v7.app.AlertDialog.Builder(
-                                    CategoryActivity.this, R.style.InvitationDialog)
-                                    .setPositiveButton(R.string.invitation_ok, null)
-                                    .setNegativeButton(R.string.invitation_cancel, null)
-                                    .create();
-                            builder.setTitle(R.string.alert);
-                            builder.setMessage("Do You Want to create this Order?");
-                            builder.setOnShowListener(new DialogInterface.OnShowListener() {
-                                @Override
-                                public void onShow(DialogInterface dialog) {
-                                    final Button btnAccept = builder.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
-                                    btnAccept.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            builder.dismiss();
-                                            Log.e("VoucherID", VOUNCHER_ID + "");
-                                            if (VOUNCHER_ID == null || VOUNCHER_ID.equals("NULL")) {
-                                                uploadOrderData();
-                                            } else {
-                                                CompareItemListsUploadUpdate(categoryItemList, TotalitemArraylist);
-                                                uploadUpdateOrderData();
-
-                                            }
-
-                                        }
-                                    });
-
-                                    final Button btnDecline = builder.getButton(AlertDialog.BUTTON_NEGATIVE);
-                                    btnDecline.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
-                                            finish();
-                                        }
-                                    });
-                                }
-                            });
-                            builder.show();
-                        }else {
-
-                            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
-                            finish();
-
-                        }
                     }
                 }
-            });
+            }
+        });
 
 
 //            startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
 //            finish();
-       // }
+        // }
 
 
     }
