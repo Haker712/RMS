@@ -13,6 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -255,7 +256,7 @@ public class RoomActivity extends AppCompatActivity {
             String room_id = cur.getString(cur.getColumnIndex("id"));
             bookingTable.setTableID(room_id);
             bookingTable.setTable_no(cur.getString(cur.getColumnIndex("room_name")));
-            bookingTable.setTableService(cur.getString(cur.getColumnIndex("status")));
+            bookingTable.setTableStatus(cur.getString(cur.getColumnIndex("status")));
             bookingTable.setTable_check(false);
             curBRoom = database.rawQuery("SELECT * FROM booking_room WHERE room_id = \"" + room_id + "\"", null);
             while (curBRoom.moveToNext()) {
@@ -286,7 +287,7 @@ public class RoomActivity extends AppCompatActivity {
 
     private void registerIDs() {
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        roomReloadbtn= (Button) findViewById(R.id.roomReload_btn);
+        roomReloadbtn = (Button) findViewById(R.id.roomReload_btn);
         transferBtn = (Button) findViewById(R.id.room_transfer_btn);
     }
 
@@ -455,10 +456,9 @@ public class RoomActivity extends AppCompatActivity {
                 bookTable.setTableService("1");
             } else if (bookingTable.getTableStatus().equals("0")) {
                 bookTable.setTableService("0");
-            }else if (bookingTable.getTableStatus().equals("2")){
+            } else if (bookingTable.getTableStatus().equals("2")) {
                 bookTable.setTableService("2");
-            }
-            else if (bookingTable.getTableStatus().equals("3")){
+            } else if (bookingTable.getTableStatus().equals("3")) {
                 bookTable.setTableService("3");
             }
 //            if (bookingTable.getTableService().equals("1")) {
@@ -731,7 +731,7 @@ public class RoomActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(final MyViewHolder holder, int position) {
+        public void onBindViewHolder(final MyViewHolder holder, final int position) {
             final BookingTable table = roomList.get(position);
             holder.tableTxt.setText(table.getTable_no());
             if (table.getTableService().equals("2")) {
@@ -859,7 +859,7 @@ public class RoomActivity extends AppCompatActivity {
                         });
                         builder.show();
 
-                    } else {
+                    } else if (table.getTableService().equals("1")) {
                         final String room_id = table.getTableID();
                         final String status = table.getTableService();
                         JSONObject jsonObject = new JSONObject();
@@ -933,10 +933,154 @@ public class RoomActivity extends AppCompatActivity {
                                 callUploadDialog("Please upload again!");
                             }
                         });
+                    } else {
+
+                        Handler handler = new Handler();
+
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (activity.isFinishing()) {
+                                    return;
+                                } else {
+
+                                    Toast.makeText(mContext, "Reserve", Toast.LENGTH_SHORT).show();
+
+                                    final AlertDialog builder = new AlertDialog.Builder(RoomActivity.this, R.style.InvitationDialog)
+                                            .setPositiveButton(R.string.invitation_ok, null)
+                                            .setNegativeButton(R.string.invitation_cancel, null)
+                                            .create();
+                                    LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                                    final View view = layoutInflater.inflate(R.layout.booking_info, null);
+                                    builder.setView(view);
+                                    builder.setTitle("Booking Information");
+                                    builder.setOnShowListener(new DialogInterface.OnShowListener() {
+                                        @Override
+                                        public void onShow(DialogInterface dialog) {
+
+                                            TextView txtCustomername = (TextView) view.findViewById(R.id.bookingCustomerName);
+                                            TextView txtFromtime = (TextView) view.findViewById(R.id.bookingFromtime);
+                                            TextView txtTotime = (TextView) view.findViewById(R.id.bookingTotime);
+                                            TextView capacity = (TextView) view.findViewById(R.id.bookingCapacity);
+
+
+                                            for (int a=0;a<download_bookingArrayList.size();a++){
+
+                                                for (int b=0;b<download_bookingArrayList.get(a).getBooking_room().length;b++){
+
+                                                    if (table.getTable_id().equals(download_bookingArrayList.get(a).getBooking_room()[b].getRoom_id())){
+
+                                                        txtCustomername.setText(download_bookingArrayList.get(a).getCustomer_name());
+                                                        txtFromtime.setText(download_bookingArrayList.get(a).getFrom_time());
+                                                        txtTotime.setText(download_bookingArrayList.get(a).getTo_time());
+                                                        capacity.setText(download_bookingArrayList.get(a).getCapacity());
+
+                                                    }
+
+                                                }
+
+                                            }
+
+
+                                            final Button btnAccept = builder.getButton(AlertDialog.BUTTON_POSITIVE);
+                                            btnAccept.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    socket.emit("room_message", "TakeRoom");
+
+                                                    final String room_id = table.getTableID();
+                                                    final String status = table.getTableService();
+                                                    JSONObject jsonObject = new JSONObject();
+                                                    try {
+                                                        jsonObject.put("room_id", room_id + "");
+                                                        jsonObject.put("status", "0");
+                                                        jsonObject.put("old", "0");
+                                                        String booking_id = table.getBookingID();
+                                                        if (booking_id == null) {
+                                                            jsonObject.put("booking_id", "null");
+                                                        } else {
+                                                            jsonObject.put("booking_id", table.getBookingID());
+                                                        }
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    Log.e("RoomStatusJson", jsonObject + "");
+                                                    callDialog("Uploading room status....");
+
+                                                    RequestInterface request = retrofit.create(RequestInterface.class);
+                                                    Call<Success> call = request.postRoomStatus(jsonObject + "");
+                                                    call.enqueue(new Callback<Success>() {
+                                                        @SuppressLint("LongLogTag")
+                                                        @Override
+                                                        public void onResponse(Call<Success> call, Response<Success> response) {
+                                                            try {
+                                                                Success jsonResponse = response.body();
+                                                                String message = jsonResponse.getMessage();
+                                                                mProgressDialog.dismiss();
+
+                                                                if (message.equals("Success")) {
+                                                                    Log.d("RoomStatus", message);
+                                                                    CategoryActivity.ROOM_ID = room_id;
+                                                                    CategoryActivity.TAKE_AWAY = "room";
+                                                                    CategoryActivity.groupTableArrayList = null;
+                                                                    CategoryActivity.TABLE_ID = null;
+                                                                    String vouncherid = getRoomInvoiceDataInDB(room_id);
+                                                                    CategoryActivity.VOUNCHER_ID = vouncherid;
+                                                                    Log.e("RoomVouncherID", vouncherid + "");
+                                                                    String invoiceeece_id;
+                                                                    invoiceeece_id = getRoomInvoiceDetail(room_id);
+                                                                    String invoice_id = null;
+                                                                    invoice_id = invoiceeece_id;
+                                                                    CategoryActivity.VOUNCHER_ID = invoice_id;
+                                                                    Log.i("CategoryActivity.vouncherIDfromRoom", CategoryActivity.VOUNCHER_ID + "");
+
+                                                                    if (invoice_id.equals("NULL") || invoice_id.equals(null)) {
+                                                                        if (table.getTableService().equals("1")) {
+                                                                            CategoryActivity.ADD_INVOICE = "status1";
+                                                                        } else {
+                                                                            CategoryActivity.ADD_INVOICE = "NULL";
+                                                                        }
+
+                                                                        CategoryActivity.VOUNCHER_ID = null;
+                                                                    } else {
+                                                                        CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
+                                                                    }
+                                                                    CategoryActivity.check_check = "room";
+                                                                    startActivity(new Intent(RoomActivity.this, CategoryActivity.class));
+                                                                    finish();
+                                                                } else {
+
+                                                                    Toast.makeText(RoomActivity.this, "This TABLE is unavailable", Toast.LENGTH_SHORT).show();
+                                                                }
+                                                            } catch (Exception e) {
+                                                                e.printStackTrace();
+                                                                callUploadDialog("Room status is null.");
+                                                            }
+                                                        }
+
+                                                        @Override
+                                                        public void onFailure(Call<Success> call, Throwable t) {
+                                                            Log.d("RoomStatus", t.getMessage());
+                                                            mProgressDialog.dismiss();
+                                                            callUploadDialog("Please upload again!");
+                                                        }
+                                                    });
+                                                    builder.dismiss();
+                                                }
+                                            });
+
+                                        }
+                                    });
+
+                                    builder.show();
+
+
+                                }
+                            }
+                        });
                     }
 
                 }
-                //}
 
             });
         }

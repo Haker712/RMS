@@ -316,7 +316,7 @@ public class TableActivity extends ActionBarActivity {
 
     private void registerIDs() {
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        tableReloadBtn= (Button) findViewById(R.id.tableReload_btn);
+        tableReloadBtn = (Button) findViewById(R.id.tableReload_btn);
         transferBtn = (Button) findViewById(R.id.transfer_btn);
         groupBtn = (Button) findViewById(R.id.group_btn);
     }
@@ -357,7 +357,7 @@ public class TableActivity extends ActionBarActivity {
         return group_invoiceee_id;
     }
 
-    private void callDialog(String messageTxt)  {
+    private void callDialog(String messageTxt) {
         try {
             mProgressDialog = new ProgressDialog(TableActivity.this, ProgressDialog.THEME_HOLO_LIGHT);
             mProgressDialog.setIndeterminate(false);
@@ -391,10 +391,9 @@ public class TableActivity extends ActionBarActivity {
                 bookTable.setTableService("1");
             } else if (bookingTable.getTableStatus().equals("0")) {
                 bookTable.setTableService("0");
-            }else if (bookingTable.getTableStatus().equals("2")){
+            } else if (bookingTable.getTableStatus().equals("2")) {
                 bookTable.setTableService("2");
-            }
-            else if (bookingTable.getTableStatus().equals("3")){
+            } else if (bookingTable.getTableStatus().equals("3")) {
                 bookTable.setTableService("3");
             }
 //                if (bookingTable.getBooking_time().equals("00:00:00")) {
@@ -456,7 +455,6 @@ public class TableActivity extends ActionBarActivity {
                 loadTableJson();
             }
         });
-
 
 
         transferBtn.setOnClickListener(new View.OnClickListener() {
@@ -558,7 +556,7 @@ public class TableActivity extends ActionBarActivity {
                                         @Override
                                         public void run() {
                                             socket.emit("table_transfer", "transfer_table");
-                                           // Toast.makeText(TableActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
+                                            // Toast.makeText(TableActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
                                         }
                                     });
 
@@ -691,7 +689,7 @@ public class TableActivity extends ActionBarActivity {
                                     product.put("table_id", book.getTableID());
                                     product.put("booking_id", book.getBookingID() + "");
                                     product.put("status", "1");
-                                    product.put("old",0);
+                                    product.put("old", 0);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -720,7 +718,7 @@ public class TableActivity extends ActionBarActivity {
                                     @Override
                                     public void run() {
                                         socket.emit("table_message", "TakeTable");
-                                      //  Toast.makeText(TableActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
+                                        //  Toast.makeText(TableActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
                                     }
                                 });
 
@@ -737,7 +735,7 @@ public class TableActivity extends ActionBarActivity {
                                 builder.dismiss();
                                 startActivity(new Intent(TableActivity.this, CategoryActivity.class));
                                 finish();
-                            }else {
+                            } else {
                                 Toast.makeText(activity, "These tables can't be grouped", Toast.LENGTH_SHORT).show();
                                 mProgressDialog.dismiss();
                             }
@@ -878,7 +876,7 @@ public class TableActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View v) {  // when you enter the table !
 
-                    CategoryActivity.check_check="table";
+                    CategoryActivity.check_check = "table";
                     if (table.getTableService().equals("1")) {
                         final JSONArray tableListJsonArray = new JSONArray();
                         JSONObject product = new JSONObject();
@@ -930,7 +928,7 @@ public class TableActivity extends ActionBarActivity {
 //                                        CategoryActivity.VOUNCHER_ID = "NULL";
                                         CategoryActivity.VOUNCHER_ID = null;
                                     } else {
-                                       // CategoryActivity.VOUNCHER_ID = "NULL";
+                                        // CategoryActivity.VOUNCHER_ID = "NULL";
                                         CategoryActivity.VOUNCHER_ID = null;
                                         if (invoice_id == null || invoice_id.equals("null")) {
                                             String group_invoice_id = getGroupTableInvoiceDataInDB(table.getTableID());
@@ -938,7 +936,7 @@ public class TableActivity extends ActionBarActivity {
                                             CategoryActivity.VOUNCHER_ID = null;
                                             if (group_invoice_id == null) {
                                                 Log.e("GroupInvoice", group_invoice_id + "");
-                                               // CategoryActivity.VOUNCHER_ID = "NULL";
+                                                // CategoryActivity.VOUNCHER_ID = "NULL";
                                                 CategoryActivity.VOUNCHER_ID = null;
                                             } else {
                                                 CategoryActivity.VOUNCHER_ID = group_invoice_id;
@@ -962,7 +960,7 @@ public class TableActivity extends ActionBarActivity {
                                 callUploadDialog("Please upload again!");
                             }
                         });
-                    } else {
+                    } else if (table.getTableService().equals("0")) {
                         final JSONArray tableListJsonArray = new JSONArray();
                         JSONObject product = new JSONObject();
                         try {
@@ -994,7 +992,7 @@ public class TableActivity extends ActionBarActivity {
                                             @Override
                                             public void run() {
                                                 socket.emit("table_message", "TakeTable");
-                                              //  Toast.makeText(mContext, "SocketFire", Toast.LENGTH_SHORT).show();
+                                                //  Toast.makeText(mContext, "SocketFire", Toast.LENGTH_SHORT).show();
                                             }
                                         });
 
@@ -1007,8 +1005,8 @@ public class TableActivity extends ActionBarActivity {
                                         CategoryActivity.TAKE_AWAY = "table";
                                         CategoryActivity.ROOM_ID = null;
                                         CategoryActivity.ADD_INVOICE = "NULL";
-                                       // CategoryActivity.VOUNCHER_ID = "NULL";
-                                        CategoryActivity.VOUNCHER_ID=null;
+                                        // CategoryActivity.VOUNCHER_ID = "NULL";
+                                        CategoryActivity.VOUNCHER_ID = null;
                                         startActivity(new Intent(TableActivity.this, CategoryActivity.class));
                                         finish();
                                     } else {
@@ -1030,7 +1028,144 @@ public class TableActivity extends ActionBarActivity {
                                 callUploadDialog("Please upload again!");
                             }
                         });
+                    } else {
+
+                        Handler handler = new Handler();
+
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (activity.isFinishing()) {
+                                    return;
+                                } else {
+
+                                    Toast.makeText(mContext, "Reserve", Toast.LENGTH_SHORT).show();
+
+                                    final AlertDialog builder = new AlertDialog.Builder(TableActivity.this, R.style.InvitationDialog)
+                                            .setPositiveButton(R.string.invitation_ok, null)
+                                            .setNegativeButton(R.string.invitation_cancel, null)
+                                            .create();
+                                    LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                                    final View view = layoutInflater.inflate(R.layout.booking_info, null);
+                                    builder.setView(view);
+                                    builder.setTitle("Booking Information");
+                                    builder.setOnShowListener(new DialogInterface.OnShowListener() {
+                                        @Override
+                                        public void onShow(DialogInterface dialog) {
+
+                                            TextView txtCustomername = (TextView) view.findViewById(R.id.bookingCustomerName);
+                                            TextView txtFromtime = (TextView) view.findViewById(R.id.bookingFromtime);
+                                            TextView txtTotime = (TextView) view.findViewById(R.id.bookingTotime);
+                                            TextView capacity = (TextView) view.findViewById(R.id.bookingCapacity);
+
+                                            for (int a=0;a<download_bookingArrayList.size();a++){
+
+                                                for (int b=0;b<download_bookingArrayList.get(a).getBooking_table().length;b++){
+
+                                                    if (table.getTable_id().equals(download_bookingArrayList.get(a).getBooking_table()[b].getTable_id())){
+
+                                                        txtCustomername.setText(download_bookingArrayList.get(a).getCustomer_name());
+                                                        txtFromtime.setText(download_bookingArrayList.get(a).getFrom_time());
+                                                        txtTotime.setText(download_bookingArrayList.get(a).getTo_time());
+                                                        capacity.setText(download_bookingArrayList.get(a).getCapacity());
+
+                                                    }
+
+                                                }
+
+                                            }
+
+
+                                            final Button btnAccept = builder.getButton(AlertDialog.BUTTON_POSITIVE);
+                                            btnAccept.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+
+                                                    final JSONArray tableListJsonArray = new JSONArray();
+                                                    JSONObject product = new JSONObject();
+                                                    try {
+                                                        product.put("booking_id", table.getBookingID() + "");
+                                                        product.put("status", "0");
+                                                        product.put("table_id", table.getTableID() + "");
+                                                        product.put("old", "0");
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    tableListJsonArray.put(product);
+                                                    Log.e("TableList", tableListJsonArray.toString());
+                                                    callDialog("Upload table data...");
+                                                    mProgressDialog.dismiss();
+
+                                                    RequestInterface request = retrofit.create(RequestInterface.class);
+                                                    Call<Success> call = request.postTableStatus(tableListJsonArray.toString());
+                                                    call.enqueue(new Callback<Success>() {
+                                                        @Override
+                                                        public void onResponse(Call<Success> call, Response<Success> response) {
+                                                            try {
+                                                                Success jsonResponse = response.body();
+                                                                String message = jsonResponse.getMessage();
+                                                                if (message.equals("Success")) {
+
+                                                                    Handler handler = new Handler();
+
+                                                                    handler.post(new Runnable() {
+                                                                        @Override
+                                                                        public void run() {
+                                                                            socket.emit("table_message", "TakeTable");
+                                                                            //  Toast.makeText(mContext, "SocketFire", Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    });
+
+                                                                    Log.d("TableStatus", message);
+                                                                    mProgressDialog.dismiss();
+                                                                    CategoryActivity.TABLE_ID = table.getTableID();
+                                                                    ArrayList<String> tableNameList = new ArrayList<String>();
+                                                                    tableNameList.add(table.getTableID());
+                                                                    CategoryActivity.groupTableArrayList = tableNameList;
+                                                                    CategoryActivity.TAKE_AWAY = "table";
+                                                                    CategoryActivity.ROOM_ID = null;
+                                                                    CategoryActivity.ADD_INVOICE = "NULL";
+                                                                    // CategoryActivity.VOUNCHER_ID = "NULL";
+                                                                    CategoryActivity.VOUNCHER_ID = null;
+                                                                    startActivity(new Intent(TableActivity.this, CategoryActivity.class));
+                                                                    finish();
+                                                                } else {
+
+                                                                    Toast.makeText(TableActivity.this, "This TABLE is unavailable", Toast.LENGTH_SHORT).show();
+
+                                                                }
+                                                            } catch (Exception e) {
+                                                                e.printStackTrace();
+                                                                mProgressDialog.dismiss();
+                                                                callUploadDialog("Table status is null.");
+                                                            }
+                                                        }
+
+                                                        @Override
+                                                        public void onFailure(Call<Success> call, Throwable t) {
+                                                            Log.d("TableStatus", t.getMessage());
+                                                            mProgressDialog.dismiss();
+                                                            callUploadDialog("Please upload again!");
+                                                        }
+                                                    });
+
+                                                }
+                                            });
+
+
+
+
+
+                                        }
+                                    });
+
+                                    builder.show();
+
+                                }
+                            }
+                        });
                     }
+
                 }
             });
             holder.backgroundLayout.setOnLongClickListener(new View.OnLongClickListener() {

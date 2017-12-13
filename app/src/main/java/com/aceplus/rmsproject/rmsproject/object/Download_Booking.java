@@ -7,6 +7,8 @@ public class Download_Booking {
     String id;
     String customer_name;
     String from_time;
+    String capacity;
+    String to_time;
     BTable booking_table [];
     BRoom booking_room [];
 
@@ -19,6 +21,16 @@ public class Download_Booking {
     }
     public String getFrom_time() {
         return from_time;
+    }
+
+    public String getCapacity(){
+
+        return capacity;
+
+    }
+
+    public String getTo_time() {
+        return to_time;
     }
 
     public BTable[] getBooking_table() {

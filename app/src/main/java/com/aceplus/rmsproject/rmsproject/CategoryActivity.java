@@ -955,9 +955,10 @@ public class CategoryActivity extends ActionBarActivity {
         // Calendar todayCal = Calendar.getInstance();
         //String todayDate = orderDate.format(todayCal.getTime());
 //        String orderID = tablet_id+ "-" + orderFormat.format(invoicecount + 1);
-        int totalWord = 11;
+//        int totalWord = 11;
         int a = invoicecount + 1;
-        String pre_orderID = String.format("%0" + (totalWord - String.valueOf(invoicecount).length()) + "d", a);
+        String pre_orderID = ("0000000000" + invoicecount).substring(String.valueOf(invoicecount).length());
+       // String pre_orderID = String.format("%0" + (totalWord - String.valueOf(invoicecount).length()) + "d", a);
 
         try {
             database.beginTransaction();

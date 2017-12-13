@@ -434,7 +434,6 @@ public class MainActivity extends Activity {
                         Waitername = jsonResponse.getWaiter_name();
                         UserRole = jsonResponse.getRole();
                         Log.i("Role", UserRole);
-                        //  Log.i("WaiterName",Waitername);
                         SharedPreferences.Editor editor = sharedpreferences.edit();
                         editor.putString(WAITER_ID, jsonResponse.getWaiter_id());
                         editor.commit();
@@ -639,46 +638,46 @@ public class MainActivity extends Activity {
                             cv.put("version", "0");
                         } else {
                             cv.put("version", download_tableVersion.getVersion());
+                            }
+                            Log.i("b4 insert : ", download_tableVersionArrayList.size() + "");
+                            database.insert("tableVersion", null, cv);
+                            Log.i("After insert : ", download_tableVersionArrayList.size() + "");
                         }
-                        Log.i("b4 insert : ", download_tableVersionArrayList.size() + "");
-                        database.insert("tableVersion", null, cv);
-                        Log.i("After insert : ", download_tableVersionArrayList.size() + "");
-                    }
-                    database.setTransactionSuccessful();
-                    database.endTransaction();
-                } catch (Exception e) {
-                    Log.i("EXCEPTION insert : ", download_tableVersionArrayList.size() + "");
-                    e.printStackTrace();
-                    if (response.message() != null && !response.message().equals("")) {
-                        callUploadDialog(response.message());
-                    } else {
-                        callUploadDialog(getResources().getString(R.string.connection_failure));
+                        database.setTransactionSuccessful();
+                        database.endTransaction();
+                    } catch(Exception e){
+                        Log.i("EXCEPTION insert : ", download_tableVersionArrayList.size() + "");
+                        e.printStackTrace();
+                        if (response.message() != null && !response.message().equals("")) {
+                            callUploadDialog(response.message());
+                        } else {
+                            callUploadDialog(getResources().getString(R.string.connection_failure));
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<JSONResponseTableVersion> call, Throwable t) {
-                if (value == 0) {
-                    progressDialog.dismiss();
+                @Override
+                public void onFailure (Call < JSONResponseTableVersion > call, Throwable t){
+                    if (value == 0) {
+                        progressDialog.dismiss();
+                    }
+                    callUploadDialog("Invalid Requested URL");
                 }
-                callUploadDialog("Invalid Requested URL");
-            }
-        });
-    }
-
-    private ArrayList<String> getVersionList() {
-        database.beginTransaction();
-        ArrayList<String> versionList = new ArrayList<>();
-        Cursor cur = database.rawQuery("SELECT * FROM tableVersion", null);
-        while (cur.moveToNext()) {
-            versionList.add(cur.getString(cur.getColumnIndex("version")));
+            });
         }
-        cur.close();
-        database.setTransactionSuccessful();
-        database.endTransaction();
-        return versionList;
-    }
+
+        private ArrayList<String> getVersionList () {
+            database.beginTransaction();
+            ArrayList<String> versionList = new ArrayList<>();
+            Cursor cur = database.rawQuery("SELECT * FROM tableVersion", null);
+            while (cur.moveToNext()) {
+                versionList.add(cur.getString(cur.getColumnIndex("version")));
+            }
+            cur.close();
+            database.setTransactionSuccessful();
+            database.endTransaction();
+            return versionList;
+        }
 
     private void loadSyncsTable(ArrayList<String> version) {  // syncs down the tables from back end !!
         callDialog("Update Data....");
@@ -938,6 +937,7 @@ public class MainActivity extends Activity {
                             cv.put("message", download_config.getMessage());
                             cv.put("remark", download_config.getRemark());
                             cv.put("room_charge", download_config.getRoom_charge());
+                            Log.i("RoomCharge",download_config.getRoom_charge()+"");
 
                             database.insert("config", null, cv);
                         }
@@ -1014,7 +1014,7 @@ public class MainActivity extends Activity {
                     database.setTransactionSuccessful();
                     database.endTransaction();
                     deleteTableVersion("tableVersion");
-//                    loadTableVersion(1);
+                    loadTableVersion(1);
 //                    startActivity(new Intent(MainActivity.this, HomePageActivity.class));
                     Intent intent = new Intent(MainActivity.this, HomePageActivity.class);
                     intent.putExtra("WaiterName", Waitername);
