@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -81,8 +80,6 @@ public class FragmentMessageCancel extends Fragment {
     Socket socket;
     Activity activity;
 
-    Typeface font;
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,10 +99,6 @@ public class FragmentMessageCancel extends Fragment {
         }
         socket.on("order_remove", onMessageCancel);
         socket.connect();
-
-        font = Typeface.createFromAsset(
-               getActivity().getAssets(),
-                "fonts/zawgyi.ttf");
     }
 
     private Emitter.Listener onMessageCancel = new Emitter.Listener() {
@@ -236,7 +229,7 @@ public class FragmentMessageCancel extends Fragment {
             } else {
                 viewHolder.tableTxt.setText(order_complete.getRoom_name());
             }
-            viewHolder.listView.getLayoutParams().height = 44 * order_complete.getOrder_item().size();
+            viewHolder.listView.getLayoutParams().height = 66 * order_complete.getOrder_item().size();
             orderItemAdapter = new OrderItemAdapter(getActivity(), order_complete.getOrder_item());
             viewHolder.listView.setAdapter(orderItemAdapter);
             orderItemAdapter.notifyDataSetChanged();
@@ -246,9 +239,9 @@ public class FragmentMessageCancel extends Fragment {
                     JSONArray jsonArray = new JSONArray();
                     try {
                         for (Order_Item order_item : order_complete.getOrder_item()) {
-                                JSONObject orderDetailID = new JSONObject();
-                                orderDetailID.put("detail_id", order_item.getOrder_detail_id() + "");
-                                jsonArray.put(orderDetailID);
+                            JSONObject orderDetailID = new JSONObject();
+                            orderDetailID.put("detail_id", order_item.getOrder_detail_id() + "");
+                            jsonArray.put(orderDetailID);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -264,7 +257,7 @@ public class FragmentMessageCancel extends Fragment {
                     call.enqueue(new Callback<Success>() {
                         @Override
                         public void onResponse(Call<Success> call, Response<Success> response) {
-                             mProgressDialog.dismiss();
+                            mProgressDialog.dismiss();
                             loadOrderStatusJson();
                         }
                         @Override
@@ -337,9 +330,6 @@ public class FragmentMessageCancel extends Fragment {
             TextView productNameTxt = (TextView) view.findViewById(R.id.product_txt);
             TextView orderTypeTxt = (TextView) view.findViewById(R.id.order_type_txt);
             TextView remarkTxt = (TextView) view.findViewById(R.id.remark_txt);
-
-            productNameTxt.setTypeface(font);
-
             if (order_item.getItem_name() == null) {
                 productNameTxt.setText(order_item.getSub_menu());
                 Log.i("cancel_for_item_IDD<<<<<<>>>>>>",order_item.getSub_menu()+"");
