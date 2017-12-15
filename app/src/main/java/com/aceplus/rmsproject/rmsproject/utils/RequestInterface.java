@@ -194,19 +194,19 @@ public interface RequestInterface {
 
     @FormUrlEncoded
     @POST("api/v1/syncs")
-    Call<JsonResponseSyncs> getUpdateData(@Field("category") String category,
-                                          @Field("items") String items,
-                                          @Field("add_on") String extra,
-                                          @Field("members") String members,
-                                          @Field("set_menu") String sub_menu,
-                                          @Field("set_item") String sub_item,
-                                          @Field("rooms") String rooms,
-                                          @Field("tables") String tables,
-                                          @Field("booking") String booking,
-                                          @Field("config") String config,
-                                          @Field("promotions") String promotions,
-                                          @Field("promotion_items") String promotion_items,
-                                          @Field("discount") String discount,
+    Call<JsonResponseSyncs> getUpdateData(@Field("category") int category,
+                                          @Field("items") int items,
+                                          @Field("add_on") int extra,
+                                          @Field("members") int members,
+                                          @Field("set_menu") int sub_menu,
+                                          @Field("set_item") int sub_item,
+                                          @Field("rooms") int rooms,
+                                          @Field("tables") int tables,
+                                          @Field("booking") int booking,
+                                          @Field("config") int config,
+                                          @Field("promotions") int promotions,
+                                          @Field("promotion_items") int promotion_items,
+                                          @Field("discount") int discount,
                                           @Field("site_activation_key") String activate_key);
 
     @FormUrlEncoded

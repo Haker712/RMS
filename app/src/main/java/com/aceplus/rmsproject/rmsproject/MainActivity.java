@@ -54,7 +54,6 @@ import com.aceplus.rmsproject.rmsproject.object.Login;
 import com.aceplus.rmsproject.rmsproject.object.LoginOrderIdRequest;
 import com.aceplus.rmsproject.rmsproject.utils.ActivationRequestInterface;
 import com.aceplus.rmsproject.rmsproject.utils.Database;
-import com.aceplus.rmsproject.rmsproject.utils.JsonForShowTableId;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
 import com.aceplus.rmsproject.rmsproject.utils.RetrofitService;
 import com.google.gson.Gson;
@@ -64,22 +63,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends Activity {
     private EditText usernameEdit;
@@ -666,12 +659,12 @@ public class MainActivity extends Activity {
             });
         }
 
-        private ArrayList<String> getVersionList () {
+    private ArrayList<Integer> getVersionList () {
             database.beginTransaction();
-            ArrayList<String> versionList = new ArrayList<>();
+            ArrayList<Integer> versionList = new ArrayList<>();
             Cursor cur = database.rawQuery("SELECT * FROM tableVersion", null);
             while (cur.moveToNext()) {
-                versionList.add(cur.getString(cur.getColumnIndex("version")));
+                versionList.add(cur.getInt(cur.getColumnIndex("version")));
             }
             cur.close();
             database.setTransactionSuccessful();
@@ -679,61 +672,61 @@ public class MainActivity extends Activity {
             return versionList;
         }
 
-    private void loadSyncsTable(ArrayList<String> version) {  // syncs down the tables from back end !!
+    private void loadSyncsTable(ArrayList<Integer> version) {  // syncs down the tables from back end !!
         callDialog("Update Data....");
         final RequestInterface request = RetrofitService.createRetrofitService(RequestInterface.class, MainActivity.this);
-        String vCategory = null;
-        String vItem = null;
-        String vAddon = null;
-        String vMember = null;
-        String vSetMenu = null;
-        String vSetItem = null;
-        String vRoom = null;
-        String vTable = null;
-        String vBooking = null;
-        String vConfig = null;
-        String vPromotion = null;
-        String vPromotionItem = null;
-        String vDiscount = null;
+        int vCategory = 0;
+        int vItem = 0;
+        int vAddon = 0;
+        int vMember = 0;
+        int vSetMenu = 0;
+        int vSetItem = 0;
+        int vRoom = 0;
+        int vTable = 0;
+        int vBooking = 0;
+        int vConfig = 0;
+        int vPromotion = 0;
+        int vPromotionItem = 0;
+        int vDiscount = 0;
         for (int i = 0; i < version.size(); i++) {
             vCategory = version.get(0);
-            Log.d("vCategory", vCategory);
+           // Log.d("vCategory", vCategory);
 
             vItem = version.get(1);
-            Log.d("vItem", vItem);
+           // Log.d("vItem", vItem);
 
             vAddon = version.get(2);
-            Log.d("vAddon", vAddon);
+           // Log.d("vAddon", vAddon);
 
             vMember = version.get(3);
-            Log.d("vMember", vMember);
+           // Log.d("vMember", vMember);
 
             vSetMenu = version.get(4);
-            Log.d("vSetMenu", vSetMenu);
+           // Log.d("vSetMenu", vSetMenu);
 
             vSetItem = version.get(5);
-            Log.d("vSetItem", vSetItem);
+           // Log.d("vSetItem", vSetItem);
 
             vRoom = version.get(6);
-            Log.d("vRoom", vRoom);
+           // Log.d("vRoom", vRoom);
 
             vTable = version.get(7);
-            Log.d("vTable", vTable);
+           // Log.d("vTable", vTable);
 
             vBooking = version.get(8);
-            Log.d("vBooking", vBooking);
+           // Log.d("vBooking", vBooking);
 
             vConfig = version.get(9);
-            Log.d("vConfig", vConfig);
+          //  Log.d("vConfig", vConfig);
 
             vPromotion = version.get(10);
-            Log.d("vPromotion", vPromotion);
+           // Log.d("vPromotion", vPromotion);
 
             vPromotionItem = version.get(11);
-            Log.d("vPromotionItem", vPromotionItem);
+           // Log.d("vPromotionItem", vPromotionItem);
 
             vDiscount = version.get(12);
-            Log.d("vDiscount", vDiscount);
+          //  Log.d("vDiscount", vDiscount);
         }
         Call<JsonResponseSyncs> call = request.getUpdateData(vCategory, vItem, vAddon, vMember, vSetMenu, vSetItem, vRoom, vTable, vBooking, vConfig, vPromotion, vPromotionItem, vDiscount, getActivateKeyFromDB());
         call.enqueue(new Callback<JsonResponseSyncs>() {
@@ -769,8 +762,9 @@ public class MainActivity extends Activity {
 
                         if (jsonResponse.getCategory() != null) {
                             download_categoryArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getCategory()));
-                            deleteTableVersion("category");
+//                            deleteTableVersion("category");
                             if (download_setMenuArrayList.size() > 0) {
+                                deleteTableVersion("category");
                                 ContentValues setMenuCV = new ContentValues();
                                 setMenuCV.put("id", "set_menu");
                                 setMenuCV.put("name", "SetMenu");

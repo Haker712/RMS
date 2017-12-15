@@ -236,7 +236,7 @@ public class FragmentMessageCancel extends Fragment {
             } else {
                 viewHolder.tableTxt.setText(order_complete.getRoom_name());
             }
-           // viewHolder.listView.getLayoutParams().height = 66 * order_complete.getOrder_item().size();
+            viewHolder.listView.getLayoutParams().height = 44 * order_complete.getOrder_item().size();
             orderItemAdapter = new OrderItemAdapter(getActivity(), order_complete.getOrder_item());
             viewHolder.listView.setAdapter(orderItemAdapter);
             orderItemAdapter.notifyDataSetChanged();
