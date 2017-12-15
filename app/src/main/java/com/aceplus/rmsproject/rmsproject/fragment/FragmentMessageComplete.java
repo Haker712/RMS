@@ -311,7 +311,7 @@ public class FragmentMessageComplete extends Fragment {
                     try {
                         jsonObject.put("waiter_id", WAITER_ID);
                         for (Order_Item order_item : completeArrayList.get(position).getOrder_item()) {
-                            if (order_item.isCheck() == true) {
+                           // if (order_item.isCheck() == true) {
                                 JSONObject orderDetailID = new JSONObject();
                                 orderDetailID.put("detail_id", order_item.getId() + "");
                                 if (order_item.getSub_menu() != null) {
@@ -327,7 +327,7 @@ public class FragmentMessageComplete extends Fragment {
                                 Log.i("Set_menu_id_.........", order_item.getSet_item_id() + "");
                                 jsonArray.put(orderDetailID);
                                 count++;
-                            }
+                         //   }
                         }
                         jsonObject.put("order_detail_id", jsonArray);
                     } catch (JSONException e) {
@@ -341,6 +341,7 @@ public class FragmentMessageComplete extends Fragment {
                         mProgressDialog.setMessage("Uploading take data....");
                         mProgressDialog.show();
                         RequestInterface request = retrofit.create(RequestInterface.class);
+                        Log.i("PostTake",jsonObject+"");
                         Call<Success> call = request.postTake(jsonObject + "");
                         call.enqueue(new Callback<Success>() {
                             @Override
@@ -510,6 +511,7 @@ public class FragmentMessageComplete extends Fragment {
                             item.setOrder_type(orderDetail.getOrder_type());
                             item.setId(orderDetail.getId());
                             item.setSet_item_id(orderDetail.getSet_item_id());
+                            Log.i("ItemId",orderDetail.getSet_item_id());
                             if (item.getStatus().equals("3") || item.getStatus() == "3") {
                                 order_itemArrayList.add(item);
                             }

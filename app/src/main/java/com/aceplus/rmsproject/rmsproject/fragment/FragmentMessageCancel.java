@@ -181,8 +181,8 @@ public class FragmentMessageCancel extends Fragment {
             for (Order_Item item : ocomplete.getOrder_item()) {
                 Order_Item oitem = new Order_Item();
                 String itemOrderID = item.getOrder_id();
-                String status = item.getStatus();
-                if (itemOrderID.equals(order_id) && status.equals("6")) {
+                int status = item.getStatus();
+                if (itemOrderID.equals(order_id) && status==6) {
                     oitem.setOrder_id(item.getOrder_id());
                     oitem.setOrder_detail_id(item.getOrder_detail_id());
                     oitem.setItem_name(item.getItem_name());
