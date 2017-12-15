@@ -311,7 +311,7 @@ public class FragmentMessageComplete extends Fragment {
                     try {
                         jsonObject.put("waiter_id", WAITER_ID);
                         for (Order_Item order_item : completeArrayList.get(position).getOrder_item()) {
-                           // if (order_item.isCheck() == true) {
+                            if (order_item.isCheck() == true) {
                                 JSONObject orderDetailID = new JSONObject();
                                 orderDetailID.put("detail_id", order_item.getId() + "");
                                 if (order_item.getSub_menu() != null) {
@@ -327,7 +327,7 @@ public class FragmentMessageComplete extends Fragment {
                                 Log.i("Set_menu_id_.........", order_item.getSet_item_id() + "");
                                 jsonArray.put(orderDetailID);
                                 count++;
-                         //   }
+                            }
                         }
                         jsonObject.put("order_detail_id", jsonArray);
                     } catch (JSONException e) {
