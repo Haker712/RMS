@@ -1048,6 +1048,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                         double exa = Double.parseDouble(detailProductArrayList.get(position).getExtraPrice().trim().replaceAll(",", ""));
                                         Log.e("IExtra", exa + "");
                                         int quantity = Integer.parseInt(detailProductArrayList.get(position).getQuantity().trim().replaceAll(",", ""));
+                                        Log.i("Quantity",quantity+"");
                                         double dis = Double.parseDouble(detailProductArrayList.get(position).getDiscount().trim().replaceAll(",", ""));
                                         Log.e("IDiscount", dis + "");
                                         double totalAmt = Double.parseDouble(totalAmtTxt.getText().toString().trim().replaceAll(",", ""));
@@ -1056,7 +1057,10 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                         //double memberAmt = Double.parseDouble(totalMemberDisTxt.getText().toString().trim().replaceAll(",", ""));
                                         final double totalAmtValue = totalAmt - amt;
                                         final double totalExaValue = Double.parseDouble(totalExtra) - (exa * quantity);
-                                        final double totalDisValue = Double.parseDouble(totalDiscount) - (dis * quantity);
+                                        totalDiscount=String.valueOf(Double.parseDouble(totalDiscount)-(dis*quantity));
+                                        Log.i("TotalDis",totalDiscount);
+                                        //final double totalDisValue = Double.parseDouble(totalDiscount) - (dis * quantity);
+                                        //Log.i("TotalDisValue",totalDisValue+"");
                                         final double taxValue = totalAmtValue * taxAmt / 100;
                                         final double serviceValue = totalAmtValue * serviceAmt / 100;
                                         final double totalNetValue = (totalAmtValue + taxValue + serviceValue) /*- (totalDisValue *//*+ memberAmt*//*)*/;
@@ -1068,6 +1072,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                             jsonObject.put("tax_amount", taxValue);
                                             jsonObject.put("total_amount", totalAmtValue);
                                             jsonObject.put("net_amount", totalNetValue);
+                                            jsonObject.put("discount",totalDiscount);
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
@@ -1103,7 +1108,6 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                                             @Override
                                                             public void run() {
                                                                 socket.emit("order_cancel", vouncherID);
-                                                                //  Toast.makeText(InvoiceDetailActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
                                                             }
                                                         });
 

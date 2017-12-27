@@ -296,7 +296,7 @@ public class FragmentMessageComplete extends Fragment {
 
             }
 
-          //  viewHolder.listView.getLayoutParams().height = 66 * completeArrayList.get(position).getOrder_item().size();//52
+              viewHolder.listView.getLayoutParams().height = 66 * completeArrayList.get(position).getOrder_item().size();//52
             orderItemAdapter = new OrderItemAdapter(getActivity(), completeArrayList.get(position).getOrder_item());
             viewHolder.listView.setAdapter(orderItemAdapter);
             orderItemAdapter.notifyDataSetChanged();
@@ -497,6 +497,8 @@ public class FragmentMessageComplete extends Fragment {
                         complete.setRoom_name(download_orderStatus.getRoom_name());
                         complete.setTable_no(download_orderStatus.getTable_name());
                         ArrayList<Order_Item> order_itemArrayList = new ArrayList<Order_Item>();
+
+
                         for (Download_OrderStatusDetail orderDetail : download_orderStatus.getProduct_list()) {
                             Order_Item item = new Order_Item();
                             String canAddForComplete = null;
@@ -511,7 +513,7 @@ public class FragmentMessageComplete extends Fragment {
                             item.setOrder_type(orderDetail.getOrder_type());
                             item.setId(orderDetail.getId());
                             item.setSet_item_id(orderDetail.getSet_item_id());
-                            Log.i("ItemId",orderDetail.getSet_item_id());
+
                             if (item.getStatus().equals("3") || item.getStatus() == "3") {
                                 order_itemArrayList.add(item);
                             }
@@ -528,6 +530,7 @@ public class FragmentMessageComplete extends Fragment {
                     setDataInRecycler();
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Log.i("Exceptionex",e.getMessage()+"");
                     mProgressDialog.dismiss();
                     callUploadDialog("Kitchen complete is null.");
                 }

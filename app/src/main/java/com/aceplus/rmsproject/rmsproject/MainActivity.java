@@ -639,7 +639,7 @@ public class MainActivity extends Activity {
                         database.setTransactionSuccessful();
                         database.endTransaction();
                     } catch(Exception e){
-                        Log.i("EXCEPTION insert : ", download_tableVersionArrayList.size() + "");
+                       // Log.i("EXCEPTION insert : ", download_tableVersionArrayList.size() + "");
                         e.printStackTrace();
                         if (response.message() != null && !response.message().equals("")) {
                             callUploadDialog(response.message());

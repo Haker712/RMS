@@ -230,6 +230,7 @@ public class CategoryActivity extends ActionBarActivity {
 
     Typeface font;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -260,10 +261,10 @@ public class CategoryActivity extends ActionBarActivity {
         }
 
         socket.on("order_remove", onNewMessage);
-        socket.on("invoice_payment", invoicePaidSocket);
+        // socket.on("invoice_payment", invoicePaidSocket);
         socket.connect();
 
-       font = Typeface.createFromAsset(
+        font = Typeface.createFromAsset(
                 activity.getAssets(),
                 "fonts/zawgyi.ttf");
 
@@ -272,31 +273,30 @@ public class CategoryActivity extends ActionBarActivity {
     /**
      * If server is paid current invoice, it will be interrupt and close.
      */
-    private Emitter.Listener invoicePaidSocket = new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                    JSONObject data = (JSONObject) args[0];
-                    String InvoiceId = "";
-                    try {
-                        InvoiceId = data.getString("invoice_id");
-                        Toast.makeText(activity, InvoiceId + "", Toast.LENGTH_SHORT).show();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    if (InvoiceId.equalsIgnoreCase(VOUNCHER_ID)) {
-                        saveBtn.setEnabled(false);
-                        saveBtn.setClickable(false);
-                        callInfoDialog("This invoice is already paid", activity);
-                    }
-                }
-            });
-        }
-    };
-
+//    private Emitter.Listener invoicePaidSocket = new Emitter.Listener() {
+//        @Override
+//        public void call(final Object... args) {
+//            activity.runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//
+//                    JSONObject data = (JSONObject) args[0];
+//                    String InvoiceId = "";
+//                    try {
+//                        InvoiceId = data.getString("invoice_id");
+//                        Toast.makeText(activity, InvoiceId + "", Toast.LENGTH_SHORT).show();
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                    if (InvoiceId.equalsIgnoreCase(VOUNCHER_ID)) {
+//                        saveBtn.setEnabled(false);
+//                        saveBtn.setClickable(false);
+//                        callInfoDialog("This invoice is already paid", activity);
+//                    }
+//                }
+//            });
+//        }
+//    };
     public void callInfoDialog(String message, final Context context) {
         final android.support.v7.app.AlertDialog builder = new android.support.v7.app.AlertDialog.Builder(context, R.style.InvitationDialog)
                 .setPositiveButton(R.string.invitation_ok, null)
@@ -957,8 +957,8 @@ public class CategoryActivity extends ActionBarActivity {
 //        String orderID = tablet_id+ "-" + orderFormat.format(invoicecount + 1);
 //        int totalWord = 11;
         int a = invoicecount + 1;
-        String pre_orderID = ("0000000000" + invoicecount).substring(String.valueOf(invoicecount).length());
-       // String pre_orderID = String.format("%0" + (totalWord - String.valueOf(invoicecount).length()) + "d", a);
+        String pre_orderID = ("0000000000" + a).substring(String.valueOf(a).length());
+        // String pre_orderID = String.format("%0" + (totalWord - String.valueOf(invoicecount).length()) + "d", a);
 
         try {
             database.beginTransaction();
@@ -1156,13 +1156,39 @@ public class CategoryActivity extends ActionBarActivity {
                             @Override
                             public void run() {
                                 socket.emit("order_edit", "blah blah");
-                                // Toast.makeText(CategoryActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
                             }
                         });
 
                         mProgressDialog.dismiss();
                         saveUpdateOrderData();
                         startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
+                        finish();
+
+                    } else if (message.equals("Paid")) {
+
+                        final android.support.v7.app.AlertDialog builder = new android.support.v7.app.AlertDialog.Builder(
+                                CategoryActivity.this, R.style.InvitationDialog)
+                                .setPositiveButton(R.string.invitation_ok, null)
+                                .create();
+                        builder.setTitle(R.string.alert);
+                        builder.setMessage("This invoice is already paid");
+                        builder.setOnShowListener(new DialogInterface.OnShowListener() {
+                            @Override
+                            public void onShow(DialogInterface dialog) {
+                                final Button btnAccept = builder.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
+                                btnAccept.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        builder.dismiss();
+
+                                        startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
+                                        finish();
+
+                                    }
+                                });
+                            }
+                        });
+                        builder.show();
 
                     }
                 } catch (Exception e) {
@@ -2002,6 +2028,7 @@ public class CategoryActivity extends ActionBarActivity {
 
                                                 String selected_item_id = cursor.getString(cursor.getColumnIndex("id"));
                                                 double selected_item_price = cursor.getDouble(cursor.getColumnIndex("price"));
+                                                Log.i("Select_Item_Price", selected_item_price + "");
                                                 categoryItem.setId(selected_item_id);
                                                 String selectd_itemname = cursor.getString(cursor.getColumnIndex("name"));
                                                 viewHolder.itemNameTxt.setText(selected_ContimentName + " " + selectd_itemname);
@@ -2009,6 +2036,21 @@ public class CategoryActivity extends ActionBarActivity {
                                                 viewHolder.amountTxt.setText(selected_item_price + "");
                                                 TotalitemArraylist.get(position).setItemName(selected_ContimentName + " " + selectd_itemname);
                                                 TotalitemArraylist.get(position).setPrice(selected_item_price);
+                                                TotalitemArraylist.get(position).setTotalAmount(selected_item_price);
+                                                double tamt = 0.0;
+                                                for (Category_Item category_item : TotalitemArraylist) {
+                                                    tamt += category_item.getTotalAmount();
+                                                }
+
+                                                tPriceTxt.setText(commaSepFormat.format(tamt));
+                                                double taxValue=tamt*(taxAmt/100);
+                                                taxAmtTxt.setText(commaSepFormat.format(taxValue));
+                                                taxPercentTxt.setText(taxAmt + "%");
+                                                double serviceValue=tamt*(serviceAmt/100);
+                                                serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
+                                                servicePercentTxt.setText(serviceAmt + "%");
+                                                double netAmount=(tamt+taxValue+serviceValue);
+                                                tnetPriceTxt.setText(commaSepFormat.format(netAmount));
 
                                             }
 
