@@ -1,9 +1,11 @@
 package com.aceplus.rmsproject.rmsproject.object;
 
+import java.io.Serializable;
+
 /**
  * Created by kyawminlwin on 8/4/16.
  */
-public class Invoice {
+public class Invoice implements Serializable{
     String vouncherID;
     String user_id;
     String take_id;

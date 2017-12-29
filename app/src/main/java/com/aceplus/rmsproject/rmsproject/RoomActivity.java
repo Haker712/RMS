@@ -1184,4 +1184,13 @@ public class RoomActivity extends AppCompatActivity {
         finish();
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Toast.makeText(activity, "Destroyed", Toast.LENGTH_SHORT).show();
+        socket.disconnect();
+        socket.off("roomChange", onNewMessage);
+        socket.off("invoice_update", onNewMessage);
+    }
 }

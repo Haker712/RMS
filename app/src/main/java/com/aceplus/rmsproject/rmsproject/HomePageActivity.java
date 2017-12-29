@@ -26,6 +26,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aceplus.rmsproject.rmsproject.object.ActivateKey;
 import com.aceplus.rmsproject.rmsproject.object.BRoom;
@@ -181,6 +182,7 @@ public class HomePageActivity extends ActionBarActivity {
                             @Override
                             public void run() {
                                 loadOrderStatusJson();
+                                //Toast.makeText(HomePageActivity.this, "Here", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }

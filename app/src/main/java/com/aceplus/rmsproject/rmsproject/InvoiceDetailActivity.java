@@ -33,14 +33,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aceplus.rmsproject.rmsproject.object.Category;
+import com.aceplus.rmsproject.rmsproject.object.Download_ForInvoiceDetail;
+import com.aceplus.rmsproject.rmsproject.object.Download_ForInvoiceExtraDetail;
+import com.aceplus.rmsproject.rmsproject.object.Download_ForInvoiceSetItemDetail;
+import com.aceplus.rmsproject.rmsproject.object.Download_ForInvoiveItemDetail;
+import com.aceplus.rmsproject.rmsproject.object.Invoice;
 import com.aceplus.rmsproject.rmsproject.object.InvoiceDetailProduct;
 import com.aceplus.rmsproject.rmsproject.object.InvoiceDetailProductSetItem;
+import com.aceplus.rmsproject.rmsproject.object.JsonResponseforInvoiceDetail;
 import com.aceplus.rmsproject.rmsproject.object.JsonTest;
 import com.aceplus.rmsproject.rmsproject.object.SetMenu_Item_for_dialog;
 import com.aceplus.rmsproject.rmsproject.object.Success;
 import com.aceplus.rmsproject.rmsproject.utils.Database;
 import com.aceplus.rmsproject.rmsproject.utils.Download_forShow_roomID;
 import com.aceplus.rmsproject.rmsproject.utils.Download_forShow_tableID;
+import com.aceplus.rmsproject.rmsproject.utils.GetDevID;
 import com.aceplus.rmsproject.rmsproject.utils.JsonForShowRoomId;
 import com.aceplus.rmsproject.rmsproject.utils.JsonForShowTableId;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
@@ -146,6 +153,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     private ArrayList<Download_forShow_tableID> download_orderTableArrayList = new ArrayList<>();
     private ArrayList<Download_forShow_roomID> download_orderRoomArrayList = new ArrayList<>();
     Boolean paidavailable = true;
+    String con_name;
 
     /***
      * PhoneLinAung 19.9.17 Start
@@ -203,7 +211,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         getArrayIntent();
         setDetailDataFromMap();
         getConfigData();
-        setAdapter();
+        //setAdapter();
         catchEvents();
 
         String mainurl = MainActivity.URL;
@@ -237,8 +245,10 @@ public class InvoiceDetailActivity extends ActionBarActivity {
 
         Intent intent = getIntent();
         Bundle args = intent.getBundleExtra("BUNDLE");
-        invoiceDetailProductArrayList = (ArrayList<InvoiceDetailProduct>) args.getSerializable("ARRAYLIST");
+        Invoice invoice = (Invoice) args.getSerializable("invoice");
+        //invoiceDetailProductArrayList = (ArrayList<InvoiceDetailProduct>) args.getSerializable("ARRAYLIST");
         detailDataMap = (Map<String, String>) args.getSerializable("Map");
+        getInvDetailProduct(invoice);
     }
 
     private void setDetailDataFromMap() {
@@ -499,10 +509,10 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                           CategoryActivity.TAKE_AWAY = "add_invoice";
                                           CategoryActivity.ADD_INVOICE = "EDITING_INVOICE";
                                           Log.i("CategoryActivity.VOUNCHER_ID", CategoryActivity.VOUNCHER_ID + "");
-                                          if (!RommCharge.equals("")){
-                                              CategoryActivity.check_check="room";
-                                          }else {
-                                              CategoryActivity.check_check="null";
+                                          if (!RommCharge.equals("")) {
+                                              CategoryActivity.check_check = "room";
+                                          } else {
+                                              CategoryActivity.check_check = "null";
                                           }
                                           startActivity(new Intent(InvoiceDetailActivity.this, CategoryActivity.class));
                                           finish();
@@ -1048,7 +1058,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                         double exa = Double.parseDouble(detailProductArrayList.get(position).getExtraPrice().trim().replaceAll(",", ""));
                                         Log.e("IExtra", exa + "");
                                         int quantity = Integer.parseInt(detailProductArrayList.get(position).getQuantity().trim().replaceAll(",", ""));
-                                        Log.i("Quantity",quantity+"");
+                                        Log.i("Quantity", quantity + "");
                                         double dis = Double.parseDouble(detailProductArrayList.get(position).getDiscount().trim().replaceAll(",", ""));
                                         Log.e("IDiscount", dis + "");
                                         double totalAmt = Double.parseDouble(totalAmtTxt.getText().toString().trim().replaceAll(",", ""));
@@ -1057,13 +1067,18 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                         //double memberAmt = Double.parseDouble(totalMemberDisTxt.getText().toString().trim().replaceAll(",", ""));
                                         final double totalAmtValue = totalAmt - amt;
                                         final double totalExaValue = Double.parseDouble(totalExtra) - (exa * quantity);
-                                        totalDiscount=String.valueOf(Double.parseDouble(totalDiscount)-(dis*quantity));
-                                        Log.i("TotalDis",totalDiscount);
+                                        totalDiscount = String.valueOf(Double.parseDouble(totalDiscount) - (dis * quantity));
+                                        Log.i("TotalDis", totalDiscount);
                                         //final double totalDisValue = Double.parseDouble(totalDiscount) - (dis * quantity);
                                         //Log.i("TotalDisValue",totalDisValue+"");
                                         final double taxValue = totalAmtValue * taxAmt / 100;
                                         final double serviceValue = totalAmtValue * serviceAmt / 100;
-                                        final double totalNetValue = (totalAmtValue + taxValue + serviceValue) /*- (totalDisValue *//*+ memberAmt*//*)*/;
+                                        final double totalNetValue;
+                                        if (!RommCharge.equals("")) {
+                                            totalNetValue = (totalAmtValue + taxValue + serviceValue + roomchargeAmt);
+                                        } else {
+                                            totalNetValue = (totalAmtValue + taxValue + serviceValue);
+                                        }
                                         final JSONObject jsonObject = new JSONObject();
                                         try {
                                             jsonObject.put("order_id", vouncherID);
@@ -1072,7 +1087,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                             jsonObject.put("tax_amount", taxValue);
                                             jsonObject.put("total_amount", totalAmtValue);
                                             jsonObject.put("net_amount", totalNetValue);
-                                            jsonObject.put("discount",totalDiscount);
+                                            jsonObject.put("discount", totalDiscount);
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
@@ -1170,6 +1185,176 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         }
     }
 
+    //for InvoiceDetail data and pass to invoicedetail.activity!
+    @SuppressLint("LongLogTag")
+    private ArrayList<InvoiceDetailProduct> getInvDetailProduct(final Invoice invoice) {
+        String vouncherID = invoice.getVouncherID();
+        Log.i("voucherID>>>>hak>>>", vouncherID);
+        RequestInterface requestInterface = retrofit.create(RequestInterface.class);
+        Call<JsonResponseforInvoiceDetail> call = requestInterface.getforInvoiceDetail(GetDevID.getActivateKeyFromDB(this), vouncherID);
+        call.enqueue(new Callback<JsonResponseforInvoiceDetail>() {
+            @SuppressLint("LongLogTag")
+            @Override
+            public void onResponse(Call<JsonResponseforInvoiceDetail> call, Response<JsonResponseforInvoiceDetail> response) {
+
+                invoiceDetailProductArrayList = new ArrayList<>();
+                JsonResponseforInvoiceDetail jsonResponseforInvoiceDetail = response.body();
+                ArrayList<Download_ForInvoiceDetail> Download_ForInvoiveDetailArrayList = jsonResponseforInvoiceDetail.getDownload_forInvoiceDetailArrayList();
+                for (Download_ForInvoiceDetail download_forInvoiceDetail : Download_ForInvoiveDetailArrayList) {
+                    detailDataMap.put("userId", download_forInvoiceDetail.getUserId());
+                    detailDataMap.put("userName",download_forInvoiceDetail.getUsername());
+                    //InvoiceDetailActivity.userID = download_forInvoiceDetail.getUserId();
+                    ArrayList<Download_ForInvoiveItemDetail> Download_ForInoviceItemDetailArrayList = download_forInvoiceDetail.getForInvoiveItemDetail();
+                    for (Download_ForInvoiveItemDetail download_forInvoiveItemDetail : Download_ForInoviceItemDetailArrayList) {
+                        InvoiceDetailProduct invDetail = new InvoiceDetailProduct();
+                        invDetail.setId(download_forInvoiveItemDetail.getOrderDetailId());
+                        final String Name;
+                        if (Integer.parseInt(download_forInvoiveItemDetail.getSetmenuId()) == 0) {
+                            String Itemid = download_forInvoiveItemDetail.getItemId();
+
+                            Cursor cursor = database.rawQuery("SELECT * FROM item where id='" + Itemid + "' and has_contiment =" + 1, null);
+
+                            if (cursor.getCount() > 0) {
+
+                                while (cursor.moveToNext()) {
+
+                                    int con_id = cursor.getInt(cursor.getColumnIndex("contiment_id"));
+
+                                    Cursor cursor1 = database.rawQuery("SELECT * FROM contiment where id=" + con_id, null);
+
+                                    while (cursor1.moveToNext()) {
+
+                                        con_name = cursor1.getString(cursor1.getColumnIndex("name"));
+
+                                    }
+
+                                }
+                                String item_name = getItemName(Itemid);
+                                Name = con_name + " " + item_name;
+
+                            } else {
+
+                                Name = getItemName(Itemid);
+
+                            }
+
+                        } else {
+                            String SetMenuid = download_forInvoiveItemDetail.getSetmenuId();
+                            Name = getSetMenuName(SetMenuid);
+                        }
+                        invDetail.setItemName(Name);
+
+                        ArrayList<Download_ForInvoiceSetItemDetail> download_forInvoiceSetItemDetailArrayList = download_forInvoiveItemDetail.getOrderSetMenus();
+                        if (download_forInvoiceSetItemDetailArrayList.size() == 0) {
+                            invDetail.setInvoiceDetailProductSetItemArrayList(null);
+                        } else {
+                            ArrayList<InvoiceDetailProductSetItem> invoiceDetailProductSetItemArrayList = new ArrayList<InvoiceDetailProductSetItem>();
+
+                            for (Download_ForInvoiceSetItemDetail download_forInvoiceSetItemDetail : download_forInvoiceSetItemDetailArrayList) {
+                                InvoiceDetailProductSetItem invoiceDetailProductSetItem = new InvoiceDetailProductSetItem();
+                                invoiceDetailProductSetItem.setItemId(download_forInvoiceSetItemDetail.getItemId());
+                                invoiceDetailProductSetItem.setSetMenuId(download_forInvoiceSetItemDetail.getSetmenuId());
+                                invoiceDetailProductSetItem.setStatusId(download_forInvoiceSetItemDetail.getStatusId());
+                                invoiceDetailProductSetItemArrayList.add(invoiceDetailProductSetItem);
+                            }
+
+                            invDetail.setInvoiceDetailProductSetItemArrayList(invoiceDetailProductSetItemArrayList);
+
+                        }
+
+
+                        invDetail.setPrice(String.valueOf(commaSepFormat.format(download_forInvoiveItemDetail.getAmount())));
+                        invDetail.setQuantity(commaSepFormat.format(download_forInvoiveItemDetail.getQuantity()));
+                        invDetail.setDiscount(commaSepFormat.format(download_forInvoiveItemDetail.getDiscountAmount()));
+                        invDetail.setAmount(commaSepFormat.format(download_forInvoiveItemDetail.getAmountWithDiscount()));
+                        invDetail.setStatus(download_forInvoiveItemDetail.getStatusId());
+                        Double ExtraAmount = 0.0;
+                        int i = 0;
+                        ArrayList<Download_ForInvoiceExtraDetail> download_forInvoiceExtraDetailsArrayList = download_forInvoiveItemDetail.getOrderExtras();
+                        if (download_forInvoiceExtraDetailsArrayList.size() == 0) {
+                            ExtraAmount = Double.valueOf(0);
+                            invDetail.setExtraPrice(String.valueOf(Double.valueOf(0)));
+                        } else {
+                            for (Download_ForInvoiceExtraDetail download_forInvoiceExtraDetail : download_forInvoiceExtraDetailsArrayList) {
+                                Log.i("ExtraAmount_size>>>>>>>>>>>>", download_forInvoiceExtraDetailsArrayList.size() + "");
+                                if (download_forInvoiceExtraDetailsArrayList.size() > 1) {
+                                    Log.i("extraamount>-------", download_forInvoiceExtraDetail.getAmount() + "");
+                                    ExtraAmount += download_forInvoiceExtraDetail.getAmount();
+                                } else {
+                                    ExtraAmount = download_forInvoiceExtraDetail.getAmount();
+                                }
+                                Log.i("ExtraAmount>>>>>>>>>>>>", download_forInvoiceExtraDetail.getAmount() + "");
+                            }
+                        }
+                        invDetail.setExtraPrice(String.valueOf(ExtraAmount));
+
+                        Log.i("status>>>>hak>>>>", invDetail.getStatus().toString());
+                        Log.i("ID>>>>hak>>>>", invDetail.getId().toString());
+                        Log.i("NAME>>>>hak>>>>", invDetail.getItemName().toString());
+                        Log.i("PRICE>>>>hak>>>>", invDetail.getPrice().toString());
+                        Log.i("AMOUNT>>>>hak>>>>", invDetail.getAmount().toString());
+                        Log.i("DISCOUNT>>>>hak>>>>", invDetail.getDiscount().toString());
+                        Log.i("EXTRA>>>>hak>>>>", invDetail.getExtraPrice().toString());
+                        invoiceDetailProductArrayList.add(invDetail);
+                    }
+                }
+                Log.i("detailProductArrayList>>Response>>", String.valueOf(invoiceDetailProductArrayList.size()));
+                //InvoiceDetailActivity.vouncherID = invoice.getVouncherID();
+
+                //InvoiceDetailActivity.date = invoice.getDate();
+                String invoiceIDDD = invoice.getVouncherID();
+                String TableID = null;
+                String RoomID = null;
+                String RoomOrTable22 = null;
+                TableID = gettableIDD(invoiceIDDD);
+                RoomID = getroomIDD(invoiceIDDD);
+                if (RoomID.equals(null) || RoomID == null || RoomID.equals("")) {
+                    RoomOrTable22 = TableID;
+                } else {
+                    RoomOrTable22 = RoomID;
+                }
+                if (RoomOrTable22 != null) {
+                    //InvoiceDetailActivity.tableNo = RoomOrTable22;
+                } else {
+                    //InvoiceDetailActivity.tableNo = "TAKE AWAY";
+                }
+                //InvoiceDetailActivity.totalAmount = invoice.getTotalAmount();
+                //InvoiceDetailActivity.totalDiscount = invoice.getDiscountAmount();
+                //InvoiceDetailActivity.totalExtra = invoice.getExtraAmount();
+                Log.i("extrapriceamount", invoice.getExtraAmount() + "");
+                //InvoiceDetailActivity.netAmount = invoice.getNetAmount();
+                //   startActivity(new Intent(InvoiceActivity.this, InvoiceDetailActivity.class));
+
+
+                setAdapter();
+
+            }
+
+            @Override
+            public void onFailure(Call<JsonResponseforInvoiceDetail> call, Throwable t) {
+                Toast.makeText(InvoiceDetailActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        return invoiceDetailProductArrayList;
+    }
+
+    private String getSetMenuName(String set_id_forName) {
+        String NameStr = "";
+        Cursor cursor = database.rawQuery("SELECT * FROM setMenu WHERE id = '" + set_id_forName + "' ", null);
+        while (cursor.moveToNext()) {
+            NameStr = cursor.getString(cursor.getColumnIndex("set_menu_name"));
+        }
+        return NameStr;
+    }
+
+    private String getItemName(String item_id_forName) {
+        String NameStr = "";
+        Cursor cursor = database.rawQuery("SELECT * FROM item WHERE id = '" + item_id_forName + "' ", null);
+        while (cursor.moveToNext()) {
+            NameStr = cursor.getString(cursor.getColumnIndex("name"));
+        }
+        return NameStr;
+    }
 
     private void callUploadDialog(final String message, final Activity activity) {
 

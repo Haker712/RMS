@@ -137,8 +137,24 @@ public class InvoiceActivity extends AppCompatActivity {
             Log.e("URL ERR :", e.getMessage());
 
         }
+
+//         handler = new Handler();
+//        handler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (activity.isFinishing()) {
+//                    return;
+//                } else {
+//                    socket.on("invoice_update", onNewMessage);
+//                    socket.connect();
+//                }
+//            }
+//        });
+
         socket.on("invoice_update", onNewMessage);
         socket.connect();
+
+
 
         Interceptor interceptor = new Interceptor() {
             @Override
@@ -226,7 +242,7 @@ public class InvoiceActivity extends AppCompatActivity {
 //                    } catch (InterruptedException e) {
 //                        e.printStackTrace();
 //                    }
-                    Toast.makeText(activity, "Here", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, "LOl", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -382,182 +398,8 @@ public class InvoiceActivity extends AppCompatActivity {
         return tableNo;
     }
 
-    //for InvoiceDetail data and pass to invoicedetail.activity!
-    @SuppressLint("LongLogTag")
-    private ArrayList<InvoiceDetailProduct> getInvDetailProduct(final Invoice invoice) {
-        String vouncherID = invoice.getVouncherID();
-        Log.i("voucherID>>>>hak>>>", vouncherID);
-        RequestInterface requestInterface = retrofit.create(RequestInterface.class);
-        Call<JsonResponseforInvoiceDetail> call = requestInterface.getforInvoiceDetail(GetDevID.getActivateKeyFromDB(this), vouncherID);
-        call.enqueue(new Callback<JsonResponseforInvoiceDetail>() {
-            @SuppressLint("LongLogTag")
-            @Override
-            public void onResponse(Call<JsonResponseforInvoiceDetail> call, Response<JsonResponseforInvoiceDetail> response) {
-
-                detailProductArrayList.clear();
-                JsonResponseforInvoiceDetail jsonResponseforInvoiceDetail = response.body();
-                ArrayList<Download_ForInvoiceDetail> Download_ForInvoiveDetailArrayList = jsonResponseforInvoiceDetail.getDownload_forInvoiceDetailArrayList();
-                for (Download_ForInvoiceDetail download_forInvoiceDetail : Download_ForInvoiveDetailArrayList) {
-                    detailDataMap.put("userId", download_forInvoiceDetail.getUserId());
-                    detailDataMap.put("userName",download_forInvoiceDetail.getUsername());
-                    //InvoiceDetailActivity.userID = download_forInvoiceDetail.getUserId();
-                    ArrayList<Download_ForInvoiveItemDetail> Download_ForInoviceItemDetailArrayList = download_forInvoiceDetail.getForInvoiveItemDetail();
-                    for (Download_ForInvoiveItemDetail download_forInvoiveItemDetail : Download_ForInoviceItemDetailArrayList) {
-                        InvoiceDetailProduct invDetail = new InvoiceDetailProduct();
-                        invDetail.setId(download_forInvoiveItemDetail.getOrderDetailId());
-                        final String Name;
-                        if (Integer.parseInt(download_forInvoiveItemDetail.getSetmenuId()) == 0) {
-                            String Itemid = download_forInvoiveItemDetail.getItemId();
-
-                            Cursor cursor = database.rawQuery("SELECT * FROM item where id='" + Itemid + "' and has_contiment =" + 1, null);
-
-                            if (cursor.getCount() > 0) {
-
-                                while (cursor.moveToNext()) {
-
-                                    int con_id = cursor.getInt(cursor.getColumnIndex("contiment_id"));
-
-                                    Cursor cursor1 = database.rawQuery("SELECT * FROM contiment where id=" + con_id, null);
-
-                                    while (cursor1.moveToNext()) {
-
-                                        con_name = cursor1.getString(cursor1.getColumnIndex("name"));
-
-                                    }
-
-                                }
-                                String item_name = getItemName(Itemid);
-                                Name = con_name + " " + item_name;
-
-                            } else {
-
-                                Name = getItemName(Itemid);
-
-                            }
-
-                        } else {
-                            String SetMenuid = download_forInvoiveItemDetail.getSetmenuId();
-                            Name = getSetMenuName(SetMenuid);
-                        }
-                        invDetail.setItemName(Name);
-
-                        ArrayList<Download_ForInvoiceSetItemDetail> download_forInvoiceSetItemDetailArrayList = download_forInvoiveItemDetail.getOrderSetMenus();
-                        if (download_forInvoiceSetItemDetailArrayList.size() == 0) {
-                            invDetail.setInvoiceDetailProductSetItemArrayList(null);
-                        } else {
-                            ArrayList<InvoiceDetailProductSetItem> invoiceDetailProductSetItemArrayList = new ArrayList<InvoiceDetailProductSetItem>();
-
-                            for (Download_ForInvoiceSetItemDetail download_forInvoiceSetItemDetail : download_forInvoiceSetItemDetailArrayList) {
-                                InvoiceDetailProductSetItem invoiceDetailProductSetItem = new InvoiceDetailProductSetItem();
-                                invoiceDetailProductSetItem.setItemId(download_forInvoiceSetItemDetail.getItemId());
-                                invoiceDetailProductSetItem.setSetMenuId(download_forInvoiceSetItemDetail.getSetmenuId());
-                                invoiceDetailProductSetItem.setStatusId(download_forInvoiceSetItemDetail.getStatusId());
-                                invoiceDetailProductSetItemArrayList.add(invoiceDetailProductSetItem);
-                            }
-
-                            invDetail.setInvoiceDetailProductSetItemArrayList(invoiceDetailProductSetItemArrayList);
-
-                        }
 
 
-                        invDetail.setPrice(String.valueOf(commaSepFormat.format(download_forInvoiveItemDetail.getAmount())));
-                        invDetail.setQuantity(commaSepFormat.format(download_forInvoiveItemDetail.getQuantity()));
-                        invDetail.setDiscount(commaSepFormat.format(download_forInvoiveItemDetail.getDiscountAmount()));
-                        invDetail.setAmount(commaSepFormat.format(download_forInvoiveItemDetail.getAmountWithDiscount()));
-                        invDetail.setStatus(download_forInvoiveItemDetail.getStatusId());
-                        Double ExtraAmount = 0.0;
-                        int i = 0;
-                        ArrayList<Download_ForInvoiceExtraDetail> download_forInvoiceExtraDetailsArrayList = download_forInvoiveItemDetail.getOrderExtras();
-                        if (download_forInvoiceExtraDetailsArrayList.size() == 0) {
-                            ExtraAmount = Double.valueOf(0);
-                            invDetail.setExtraPrice(String.valueOf(Double.valueOf(0)));
-                        } else {
-                            for (Download_ForInvoiceExtraDetail download_forInvoiceExtraDetail : download_forInvoiceExtraDetailsArrayList) {
-                                Log.i("ExtraAmount_size>>>>>>>>>>>>", download_forInvoiceExtraDetailsArrayList.size() + "");
-                                if (download_forInvoiceExtraDetailsArrayList.size() > 1) {
-                                    Log.i("extraamount>-------", download_forInvoiceExtraDetail.getAmount() + "");
-                                    ExtraAmount += download_forInvoiceExtraDetail.getAmount();
-                                } else {
-                                    ExtraAmount = download_forInvoiceExtraDetail.getAmount();
-                                }
-                                Log.i("ExtraAmount>>>>>>>>>>>>", download_forInvoiceExtraDetail.getAmount() + "");
-                            }
-                        }
-                        invDetail.setExtraPrice(String.valueOf(ExtraAmount));
-
-                        Log.i("status>>>>hak>>>>", invDetail.getStatus().toString());
-                        Log.i("ID>>>>hak>>>>", invDetail.getId().toString());
-                        Log.i("NAME>>>>hak>>>>", invDetail.getItemName().toString());
-                        Log.i("PRICE>>>>hak>>>>", invDetail.getPrice().toString());
-                        Log.i("AMOUNT>>>>hak>>>>", invDetail.getAmount().toString());
-                        Log.i("DISCOUNT>>>>hak>>>>", invDetail.getDiscount().toString());
-                        Log.i("EXTRA>>>>hak>>>>", invDetail.getExtraPrice().toString());
-                        detailProductArrayList.add(invDetail);
-                    }
-                }
-                Log.i("detailProductArrayList>>Response>>", String.valueOf(detailProductArrayList.size()));
-                //InvoiceDetailActivity.vouncherID = invoice.getVouncherID();
-
-                //InvoiceDetailActivity.date = invoice.getDate();
-                String invoiceIDDD = invoice.getVouncherID();
-                String TableID = null;
-                String RoomID = null;
-                String RoomOrTable22 = null;
-                TableID = gettableIDD(invoiceIDDD);
-                RoomID = getroomIDD(invoiceIDDD);
-                if (RoomID.equals(null) || RoomID == null || RoomID.equals("")) {
-                    RoomOrTable22 = TableID;
-                } else {
-                    RoomOrTable22 = RoomID;
-                }
-                if (RoomOrTable22 != null) {
-                    //InvoiceDetailActivity.tableNo = RoomOrTable22;
-                } else {
-                    //InvoiceDetailActivity.tableNo = "TAKE AWAY";
-                }
-                //InvoiceDetailActivity.totalAmount = invoice.getTotalAmount();
-                //InvoiceDetailActivity.totalDiscount = invoice.getDiscountAmount();
-                //InvoiceDetailActivity.totalExtra = invoice.getExtraAmount();
-                Log.i("extrapriceamount", invoice.getExtraAmount() + "");
-                //InvoiceDetailActivity.netAmount = invoice.getNetAmount();
-                //   startActivity(new Intent(InvoiceActivity.this, InvoiceDetailActivity.class));
-
-                Intent intent = new Intent(InvoiceActivity.this, InvoiceDetailActivity.class);
-                Bundle args = new Bundle();
-                args.putSerializable("ARRAYLIST", detailProductArrayList);
-                args.putSerializable("Map", detailDataMap);
-                intent.putExtra("BUNDLE", args);
-                startActivity(intent);
-                finish();
-
-
-            }
-
-            @Override
-            public void onFailure(Call<JsonResponseforInvoiceDetail> call, Throwable t) {
-                Toast.makeText(InvoiceActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-        return detailProductArrayList;
-    }
-
-    private String getSetMenuName(String set_id_forName) {
-        String NameStr = "";
-        Cursor cursor = database.rawQuery("SELECT * FROM setMenu WHERE id = '" + set_id_forName + "' ", null);
-        while (cursor.moveToNext()) {
-            NameStr = cursor.getString(cursor.getColumnIndex("set_menu_name"));
-        }
-        return NameStr;
-    }
-
-    private String getItemName(String item_id_forName) {
-        String NameStr = "";
-        Cursor cursor = database.rawQuery("SELECT * FROM item WHERE id = '" + item_id_forName + "' ", null);
-        while (cursor.moveToNext()) {
-            NameStr = cursor.getString(cursor.getColumnIndex("name"));
-        }
-        return NameStr;
-    }
 
     public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.ViewHolder> {   // view methods
         private ArrayList<Invoice> invoiceList;
@@ -614,7 +456,15 @@ public class InvoiceActivity extends AppCompatActivity {
 //                    InvoiceDetailActivity.netAmount = invoice.getNetAmount();
 
                     Log.i("detailProductArrayList>CallIntent>>>", String.valueOf(detailProductArrayList.size()));
-                    detailProductArrayList = getInvDetailProduct(invoice);
+                    Intent intent = new Intent(InvoiceActivity.this, InvoiceDetailActivity.class);
+                    Bundle args = new Bundle();
+                    //args.putSerializable("ARRAYLIST", detailProductArrayList);
+                    args.putSerializable("invoice", invoice);
+                    args.putSerializable("Map", detailDataMap);
+                    intent.putExtra("BUNDLE", args);
+                    startActivity(intent);
+                    finish();
+                    //detailProductArrayList = getInvDetailProduct(invoice);
                 }
             });
             return new ViewHolder(view);
@@ -711,5 +561,13 @@ public class InvoiceActivity extends AppCompatActivity {
         super.onBackPressed();
         startActivity(new Intent(InvoiceActivity.this, HomePageActivity.class));
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Toast.makeText(activity, "Destroyed", Toast.LENGTH_SHORT).show();
+        socket.disconnect();
+        socket.off("invoice_update", onNewMessage);
     }
 }

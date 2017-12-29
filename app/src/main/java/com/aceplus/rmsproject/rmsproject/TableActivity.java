@@ -1461,4 +1461,13 @@ public class TableActivity extends ActionBarActivity {
         super.onStop();
         ContinueThread.set(false);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Toast.makeText(activity, "Destroyed", Toast.LENGTH_SHORT).show();
+        socket.disconnect();
+        socket.off("tableChange", onNewMessage);
+        socket.off("invoice_update", onNewMessage);
+    }
 }

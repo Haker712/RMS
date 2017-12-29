@@ -343,7 +343,6 @@ public class CategoryActivity extends ActionBarActivity {
                     String InvoiceId = "";
                     try {
                         InvoiceId = data.getString("order_remove_id");
-                        Toast.makeText(activity, InvoiceId + "", Toast.LENGTH_SHORT).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -998,7 +997,17 @@ public class CategoryActivity extends ActionBarActivity {
                 });
             }
         });
-        builder.show();
+        Handler handler = new Handler();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (activity.isFinishing()) {
+                    return;
+                } else {
+                    builder.show();
+                }
+            }
+        });
     }
 
     public void getConfigData() {
@@ -1117,22 +1126,42 @@ public class CategoryActivity extends ActionBarActivity {
             orderjsonObject.put("extra_price", totalExtraAmt);
             orderjsonObject.put("discount_amount", totalDisAmt);
 
-            // if (ROOM_ID != null /*|| !ROOM_ID.equals("")*/) { //  NEED TO CHECK LATER
+             if (ROOM_ID != null /*|| !ROOM_ID.equals("")*/) {
+                 totalcharge = (serviceamont + roomchargeAmt);
+                 orderjsonObject.put("service_amount", serviceamont);
+                 Log.i("totalcharge111", totalcharge + "");
 
-            if (!check_check.equals("null")) {
-                totalcharge = (serviceamont + roomchargeAmt);
-                orderjsonObject.put("service_amount", totalcharge);
-                Log.i("totalcharge111", totalcharge + "");
-            } else {
-                totalcharge = serviceamont;
-                orderjsonObject.put("service_amount", serviceamont);
-            }
+
+             } else {
+                 totalcharge = serviceamont;
+                 orderjsonObject.put("service_amount", serviceamont);
+             } //  NEED TO CHECK LATER
+
+//            if (!check_check.equals("null")) {
+//                totalcharge = (serviceamont + roomchargeAmt);
+//                orderjsonObject.put("service_amount", serviceamont);
+//                Log.i("totalcharge111", totalcharge + "");
+//            } else {
+//                totalcharge = serviceamont;
+//                orderjsonObject.put("service_amount", serviceamont);
+//            }
 
             orderjsonObject.put("tax_amount", taxamount);
             netcharge = (tvalue + totalcharge + taxamount);
 
             orderjsonObject.put("net_price", netcharge);
             orderjsonObject.put("order_detail", orderDetailJsonArray);
+
+            if (check_check.equals("room")) {
+
+                orderjsonObject.put("room_charge", roomchargeAmt);
+
+            } else {
+
+                orderjsonObject.put("room_charge", 0);
+
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -1155,7 +1184,7 @@ public class CategoryActivity extends ActionBarActivity {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                socket.emit("order_edit", "blah blah");
+                                socket.emit("order_edit", VOUNCHER_ID);
                             }
                         });
 
@@ -1188,7 +1217,17 @@ public class CategoryActivity extends ActionBarActivity {
                                 });
                             }
                         });
-                        builder.show();
+                        Handler handler = new Handler();
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (activity.isFinishing()) {
+                                    return;
+                                } else {
+                                    builder.show();
+                                }
+                            }
+                        });
 
                     }
                 } catch (Exception e) {
@@ -1809,7 +1848,6 @@ public class CategoryActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 if (TotalitemArraylist.size() > 0) {
-                    Log.e("VoucherID", VOUNCHER_ID + "");
                     if (VOUNCHER_ID == null || VOUNCHER_ID.equals("NULL")) {
                         uploadOrderData();
                     } else {
@@ -1835,7 +1873,17 @@ public class CategoryActivity extends ActionBarActivity {
                             });
                         }
                     });
-                    builder.show();
+                    Handler handler = new Handler();
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (activity.isFinishing()) {
+                                return;
+                            } else {
+                                builder.show();
+                            }
+                        }
+                    });
                 }
                 Log.i("InvoiceID", "" + VOUNCHER_ID);
             }
@@ -1984,7 +2032,6 @@ public class CategoryActivity extends ActionBarActivity {
                                 contimentforItemSelectList.add(contimet);
                             }
 
-                            Toast.makeText(CategoryActivity.this, categoryItem.getItemName(), Toast.LENGTH_SHORT).show();
                             final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
                                     .setPositiveButton(R.string.invitation_ok, null)
                                     .setNegativeButton(R.string.invitation_cancel, null)
@@ -2005,16 +2052,24 @@ public class CategoryActivity extends ActionBarActivity {
                             builder.setView(view1);
                             builder.setTitle(categoryItem.getItemName());
                             builder.setMessage("Choose ContimentforItemSelect");
-                            builder.show();
+
+                            Handler handler = new Handler();
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (activity.isFinishing()) {
+                                        return;
+                                    } else {
+                                        builder.show();
+                                    }
+                                }
+                            });
 
                             contimentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
                                     String selected_ContimentName = contimentnameList.get(i);
-                                    Toast.makeText(CategoryActivity.this, selected_ContimentName, Toast.LENGTH_SHORT).show();
-
-                                    // itemNameTxt.setText(selected_ContimentName + categoryItem.getItemName());
 
                                     for (i = 0; i < contimentnameList.size(); i++) {
 
@@ -2181,7 +2236,17 @@ public class CategoryActivity extends ActionBarActivity {
                                     });
                                 }
                             });
-                            builder.show();
+                            Handler handler = new Handler();
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (activity.isFinishing()) {
+                                        return;
+                                    } else {
+                                        builder.show();
+                                    }
+                                }
+                            });
                         }
 
                     });
@@ -2341,7 +2406,17 @@ public class CategoryActivity extends ActionBarActivity {
                                 });
                             }
                         });
-                        builder.show();
+                        Handler handler = new Handler();
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (activity.isFinishing()) {
+                                    return;
+                                } else {
+                                    builder.show();
+                                }
+                            }
+                        });
                     }
                 });
                 viewHolder.extraBtn.setOnClickListener(new View.OnClickListener() {
@@ -2384,7 +2459,17 @@ public class CategoryActivity extends ActionBarActivity {
                                 });
                             }
                         });
-                        builder.show();
+                        Handler handler = new Handler();
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (activity.isFinishing()) {
+                                    return;
+                                } else {
+                                    builder.show();
+                                }
+                            }
+                        });
                     }
                 });
                 //ADD_INVOICE = null;
@@ -2503,7 +2588,17 @@ public class CategoryActivity extends ActionBarActivity {
                                         });
                                     }
                                 });
-                                builder.show();
+                                Handler handler = new Handler();
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (activity.isFinishing()) {
+                                            return;
+                                        } else {
+                                            builder.show();
+                                        }
+                                    }
+                                });
                             }
                         });
                     }
@@ -2651,7 +2746,17 @@ public class CategoryActivity extends ActionBarActivity {
                                     });
                                 }
                             });
-                            builder.show();
+                            Handler handler = new Handler();
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (activity.isFinishing()) {
+                                        return;
+                                    } else {
+                                        builder.show();
+                                    }
+                                }
+                            });
                         }
                     });
                     viewHolder.extraBtn.setOnClickListener(new View.OnClickListener() {
@@ -2694,7 +2799,17 @@ public class CategoryActivity extends ActionBarActivity {
                                     });
                                 }
                             });
-                            builder.show();
+                            Handler handler = new Handler();
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (activity.isFinishing()) {
+                                        return;
+                                    } else {
+                                        builder.show();
+                                    }
+                                }
+                            });
                         }
                     });
                 }
@@ -4688,7 +4803,8 @@ public class CategoryActivity extends ActionBarActivity {
             if (ROOM_ID != null /*|| !ROOM_ID.equals("")*/) {
 
                 totalcharge = (service_value + roomchargeAmt);
-                orderjsonObject.put("service_amount", totalcharge);
+                //totalcharge = service_value;
+                orderjsonObject.put("service_amount", service_value);
                 Log.i("totalcharge111", totalcharge + "");
             } else {
                 totalcharge = service_value;
@@ -4738,7 +4854,6 @@ public class CategoryActivity extends ActionBarActivity {
                             @Override
                             public void run() {
                                 socket.emit("order", "blah blah");
-                                // Toast.makeText(CategoryActivity.this, "SocketFire", Toast.LENGTH_SHORT).show();
                             }
                         });
 

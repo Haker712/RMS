@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aceplus.rmsproject.rmsproject.MainActivity;
 import com.aceplus.rmsproject.rmsproject.R;
@@ -509,5 +510,14 @@ public class FragmentMessageCancel extends Fragment {
     public void onStop() {
         super.onStop();
         //ContinueThread.set(false);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        Toast.makeText(activity, "Destroyed", Toast.LENGTH_SHORT).show();
+        socket.disconnect();
+        socket.off("order_remove", onMessageCancel);
     }
 }

@@ -296,7 +296,7 @@ public class FragmentMessageComplete extends Fragment {
 
             }
 
-              viewHolder.listView.getLayoutParams().height = 66 * completeArrayList.get(position).getOrder_item().size();//52
+            viewHolder.listView.getLayoutParams().height = 66 * completeArrayList.get(position).getOrder_item().size();//52
             orderItemAdapter = new OrderItemAdapter(getActivity(), completeArrayList.get(position).getOrder_item());
             viewHolder.listView.setAdapter(orderItemAdapter);
             orderItemAdapter.notifyDataSetChanged();
@@ -341,7 +341,7 @@ public class FragmentMessageComplete extends Fragment {
                         mProgressDialog.setMessage("Uploading take data....");
                         mProgressDialog.show();
                         RequestInterface request = retrofit.create(RequestInterface.class);
-                        Log.i("PostTake",jsonObject+"");
+                        Log.i("PostTake", jsonObject + "");
                         Call<Success> call = request.postTake(jsonObject + "");
                         call.enqueue(new Callback<Success>() {
                             @Override
@@ -530,7 +530,7 @@ public class FragmentMessageComplete extends Fragment {
                     setDataInRecycler();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Log.i("Exceptionex",e.getMessage()+"");
+                    Log.i("Exceptionex", e.getMessage() + "");
                     mProgressDialog.dismiss();
                     callUploadDialog("Kitchen complete is null.");
                 }
@@ -661,4 +661,15 @@ public class FragmentMessageComplete extends Fragment {
         super.onStop();
         /*ContinueThread.set(false);*/
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        Toast.makeText(activity, "Destroyed", Toast.LENGTH_SHORT).show();
+        socket.disconnect();
+        socket.off("cooking_done", onMessageCompete);
+        socket.off("take", onMessageCompete);
+    }
+
 }
