@@ -194,7 +194,7 @@ public class TableActivity extends ActionBarActivity {
 //                        return;
 //                    }
                     loadTableJson();
-                    mProgressDialog.dismiss();
+                    //mProgressDialog.dismiss();
                 }
             });
         }
@@ -688,7 +688,7 @@ public class TableActivity extends ActionBarActivity {
                                 try {
                                     product.put("table_id", book.getTableID());
                                     product.put("booking_id", book.getBookingID() + "");
-                                    product.put("status", "1");
+                                    product.put("status", "");
                                     product.put("old", 0);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -1058,11 +1058,11 @@ public class TableActivity extends ActionBarActivity {
                                             TextView txtTotime = (TextView) view.findViewById(R.id.bookingTotime);
                                             TextView capacity = (TextView) view.findViewById(R.id.bookingCapacity);
 
-                                            for (int a=0;a<download_bookingArrayList.size();a++){
+                                            for (int a = 0; a < download_bookingArrayList.size(); a++) {
 
-                                                for (int b=0;b<download_bookingArrayList.get(a).getBooking_table().length;b++){
+                                                for (int b = 0; b < download_bookingArrayList.get(a).getBooking_table().length; b++) {
 
-                                                    if (table.getTable_id().equals(download_bookingArrayList.get(a).getBooking_table()[b].getTable_id())){
+                                                    if (table.getTable_id().equals(download_bookingArrayList.get(a).getBooking_table()[b].getTable_id())) {
 
                                                         txtCustomername.setText(download_bookingArrayList.get(a).getCustomer_name());
                                                         txtFromtime.setText(download_bookingArrayList.get(a).getFrom_time());
@@ -1153,9 +1153,6 @@ public class TableActivity extends ActionBarActivity {
                                             });
 
 
-
-
-
                                         }
                                     });
 
@@ -1244,6 +1241,10 @@ public class TableActivity extends ActionBarActivity {
     }
 
     private void loadTableJson() {  // for table data from back end !
+
+        if (mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+        }
         callDialog("Download table data....");
         RequestInterface request = retrofit.create(RequestInterface.class);
         Call<JSONResponseTable> call = request.getTable(getActivateKeyFromDB());
@@ -1465,9 +1466,10 @@ public class TableActivity extends ActionBarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Toast.makeText(activity, "Destroyed", Toast.LENGTH_SHORT).show();
-        socket.disconnect();
-        socket.off("tableChange", onNewMessage);
-        socket.off("invoice_update", onNewMessage);
+        if (socket.connected()) {
+            //socket.disconnect();
+            socket.off("tableChange", onNewMessage);
+            socket.off("invoice_update", onNewMessage);
+        }
     }
 }

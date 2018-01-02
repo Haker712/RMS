@@ -207,6 +207,8 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         mProgressDialog = new ProgressDialog(InvoiceDetailActivity.this, ProgressDialog.THEME_HOLO_LIGHT);
         mProgressDialog.setIndeterminate(false);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.setMessage("Please Wait");
+        mProgressDialog.show();
 
         getArrayIntent();
         setDetailDataFromMap();
@@ -1327,6 +1329,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
 
 
                 setAdapter();
+                mProgressDialog.dismiss();
 
             }
 

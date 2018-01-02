@@ -481,6 +481,10 @@ public class CategoryActivity extends ActionBarActivity {
                     item.setDiscount(curDiscount.getDouble(curDiscount.getColumnIndex("amount")));
                     item.setDiscount_type(curDiscount.getString(curDiscount.getColumnIndex("type")));
                 }
+
+
+
+
                 itemArrayList.add(item);
                 Log.i("ItemArraySize", itemArrayList.size() + "");
             }
@@ -504,6 +508,8 @@ public class CategoryActivity extends ActionBarActivity {
                 item.setDiscount(curDiscount.getDouble(curDiscount.getColumnIndex("amount")));
                 item.setDiscount_type(curDiscount.getString(curDiscount.getColumnIndex("type")));
             }
+
+
             itemArrayList.add(item);
             Log.i("ItemArraySize1", itemArrayList.size() + "");
         }
@@ -2069,6 +2075,9 @@ public class CategoryActivity extends ActionBarActivity {
                                 @Override
                                 public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
+                                    String con_disamount="";
+                                    String con_distype="";
+
                                     String selected_ContimentName = contimentnameList.get(i);
 
                                     for (i = 0; i < contimentnameList.size(); i++) {
@@ -2083,6 +2092,28 @@ public class CategoryActivity extends ActionBarActivity {
 
                                                 String selected_item_id = cursor.getString(cursor.getColumnIndex("id"));
                                                 double selected_item_price = cursor.getDouble(cursor.getColumnIndex("price"));
+
+                                                Cursor cursorContimentDiscount=database.rawQuery("SELECT * FROM discount WHERE item_id=\"" + selected_item_id+"\"",null);
+
+
+                                                while (cursorContimentDiscount.moveToNext()){
+
+                                                     con_disamount=cursorContimentDiscount.getString(cursorContimentDiscount.getColumnIndex("amount"));
+                                                     con_distype  =cursorContimentDiscount.getString(cursorContimentDiscount.getColumnIndex("type"));
+//
+
+
+                                                }
+                                                if (con_distype.equalsIgnoreCase("%")){
+
+                                                    double total = selected_item_price * Double.parseDouble(con_disamount);
+                                                    TotalitemArraylist.get(position).setDiscount(total/100);
+                                                    Log.i("Price",TotalitemArraylist.get(position).getPrice()+","+Integer.parseInt(con_disamount) + "," +total);
+                                                }else {
+                                                    TotalitemArraylist.get(position).setDiscount(Double.parseDouble(con_disamount) );
+                                                }
+
+
                                                 Log.i("Select_Item_Price", selected_item_price + "");
                                                 categoryItem.setId(selected_item_id);
                                                 String selectd_itemname = cursor.getString(cursor.getColumnIndex("name"));
@@ -2107,8 +2138,10 @@ public class CategoryActivity extends ActionBarActivity {
                                                 double netAmount=(tamt+taxValue+serviceValue);
                                                 tnetPriceTxt.setText(commaSepFormat.format(netAmount));
 
-                                            }
 
+                                            }
+                                            cursor.close();
+                                            categoryItemAdapter.notifyDataSetChanged();
                                         }
 
                                     }
@@ -4853,15 +4886,23 @@ public class CategoryActivity extends ActionBarActivity {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                socket.emit("order", "blah blah");
+                                if (socket.connected()){
+                                    socket.emit("order", "blah blah");
+                                }else {
+                                    //socket.connect();
+                                    socket.emit("order","blah blah");
+                                }
+
+
                             }
                         });
-
 
                         mProgressDialog.dismiss();
                         saveOrderData(order_id);
                         startActivity(new Intent(CategoryActivity.this, HomePageActivity.class));
                         finish();
+
+
                     } else {
                         Log.e("Message", message + "");
                     }
@@ -5274,6 +5315,14 @@ public class CategoryActivity extends ActionBarActivity {
                 }
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (socket.connected() || socket.hasListeners("order_remove")){
+        socket.disconnect();
+        socket.off("order_remove", onNewMessage);}
     }
 }
 

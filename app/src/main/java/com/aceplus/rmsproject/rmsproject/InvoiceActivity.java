@@ -566,7 +566,6 @@ public class InvoiceActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Toast.makeText(activity, "Destroyed", Toast.LENGTH_SHORT).show();
         socket.disconnect();
         socket.off("invoice_update", onNewMessage);
     }

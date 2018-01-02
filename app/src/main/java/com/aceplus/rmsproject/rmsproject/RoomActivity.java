@@ -124,6 +124,10 @@ public class RoomActivity extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        mProgressDialog = new ProgressDialog(RoomActivity.this, ProgressDialog.THEME_HOLO_LIGHT);
+        mProgressDialog.setIndeterminate(false);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+
         String mainurl = MainActivity.URL;
         String supmainturl = "";
 
@@ -343,6 +347,13 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void loadRoomJson() {
+
+        if (mProgressDialog.isShowing()){
+
+            mProgressDialog.dismiss();
+
+        }
+
         callDialog("Download room data....");
         RequestInterface request = retrofit.create(RequestInterface.class);
         Call<JSONResponseRoom> call = request.getRoom(getActivateKeyFromDB());
@@ -1188,8 +1199,7 @@ public class RoomActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Toast.makeText(activity, "Destroyed", Toast.LENGTH_SHORT).show();
-        socket.disconnect();
+       // socket.disconnect();
         socket.off("roomChange", onNewMessage);
         socket.off("invoice_update", onNewMessage);
     }
