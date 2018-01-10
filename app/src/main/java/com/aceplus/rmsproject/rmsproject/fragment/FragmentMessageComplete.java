@@ -666,7 +666,6 @@ public class FragmentMessageComplete extends Fragment {
     public void onDestroy() {
         super.onDestroy();
 
-        Toast.makeText(activity, "Destroyed", Toast.LENGTH_SHORT).show();
         socket.disconnect();
         socket.off("cooking_done", onMessageCompete);
         socket.off("take", onMessageCompete);

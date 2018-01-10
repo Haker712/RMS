@@ -299,7 +299,7 @@ public class HomePageActivity extends ActionBarActivity {
                 CategoryActivity.ROOM_ID = null;
                 CategoryActivity.groupTableArrayList = null;
                 CategoryActivity.check_check = "null";
-                CategoryActivity.ADD_INVOICE=null;
+                CategoryActivity.ADD_INVOICE = null;
                 startActivity(new Intent(HomePageActivity.this, CategoryActivity.class));
                 finish();
             }
@@ -395,43 +395,43 @@ public class HomePageActivity extends ActionBarActivity {
         int vDiscount = 0;
         for (int i = 0; i < version.size(); i++) {
             vCategory = version.get(0);
-           // Log.d("vCategory", vCategory);
+            Log.d("vCategory", vCategory + "");
 
             vItem = version.get(1);
-           // Log.d("vItem", vItem);
+            Log.d("vItem", vItem + "");
 
             vAddon = version.get(2);
-           // Log.d("vAddon", vAddon);
+            Log.d("vAddon", vAddon + "");
 
             vMember = version.get(3);
-           // Log.d("vMember", vMember);
+            Log.d("vMember", vMember + "");
 
             vSetMenu = version.get(4);
-           // Log.d("vSetMenu", vSetMenu);
+            Log.d("vSetMenu", vSetMenu + "");
 
             vSetItem = version.get(5);
-           // Log.d("vSetItem", vSetItem);
+            Log.d("vSetItem", vSetItem + "");
 
             vRoom = version.get(6);
-           // Log.d("vRoom", vRoom);
+            Log.d("vRoom", vRoom + "");
 
             vTable = version.get(7);
-           // Log.d("vTable", vTable);
+            Log.d("vTable", vTable + "");
 
             vBooking = version.get(8);
-           // Log.d("vBooking", vBooking);
+            Log.d("vBooking", vBooking + "");
 
             vConfig = version.get(9);
-           // Log.d("vConfig", vConfig);
+            Log.d("vConfig", vConfig + "");
 
             vPromotion = version.get(10);
-           // Log.d("vPromotion", vPromotion);
+            Log.d("vPromotion", vPromotion + "");
 
             vPromotionItem = version.get(11);
-           // Log.d("vPromotionItem", vPromotionItem);
+            Log.d("vPromotionItem", vPromotionItem + "");
 
             vDiscount = version.get(12);
-           // Log.d("vDiscount", vDiscount);
+            Log.d("vDiscount", vDiscount + "");
         }
         Call<JsonResponseSyncs> call = request.getUpdateData(vCategory, vItem, vAddon, vMember, vSetMenu, vSetItem, vRoom, vTable, vBooking, vConfig, vPromotion, vPromotionItem, vDiscount, getActivateKeyFromDB());
         call.enqueue(new Callback<JsonResponseSyncs>() {
@@ -468,16 +468,19 @@ public class HomePageActivity extends ActionBarActivity {
                         if (jsonResponse.getCategory() != null) {
                             download_categoryArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getCategory()));
 //                            deleteTableVersion("category");
-                            if (download_setMenuArrayList.size() > 0) {
+//                            if (download_setMenuArrayList.size() > 0) {
+//                                // deleteTableVersion("category");
+//                                ContentValues setMenuCV = new ContentValues();
+//                                setMenuCV.put("id", "set_menu");
+//                                setMenuCV.put("name", "SetMenu");
+//                                setMenuCV.put("status", "1");
+//                                setMenuCV.put("parent_id", "0");
+//                                setMenuCV.put("kitchen_id", "0");
+//                                setMenuCV.put("image", "setmenu.jpg");
+//                                database.insert("category", null, setMenuCV);
+//                            }
+                            if (download_categoryArrayList.size() > 0) {
                                 deleteTableVersion("category");
-                                ContentValues setMenuCV = new ContentValues();
-                                setMenuCV.put("id", "set_menu");
-                                setMenuCV.put("name", "SetMenu");
-                                setMenuCV.put("status", "1");
-                                setMenuCV.put("parent_id", "0");
-                                setMenuCV.put("kitchen_id", "0");
-                                setMenuCV.put("image", "setmenu.jpg");
-                                database.insert("category", null, setMenuCV);
                             }
                             for (Download_Category download_category : download_categoryArrayList) {
                                 ContentValues cv = new ContentValues();
@@ -490,6 +493,24 @@ public class HomePageActivity extends ActionBarActivity {
                                 database.insert("category", null, cv);
                             }
                         }
+
+                        Cursor cursor =database.rawQuery("SELECT * FROM setMenu",null);
+
+
+                        Cursor cursor1 =database.rawQuery("SELECT * FROM category where id='set_menu'",null);
+
+
+                        if (cursor.getCount()>0 && cursor1.getCount()!=1){
+                            ContentValues setMenuCV = new ContentValues();
+                            setMenuCV.put("id", "set_menu");
+                            setMenuCV.put("name", "SetMenu");
+                            setMenuCV.put("status", "1");
+                            setMenuCV.put("parent_id", "0");
+                            setMenuCV.put("kitchen_id", "0");
+                            setMenuCV.put("image", "setmenu.jpg");
+                            database.insert("category", null, setMenuCV);
+                        }
+
                         Log.d("Demo Category", download_categoryArrayList.size() + "");
                         download_itemArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getItems()));
                         if (download_itemArrayList.size() > 0) {

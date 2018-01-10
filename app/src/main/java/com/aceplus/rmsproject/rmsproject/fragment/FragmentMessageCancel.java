@@ -515,8 +515,6 @@ public class FragmentMessageCancel extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-        Toast.makeText(activity, "Destroyed", Toast.LENGTH_SHORT).show();
         socket.disconnect();
         socket.off("order_remove", onMessageCancel);
     }

@@ -147,7 +147,7 @@ public class MainActivity extends Activity {
         database = new Database(this).getDataBase();
         sharedpreferences = getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE);
         registerIds();
-        activateEdit.setText("880661d88126fffe7360cb8b1e494db0");
+        activateEdit.setText("b4c4447b954302f373c01d320d8b5c58");
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -762,17 +762,20 @@ public class MainActivity extends Activity {
 
                         if (jsonResponse.getCategory() != null) {
                             download_categoryArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getCategory()));
-//                            deleteTableVersion("category");
-                            if (download_setMenuArrayList.size() > 0) {
+                            //deleteTableVersion("category");
+//                            if (download_setMenuArrayList.size() > 0) {
+//                               // deleteTableVersion("category");
+//                                ContentValues setMenuCV = new ContentValues();
+//                                setMenuCV.put("id", "set_menu");
+//                                setMenuCV.put("name", "SetMenu");
+//                                setMenuCV.put("status", "1");
+//                                setMenuCV.put("parent_id", "0");
+//                                setMenuCV.put("kitchen_id", "0");
+//                                setMenuCV.put("image", "setmenu.jpg");
+//                                database.insert("category", null, setMenuCV);
+//                            }
+                            if (download_categoryArrayList.size()>0){
                                 deleteTableVersion("category");
-                                ContentValues setMenuCV = new ContentValues();
-                                setMenuCV.put("id", "set_menu");
-                                setMenuCV.put("name", "SetMenu");
-                                setMenuCV.put("status", "1");
-                                setMenuCV.put("parent_id", "0");
-                                setMenuCV.put("kitchen_id", "0");
-                                setMenuCV.put("image", "setmenu.jpg");
-                                database.insert("category", null, setMenuCV);
                             }
                             for (Download_Category download_category : download_categoryArrayList) {
                                 ContentValues cv = new ContentValues();
@@ -785,6 +788,24 @@ public class MainActivity extends Activity {
                                 database.insert("category", null, cv);
                             }
                         }
+
+                        Cursor cursor =database.rawQuery("SELECT * FROM setMenu",null);
+
+
+                        Cursor cursor1 =database.rawQuery("SELECT * FROM category where id='set_menu'",null);
+
+
+                        if (cursor.getCount()>0 && cursor1.getCount()<1){
+                            ContentValues setMenuCV = new ContentValues();
+                            setMenuCV.put("id", "set_menu");
+                            setMenuCV.put("name", "SetMenu");
+                            setMenuCV.put("status", "1");
+                            setMenuCV.put("parent_id", "0");
+                            setMenuCV.put("kitchen_id", "0");
+                            setMenuCV.put("image", "setmenu.jpg");
+                            database.insert("category", null, setMenuCV);
+                        }
+
                         Log.d("Demo Category", download_categoryArrayList.size() + "");
                         download_itemArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getItems()));
                         if (download_itemArrayList.size() > 0) {

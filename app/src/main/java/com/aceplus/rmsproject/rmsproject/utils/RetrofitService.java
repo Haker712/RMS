@@ -90,7 +90,7 @@ public class RetrofitService {
 
     private static String getActivateKeyFromDB(Context context) { // for activation key
 
-        SQLiteDatabase database = new Database(context).getDataBase();;
+        SQLiteDatabase database = new Database(context).getDataBase();
         database.beginTransaction();
         String backend_activate_key = null;
         Cursor cur = database.rawQuery("SELECT * FROM activate_key", null);

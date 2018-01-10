@@ -1054,17 +1054,30 @@ public class CategoryActivity extends ActionBarActivity {
                 if (category_item.getAddOnArrayList() != null) {
 
                     for (AddOn addOn : category_item.getAddOnArrayList()) {
-                        if (addOn.isSelected() == true) {
+
+                        if (addOn.isSelected()){
+                            addOn.setStatus("1");
+                        }else {
+                            addOn.setStatus("0");
+                        }
+                       // if (addOn.isSelected() == true) {
                             JSONObject extra_object = new JSONObject();
                             try {
                                 extra_object.put("extra_id", addOn.getId());
                                 extra_object.put("quantity", category_item.getQuantity());//set the same Quantity of OrderItem
                                 extra_object.put("amount", addOn.getPrice());
+//                                if (!addOn.getStatus().equals("0")){
+//                                    extra_object.put("status","1");
+//                                }else {
+//                                    extra_object.put("status",addOn.getStatus());
+//                                }
+                                extra_object.put("status",addOn.getStatus());
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                             orderExtraJsonArray.put(extra_object);
-                        }
+                       // }
                     }
                 }
                 try {
@@ -2104,13 +2117,19 @@ public class CategoryActivity extends ActionBarActivity {
 
 
                                                 }
-                                                if (con_distype.equalsIgnoreCase("%")){
 
-                                                    double total = selected_item_price * Double.parseDouble(con_disamount);
-                                                    TotalitemArraylist.get(position).setDiscount(total/100);
-                                                    Log.i("Price",TotalitemArraylist.get(position).getPrice()+","+Integer.parseInt(con_disamount) + "," +total);
+                                                if (con_distype!= null && !con_distype.equals("")){
+
+                                                    if (con_distype.equalsIgnoreCase("%")) {
+
+                                                        double total = selected_item_price * Double.parseDouble(con_disamount);
+                                                        TotalitemArraylist.get(position).setDiscount(total / 100);
+                                                        Log.i("Price", TotalitemArraylist.get(position).getPrice() + "," + Integer.parseInt(con_disamount) + "," + total);
+                                                    } else {
+                                                        TotalitemArraylist.get(position).setDiscount(Double.parseDouble(con_disamount));
+                                                    }
                                                 }else {
-                                                    TotalitemArraylist.get(position).setDiscount(Double.parseDouble(con_disamount) );
+                                                    TotalitemArraylist.get(position).setDiscount(0);
                                                 }
 
 
@@ -2171,6 +2190,7 @@ public class CategoryActivity extends ActionBarActivity {
              * PhoneLinAung 12.9.17 End
              */
             String statusiddd = TotalitemArraylist.get(position).getStatusid();
+            Log.i("Status",statusiddd);
             if (TAKE_AWAY == "table" || TAKE_AWAY == "room") {     // for from room and table including new invoice and exiting invoice
                 if ((statusiddd == "6" || statusiddd.equals("6")) || (statusiddd == "7" || statusiddd.equals("7"))) {
                     viewHolder.itemNameTxt.setText(categoryItem.getItemName());
@@ -2189,7 +2209,8 @@ public class CategoryActivity extends ActionBarActivity {
                     viewHolder.amountTxt.setPaintFlags(viewHolder.amountTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
                     viewHolder.takeAwayCheck.setEnabled(false);
 
-                } else {
+                }
+                else {
                     viewHolder.itemNameTxt.setText(categoryItem.getItemName());
                     viewHolder.quantityBtn.setText(categoryItem.getQuantity() + "");
                     viewHolder.priceTxt.setText(commaSepFormat.format(categoryItem.getPrice()));
@@ -2229,6 +2250,8 @@ public class CategoryActivity extends ActionBarActivity {
                                                 serviceValue = totalValue * serviceAmt / 100;
                                                 servicecharges = taxValue + serviceValue;
                                             } else {
+                                                taxValue=0;
+                                                serviceValue=0;
                                                 servicecharges = 0;
                                             }
                                             totalAmt = totalValue;
@@ -2508,7 +2531,7 @@ public class CategoryActivity extends ActionBarActivity {
                 //ADD_INVOICE = null;
             } else {
                 Log.i("takeaway!!!!!", TAKE_AWAY + "");      // for from  take away including new invoice and exiting invoice
-                if ((statusiddd == "6" || statusiddd.equals("6")) || (statusiddd == "7" || statusiddd.equals("7"))) {
+                if ((statusiddd == "6" || statusiddd.equals("6")) || (statusiddd == "7" || statusiddd.equals("7")) ) {
                     viewHolder.itemNameTxt.setText(categoryItem.getItemName());
                     viewHolder.itemNameTxt.setPaintFlags(viewHolder.itemNameTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
                     viewHolder.quantityBtn.setText(categoryItem.getQuantity() + "");
@@ -2533,7 +2556,8 @@ public class CategoryActivity extends ActionBarActivity {
                         }
                     });
                     viewHolder.takeAwayCheck.setEnabled(false);
-                } else {
+                }
+                else {
                     viewHolder.itemNameTxt.setText(categoryItem.getItemName());
                     viewHolder.quantityBtn.setText(categoryItem.getQuantity() + "");
                     viewHolder.priceTxt.setText(commaSepFormat.format(categoryItem.getPrice()));
@@ -2582,6 +2606,8 @@ public class CategoryActivity extends ActionBarActivity {
                                                     serviceValue = totalValue * serviceAmt / 100;
                                                     servicecharges = taxValue + serviceValue;
                                                 } else {
+                                                    taxValue=0;
+                                                    serviceValue=0;
                                                     servicecharges = 0;
                                                 }
                                                 totalAmt = totalValue;
@@ -4419,12 +4445,22 @@ public class CategoryActivity extends ActionBarActivity {
             CheckBox add_on_check = (CheckBox) view.findViewById(R.id.check_box);
             TextView name_txt = (TextView) view.findViewById(R.id.name_txt);
             add_on_check.setChecked(addOn.isSelected());
+            if (addOn.isSelected()){
+                addOn.setStatus("1");
+            }else {
+                addOn.setStatus("0");
+            }
             name_txt.setText(addOn.getFood_name());
             add_on_check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
                                                         @Override
                                                         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                                             addOn.setSelected(isChecked);
+                                                            if (!isChecked){
+                                                                addOn.setStatus("0");
+                                                            }else {
+                                                                addOn.setStatus("1");
+                                                            }
                                                             //addOnAdapter.notifyDataSetChanged();
                                                         }
                                                     }
@@ -4886,13 +4922,8 @@ public class CategoryActivity extends ActionBarActivity {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                if (socket.connected()){
-                                    socket.emit("order", "blah blah");
-                                }else {
-                                    //socket.connect();
-                                    socket.emit("order","blah blah");
-                                }
 
+                                    socket.emit("order", "blah blah");
 
                             }
                         });
