@@ -296,6 +296,7 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void callUploadDialog(String message) {
+
         final android.support.v7.app.AlertDialog builder = new android.support.v7.app.AlertDialog.Builder(RoomActivity.this, R.style.InvitationDialog)
                 .setPositiveButton(R.string.invitation_ok, null)
                 .create();
@@ -313,7 +314,11 @@ public class RoomActivity extends AppCompatActivity {
                 });
             }
         });
-        builder.show();
+        if (activity.isFinishing()) {
+            return;
+        } else {
+            builder.show();
+        }
     }
 
     private String getRoomInvoiceDataInDB(String room_id) {
@@ -348,7 +353,7 @@ public class RoomActivity extends AppCompatActivity {
 
     private void loadRoomJson() {
 
-        if (mProgressDialog.isShowing()){
+        if (mProgressDialog.isShowing()) {
 
             mProgressDialog.dismiss();
 
@@ -975,11 +980,11 @@ public class RoomActivity extends AppCompatActivity {
                                             TextView capacity = (TextView) view.findViewById(R.id.bookingCapacity);
 
 
-                                            for (int a=0;a<download_bookingArrayList.size();a++){
+                                            for (int a = 0; a < download_bookingArrayList.size(); a++) {
 
-                                                for (int b=0;b<download_bookingArrayList.get(a).getBooking_room().length;b++){
+                                                for (int b = 0; b < download_bookingArrayList.get(a).getBooking_room().length; b++) {
 
-                                                    if (table.getTable_id().equals(download_bookingArrayList.get(a).getBooking_room()[b].getRoom_id())){
+                                                    if (table.getTable_id().equals(download_bookingArrayList.get(a).getBooking_room()[b].getRoom_id())) {
 
                                                         txtCustomername.setText(download_bookingArrayList.get(a).getCustomer_name());
                                                         txtFromtime.setText(download_bookingArrayList.get(a).getFrom_time());
@@ -1199,7 +1204,7 @@ public class RoomActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-       // socket.disconnect();
+        // socket.disconnect();
         socket.off("roomChange", onNewMessage);
         socket.off("invoice_update", onNewMessage);
     }

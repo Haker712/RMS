@@ -155,7 +155,6 @@ public class InvoiceActivity extends AppCompatActivity {
         socket.connect();
 
 
-
         Interceptor interceptor = new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
@@ -242,7 +241,6 @@ public class InvoiceActivity extends AppCompatActivity {
 //                    } catch (InterruptedException e) {
 //                        e.printStackTrace();
 //                    }
-                    Toast.makeText(activity, "LOl", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -399,8 +397,6 @@ public class InvoiceActivity extends AppCompatActivity {
     }
 
 
-
-
     public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.ViewHolder> {   // view methods
         private ArrayList<Invoice> invoiceList;
 
@@ -536,7 +532,11 @@ public class InvoiceActivity extends AppCompatActivity {
                 });
             }
         });
-        builder.show();
+        if (activity.isFinishing()) {
+            return;
+        } else {
+            builder.show();
+        }
     }
 
     @Override

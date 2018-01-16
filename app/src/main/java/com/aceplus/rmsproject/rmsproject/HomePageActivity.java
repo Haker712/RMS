@@ -1,11 +1,13 @@
 package com.aceplus.rmsproject.rmsproject;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,8 +20,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.PopupMenu;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -81,7 +86,8 @@ public class HomePageActivity extends ActionBarActivity {
     SQLiteDatabase database;
 
     String waiterName;
-    String userRole;
+    String waiterId;
+    String waiterRole;
 
 
     ProgressDialog progressDialog;
@@ -136,17 +142,64 @@ public class HomePageActivity extends ActionBarActivity {
 
     public static String tablet_id;
 
+    Activity activity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
 
+        activity = this;
+
+
         waiterName = getIntent().getStringExtra("WaiterName");
-        userRole = getIntent().getStringExtra("UserRole");
-        TextView txtWaiterName = (TextView) findViewById(R.id.waiternametxt);
-        txtWaiterName.setText(waiterName);
-        TextView txtUserRole = (TextView) findViewById(R.id.roletxt);
-        txtUserRole.setText(userRole);
+        waiterId = getIntent().getStringExtra("WaiterId");
+        waiterRole = getIntent().getStringExtra("UserRole");
+        final Button homeMenuBtn = (Button) findViewById(R.id.home_menu_btn);
+        homeMenuBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popup = new PopupMenu(HomePageActivity.this, homeMenuBtn);
+                //Inflating the Popup using xml file
+                popup.getMenuInflater()
+                        .inflate(R.menu.popup_menu, popup.getMenu());
+
+                //registering popup with OnMenuItemClickListener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+
+                        if (item.getTitle().equals("UserProfile")) {
+
+                            final AlertDialog builder = new AlertDialog.Builder(HomePageActivity.this, R.style.InvitationDialog)
+                                    .setTitle("User Info")
+                                    .create();
+                            LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                            final View view = layoutInflater.inflate(R.layout.userinfo_dialog, null);
+                            TextView txtwaiterName, txtwaiterId, txtwaiterRole;
+
+                            txtwaiterName = (TextView) view.findViewById(R.id.waiter_name);
+                            txtwaiterId = (TextView) view.findViewById(R.id.waiter_id);
+                            txtwaiterRole = (TextView) view.findViewById(R.id.waiter_role);
+
+//                            txtwaiterName.setText(waiterName);
+//                            txtwaiterId.setText(waiterId);
+//                            txtwaiterRole.setText(waiterRole);
+
+                            builder.setView(view);
+                            builder.show();
+
+
+                        } else {
+                            onBackPressed();
+                        }
+
+                        return true;
+                    }
+                });
+
+                popup.show(); //showing popup menu
+            }
+        });
 
         try {
             database = new Database(HomePageActivity.this).getDataBase();
@@ -182,7 +235,6 @@ public class HomePageActivity extends ActionBarActivity {
                             @Override
                             public void run() {
                                 loadOrderStatusJson();
-                                //Toast.makeText(HomePageActivity.this, "Here", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -283,7 +335,11 @@ public class HomePageActivity extends ActionBarActivity {
                     });
                 }
             });
-            builder.show();
+            if (activity.isFinishing()) {
+                return;
+            } else {
+                builder.show();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -479,7 +535,7 @@ public class HomePageActivity extends ActionBarActivity {
 //                                setMenuCV.put("image", "setmenu.jpg");
 //                                database.insert("category", null, setMenuCV);
 //                            }
-                            if (download_categoryArrayList.size() > 0) {
+                            if (download_categoryArrayList.size() > 0) {//kyi kyi ma kyi kyi delete ya ml//think again
                                 deleteTableVersion("category");
                             }
                             for (Download_Category download_category : download_categoryArrayList) {
@@ -494,13 +550,13 @@ public class HomePageActivity extends ActionBarActivity {
                             }
                         }
 
-                        Cursor cursor =database.rawQuery("SELECT * FROM setMenu",null);
+                        Cursor cursor = database.rawQuery("SELECT * FROM setMenu", null);
 
 
-                        Cursor cursor1 =database.rawQuery("SELECT * FROM category where id='set_menu'",null);
+                        Cursor cursor1 = database.rawQuery("SELECT * FROM category where id='set_menu'", null);
 
 
-                        if (cursor.getCount()>0 && cursor1.getCount()!=1){
+                        if (cursor.getCount() > 0 && cursor1.getCount() != 1) {
                             ContentValues setMenuCV = new ContentValues();
                             setMenuCV.put("id", "set_menu");
                             setMenuCV.put("name", "SetMenu");

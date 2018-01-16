@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -135,6 +137,7 @@ public class MainActivity extends Activity {
     SharedPreferences.Editor editor;
 
     String Waitername = "";
+    String WaiterId = "";
     String UserRole = "";
 
     public static String tablet_id;
@@ -143,6 +146,9 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        appVersion();
+
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         database = new Database(this).getDataBase();
         sharedpreferences = getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE);
@@ -425,8 +431,9 @@ public class MainActivity extends Activity {
                         Log.d("Login", message);
                         Log.d("Waiter_ID", jsonResponse.getWaiter_id());
                         Waitername = jsonResponse.getWaiter_name();
+                        WaiterId = jsonResponse.getWaiter_id();
                         UserRole = jsonResponse.getRole();
-                        Log.i("Role", UserRole);
+
                         SharedPreferences.Editor editor = sharedpreferences.edit();
                         editor.putString(WAITER_ID, jsonResponse.getWaiter_id());
                         editor.commit();
@@ -459,6 +466,36 @@ public class MainActivity extends Activity {
                             }
                         });
                         builder.show();
+                    } else if (message.equals("User Disable")) {
+
+                        final android.support.v7.app.AlertDialog builder = new android.support.v7.app.AlertDialog.Builder(MainActivity.this, R.style.InvitationDialog)
+                                .setPositiveButton(R.string.invitation_ok, null)
+                                .setNegativeButton(R.string.invitation_cancel, null)
+                                .create();
+                        builder.setTitle(R.string.alert);
+                        builder.setMessage("This User is already disabled");
+                        builder.setOnShowListener(new DialogInterface.OnShowListener() {
+                            @Override
+                            public void onShow(DialogInterface dialog) {
+                                final Button btnAccept = builder.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
+                                btnAccept.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        builder.dismiss();
+                                        passwordEdit.selectAll();
+                                    }
+                                });
+                                final Button btnCancle = builder.getButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE);
+                                btnCancle.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        builder.dismiss();
+                                    }
+                                });
+                            }
+                        });
+                        builder.show();
+
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -631,46 +668,46 @@ public class MainActivity extends Activity {
                             cv.put("version", "0");
                         } else {
                             cv.put("version", download_tableVersion.getVersion());
-                            }
-                            Log.i("b4 insert : ", download_tableVersionArrayList.size() + "");
-                            database.insert("tableVersion", null, cv);
-                            Log.i("After insert : ", download_tableVersionArrayList.size() + "");
                         }
-                        database.setTransactionSuccessful();
-                        database.endTransaction();
-                    } catch(Exception e){
-                       // Log.i("EXCEPTION insert : ", download_tableVersionArrayList.size() + "");
-                        e.printStackTrace();
-                        if (response.message() != null && !response.message().equals("")) {
-                            callUploadDialog(response.message());
-                        } else {
-                            callUploadDialog(getResources().getString(R.string.connection_failure));
-                        }
+                        Log.i("b4 insert : ", download_tableVersionArrayList.size() + "");
+                        database.insert("tableVersion", null, cv);
+                        Log.i("After insert : ", download_tableVersionArrayList.size() + "");
+                    }
+                    database.setTransactionSuccessful();
+                    database.endTransaction();
+                } catch (Exception e) {
+                    // Log.i("EXCEPTION insert : ", download_tableVersionArrayList.size() + "");
+                    e.printStackTrace();
+                    if (response.message() != null && !response.message().equals("")) {
+                        callUploadDialog(response.message());
+                    } else {
+                        callUploadDialog(getResources().getString(R.string.connection_failure));
                     }
                 }
-
-                @Override
-                public void onFailure (Call < JSONResponseTableVersion > call, Throwable t){
-                    if (value == 0) {
-                        progressDialog.dismiss();
-                    }
-                    callUploadDialog("Invalid Requested URL");
-                }
-            });
-        }
-
-    private ArrayList<Integer> getVersionList () {
-            database.beginTransaction();
-            ArrayList<Integer> versionList = new ArrayList<>();
-            Cursor cur = database.rawQuery("SELECT * FROM tableVersion", null);
-            while (cur.moveToNext()) {
-                versionList.add(cur.getInt(cur.getColumnIndex("version")));
             }
-            cur.close();
-            database.setTransactionSuccessful();
-            database.endTransaction();
-            return versionList;
+
+            @Override
+            public void onFailure(Call<JSONResponseTableVersion> call, Throwable t) {
+                if (value == 0) {
+                    progressDialog.dismiss();
+                }
+                callUploadDialog("Invalid Requested URL");
+            }
+        });
+    }
+
+    private ArrayList<Integer> getVersionList() {
+        database.beginTransaction();
+        ArrayList<Integer> versionList = new ArrayList<>();
+        Cursor cur = database.rawQuery("SELECT * FROM tableVersion", null);
+        while (cur.moveToNext()) {
+            versionList.add(cur.getInt(cur.getColumnIndex("version")));
         }
+        cur.close();
+        database.setTransactionSuccessful();
+        database.endTransaction();
+        return versionList;
+    }
 
     private void loadSyncsTable(ArrayList<Integer> version) {  // syncs down the tables from back end !!
         callDialog("Update Data....");
@@ -690,43 +727,43 @@ public class MainActivity extends Activity {
         int vDiscount = 0;
         for (int i = 0; i < version.size(); i++) {
             vCategory = version.get(0);
-           // Log.d("vCategory", vCategory);
+            // Log.d("vCategory", vCategory);
 
             vItem = version.get(1);
-           // Log.d("vItem", vItem);
+            // Log.d("vItem", vItem);
 
             vAddon = version.get(2);
-           // Log.d("vAddon", vAddon);
+            // Log.d("vAddon", vAddon);
 
             vMember = version.get(3);
-           // Log.d("vMember", vMember);
+            // Log.d("vMember", vMember);
 
             vSetMenu = version.get(4);
-           // Log.d("vSetMenu", vSetMenu);
+            // Log.d("vSetMenu", vSetMenu);
 
             vSetItem = version.get(5);
-           // Log.d("vSetItem", vSetItem);
+            // Log.d("vSetItem", vSetItem);
 
             vRoom = version.get(6);
-           // Log.d("vRoom", vRoom);
+            // Log.d("vRoom", vRoom);
 
             vTable = version.get(7);
-           // Log.d("vTable", vTable);
+            // Log.d("vTable", vTable);
 
             vBooking = version.get(8);
-           // Log.d("vBooking", vBooking);
+            // Log.d("vBooking", vBooking);
 
             vConfig = version.get(9);
-          //  Log.d("vConfig", vConfig);
+            //  Log.d("vConfig", vConfig);
 
             vPromotion = version.get(10);
-           // Log.d("vPromotion", vPromotion);
+            // Log.d("vPromotion", vPromotion);
 
             vPromotionItem = version.get(11);
-           // Log.d("vPromotionItem", vPromotionItem);
+            // Log.d("vPromotionItem", vPromotionItem);
 
             vDiscount = version.get(12);
-          //  Log.d("vDiscount", vDiscount);
+            //  Log.d("vDiscount", vDiscount);
         }
         Call<JsonResponseSyncs> call = request.getUpdateData(vCategory, vItem, vAddon, vMember, vSetMenu, vSetItem, vRoom, vTable, vBooking, vConfig, vPromotion, vPromotionItem, vDiscount, getActivateKeyFromDB());
         call.enqueue(new Callback<JsonResponseSyncs>() {
@@ -774,7 +811,7 @@ public class MainActivity extends Activity {
 //                                setMenuCV.put("image", "setmenu.jpg");
 //                                database.insert("category", null, setMenuCV);
 //                            }
-                            if (download_categoryArrayList.size()>0){
+                            if (download_categoryArrayList.size() > 0) {
                                 deleteTableVersion("category");
                             }
                             for (Download_Category download_category : download_categoryArrayList) {
@@ -789,13 +826,13 @@ public class MainActivity extends Activity {
                             }
                         }
 
-                        Cursor cursor =database.rawQuery("SELECT * FROM setMenu",null);
+                        Cursor cursor = database.rawQuery("SELECT * FROM setMenu", null);
 
 
-                        Cursor cursor1 =database.rawQuery("SELECT * FROM category where id='set_menu'",null);
+                        Cursor cursor1 = database.rawQuery("SELECT * FROM category where id='set_menu'", null);
 
 
-                        if (cursor.getCount()>0 && cursor1.getCount()<1){
+                        if (cursor.getCount() > 0 && cursor1.getCount() < 1) {
                             ContentValues setMenuCV = new ContentValues();
                             setMenuCV.put("id", "set_menu");
                             setMenuCV.put("name", "SetMenu");
@@ -952,7 +989,7 @@ public class MainActivity extends Activity {
                             cv.put("message", download_config.getMessage());
                             cv.put("remark", download_config.getRemark());
                             cv.put("room_charge", download_config.getRoom_charge());
-                            Log.i("RoomCharge",download_config.getRoom_charge()+"");
+                            Log.i("RoomCharge", download_config.getRoom_charge() + "");
 
                             database.insert("config", null, cv);
                         }
@@ -1033,6 +1070,7 @@ public class MainActivity extends Activity {
 //                    startActivity(new Intent(MainActivity.this, HomePageActivity.class));
                     Intent intent = new Intent(MainActivity.this, HomePageActivity.class);
                     intent.putExtra("WaiterName", Waitername);
+                    intent.putExtra("WaiterId", WaiterId);
                     intent.putExtra("UserRole", UserRole);
                     startActivity(intent);
                     finish();
@@ -1069,4 +1107,14 @@ public class MainActivity extends Activity {
         return jsonString;
     }
 
+    private void appVersion() {
+        try {
+            PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
+            String version = pInfo.versionName;
+            TextView textViewVersion = (TextView) findViewById(R.id.appVersion);
+            textViewVersion.setText("Current Version : " + version);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 }
