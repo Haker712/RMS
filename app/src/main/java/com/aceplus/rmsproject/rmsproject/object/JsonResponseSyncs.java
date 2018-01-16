@@ -17,6 +17,7 @@ public class JsonResponseSyncs {
     private Download_Promotion_Item[]  promotion_item;
     private Download_Discount[] discount;
     private Download_Config[] config;
+    private Download_Contiment[] continent;
 
     public Download_Category[] getCategory() {
         return category;
@@ -68,5 +69,9 @@ public class JsonResponseSyncs {
 
     public Download_Discount[] getDiscount() {
         return discount;
+    }
+
+    public Download_Contiment[] getContiments() {
+        return continent;
     }
 }

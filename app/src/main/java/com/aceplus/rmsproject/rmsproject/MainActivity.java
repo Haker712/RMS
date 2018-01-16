@@ -39,6 +39,7 @@ import com.aceplus.rmsproject.rmsproject.object.Download_AddOn;
 import com.aceplus.rmsproject.rmsproject.object.Download_Booking;
 import com.aceplus.rmsproject.rmsproject.object.Download_Category;
 import com.aceplus.rmsproject.rmsproject.object.Download_Config;
+import com.aceplus.rmsproject.rmsproject.object.Download_Contiment;
 import com.aceplus.rmsproject.rmsproject.object.Download_Discount;
 import com.aceplus.rmsproject.rmsproject.object.Download_Item;
 import com.aceplus.rmsproject.rmsproject.object.Download_Member;
@@ -103,6 +104,7 @@ public class MainActivity extends Activity {
     private ArrayList<Download_Promotion> download_promotionArrayList;
     private ArrayList<Download_Promotion_Item> download_promotion_itemArrayList;
     private ArrayList<Download_Discount> download_discountArrayList;
+    private ArrayList<Download_Contiment> download_contimentArrayList;
     private ArrayList<Download_TableVersion> download_tableVersionArrayList;
     //    public static final String URL = "http://192.168.11.57:9090";
     //public static  String URL = "http://192.168.11.62:8800";
@@ -725,6 +727,7 @@ public class MainActivity extends Activity {
         int vPromotion = 0;
         int vPromotionItem = 0;
         int vDiscount = 0;
+        int vContinent=0;
         for (int i = 0; i < version.size(); i++) {
             vCategory = version.get(0);
             // Log.d("vCategory", vCategory);
@@ -764,8 +767,11 @@ public class MainActivity extends Activity {
 
             vDiscount = version.get(12);
             //  Log.d("vDiscount", vDiscount);
+
+            vContinent= version.get(13);
+            Log.d("vCon", vContinent+"");
         }
-        Call<JsonResponseSyncs> call = request.getUpdateData(vCategory, vItem, vAddon, vMember, vSetMenu, vSetItem, vRoom, vTable, vBooking, vConfig, vPromotion, vPromotionItem, vDiscount, getActivateKeyFromDB());
+        Call<JsonResponseSyncs> call = request.getUpdateData(vCategory, vItem, vAddon, vMember, vSetMenu, vSetItem, vRoom, vTable, vBooking, vConfig, vPromotion, vPromotionItem, vDiscount,vContinent, getActivateKeyFromDB());
         call.enqueue(new Callback<JsonResponseSyncs>() {
             @Override
             public void onResponse(Call<JsonResponseSyncs> call, Response<JsonResponseSyncs> response) {
@@ -1022,6 +1028,18 @@ public class MainActivity extends Activity {
                             database.insert("promotionItem", null, cv);
                         }
                         Log.d("Demo PromotionItem", download_promotion_itemArrayList.size() + "");
+                        download_contimentArrayList=new ArrayList<>(Arrays.asList(jsonResponse.getContiments()));
+                        if (download_contimentArrayList.size()>0){
+                            deleteTableVersion("contiment");
+                        }
+                        for (Download_Contiment download_contiment:download_contimentArrayList){
+
+                            ContentValues cv = new ContentValues();
+                            cv.put("id",download_contiment.getId());
+                            cv.put("name",download_contiment.getName());
+                            database.insert("contiment",null,cv);
+                        }
+
                         database.setTransactionSuccessful();
                         database.endTransaction();
                         loadDiscountJson();

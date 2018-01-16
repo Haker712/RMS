@@ -207,6 +207,7 @@ public interface RequestInterface {
                                           @Field("promotions") int promotions,
                                           @Field("promotion_items") int promotion_items,
                                           @Field("discount") int discount,
+                                          @Field("continent") int continent,
                                           @Field("site_activation_key") String activate_key);
 
 

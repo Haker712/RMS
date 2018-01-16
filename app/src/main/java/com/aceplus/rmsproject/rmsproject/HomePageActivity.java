@@ -449,6 +449,7 @@ public class HomePageActivity extends ActionBarActivity {
         int vPromotion = 0;
         int vPromotionItem = 0;
         int vDiscount = 0;
+        int vContiment=0;
         for (int i = 0; i < version.size(); i++) {
             vCategory = version.get(0);
             Log.d("vCategory", vCategory + "");
@@ -488,8 +489,11 @@ public class HomePageActivity extends ActionBarActivity {
 
             vDiscount = version.get(12);
             Log.d("vDiscount", vDiscount + "");
+
+            vContiment = version.get(13);
+            Log.d("vDiscount", vDiscount + "");
         }
-        Call<JsonResponseSyncs> call = request.getUpdateData(vCategory, vItem, vAddon, vMember, vSetMenu, vSetItem, vRoom, vTable, vBooking, vConfig, vPromotion, vPromotionItem, vDiscount, getActivateKeyFromDB());
+        Call<JsonResponseSyncs> call = request.getUpdateData(vCategory, vItem, vAddon, vMember, vSetMenu, vSetItem, vRoom, vTable, vBooking, vConfig, vPromotion, vPromotionItem, vDiscount,vContiment, getActivateKeyFromDB());
         call.enqueue(new Callback<JsonResponseSyncs>() {
             @Override
             public void onResponse(Call<JsonResponseSyncs> call, Response<JsonResponseSyncs> response) {
