@@ -230,6 +230,10 @@ public class CategoryActivity extends ActionBarActivity {
 
     Typeface font;
 
+    String con_disamount = "";
+    String con_distype = "";
+    String selected_ContimentName;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -481,8 +485,6 @@ public class CategoryActivity extends ActionBarActivity {
                     item.setDiscount(curDiscount.getDouble(curDiscount.getColumnIndex("amount")));
                     item.setDiscount_type(curDiscount.getString(curDiscount.getColumnIndex("type")));
                 }
-
-
 
 
                 itemArrayList.add(item);
@@ -1055,29 +1057,29 @@ public class CategoryActivity extends ActionBarActivity {
 
                     for (AddOn addOn : category_item.getAddOnArrayList()) {
 
-                        if (addOn.isSelected()){
+                        if (addOn.isSelected()) {
                             addOn.setStatus("1");
-                        }else {
+                        } else {
                             addOn.setStatus("0");
                         }
-                       // if (addOn.isSelected() == true) {
-                            JSONObject extra_object = new JSONObject();
-                            try {
-                                extra_object.put("extra_id", addOn.getId());
-                                extra_object.put("quantity", category_item.getQuantity());//set the same Quantity of OrderItem
-                                extra_object.put("amount", addOn.getPrice());
+                        // if (addOn.isSelected() == true) {
+                        JSONObject extra_object = new JSONObject();
+                        try {
+                            extra_object.put("extra_id", addOn.getId());
+                            extra_object.put("quantity", category_item.getQuantity());//set the same Quantity of OrderItem
+                            extra_object.put("amount", addOn.getPrice());
 //                                if (!addOn.getStatus().equals("0")){
 //                                    extra_object.put("status","1");
 //                                }else {
 //                                    extra_object.put("status",addOn.getStatus());
 //                                }
-                                extra_object.put("status",addOn.getStatus());
+                            extra_object.put("status", addOn.getStatus());
 
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            orderExtraJsonArray.put(extra_object);
-                       // }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        orderExtraJsonArray.put(extra_object);
+                        // }
                     }
                 }
                 try {
@@ -1145,16 +1147,16 @@ public class CategoryActivity extends ActionBarActivity {
             orderjsonObject.put("extra_price", totalExtraAmt);
             orderjsonObject.put("discount_amount", totalDisAmt);
 
-             if (ROOM_ID != null /*|| !ROOM_ID.equals("")*/) {
-                 totalcharge = (serviceamont + roomchargeAmt);
-                 orderjsonObject.put("service_amount", serviceamont);
-                 Log.i("totalcharge111", totalcharge + "");
+            if (ROOM_ID != null /*|| !ROOM_ID.equals("")*/) {
+                totalcharge = (serviceamont + roomchargeAmt);
+                orderjsonObject.put("service_amount", serviceamont);
+                Log.i("totalcharge111", totalcharge + "");
 
 
-             } else {
-                 totalcharge = serviceamont;
-                 orderjsonObject.put("service_amount", serviceamont);
-             } //  NEED TO CHECK LATER
+            } else {
+                totalcharge = serviceamont;
+                orderjsonObject.put("service_amount", serviceamont);
+            } //  NEED TO CHECK LATER
 
 //            if (!check_check.equals("null")) {
 //                totalcharge = (serviceamont + roomchargeAmt);
@@ -2072,32 +2074,116 @@ public class CategoryActivity extends ActionBarActivity {
                             builder.setTitle(categoryItem.getItemName());
                             builder.setMessage("Choose ContimentforItemSelect");
 
-                            Handler handler = new Handler();
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (activity.isFinishing()) {
-                                        return;
-                                    } else {
-                                        builder.show();
-                                    }
-                                }
-                            });
+//                            Handler handler = new Handler();
+//                            handler.post(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    if (activity.isFinishing()) {
+//                                        return;
+//                                    } else {
+//                                        builder.show();
+//                                    }
+//                                }
+//                            });
 
                             contimentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
-                                    String con_disamount="";
-                                    String con_distype="";
+//                                    String con_disamount = "";
+//                                    String con_distype = "";
 
-                                    String selected_ContimentName = contimentnameList.get(i);
+                                     selected_ContimentName = contimentnameList.get(i);
 
                                     for (i = 0; i < contimentnameList.size(); i++) {
 
                                         if (selected_ContimentName.equals(contimentforItemSelectList.get(i).getContiment_name())) {
 
                                             selected_Contiment_id = contimentforItemSelectList.get(i).getContiment_id();
+
+//                                            Cursor cursor = database.rawQuery("SELECT * FROM item where contiment_id='" + selected_Contiment_id + "' and group_id='" + group_id + "'", null);
+//
+//                                            while (cursor.moveToNext()) {
+//
+//                                                String selected_item_id = cursor.getString(cursor.getColumnIndex("id"));
+//                                                double selected_item_price = cursor.getDouble(cursor.getColumnIndex("price"));
+//
+//                                                Cursor cursorContimentDiscount = database.rawQuery("SELECT * FROM discount WHERE item_id=\"" + selected_item_id + "\"", null);
+//
+//
+//                                                while (cursorContimentDiscount.moveToNext()) {
+//
+//                                                    con_disamount = cursorContimentDiscount.getString(cursorContimentDiscount.getColumnIndex("amount"));
+//                                                    con_distype = cursorContimentDiscount.getString(cursorContimentDiscount.getColumnIndex("type"));
+////
+//
+//
+//                                                }
+//
+//                                                if (con_distype != null && !con_distype.equals("")) {
+//
+//                                                    if (con_distype.equalsIgnoreCase("%")) {
+//
+//                                                        double total = selected_item_price * Double.parseDouble(con_disamount);
+//                                                        TotalitemArraylist.get(position).setDiscount(total / 100);
+//                                                        Log.i("Price", TotalitemArraylist.get(position).getPrice() + "," + Integer.parseInt(con_disamount) + "," + total);
+//                                                    } else {
+//                                                        TotalitemArraylist.get(position).setDiscount(Double.parseDouble(con_disamount));
+//                                                    }
+//                                                } else {
+//                                                    TotalitemArraylist.get(position).setDiscount(0);
+//                                                }
+//
+//
+//                                                Log.i("Select_Item_Price", selected_item_price + "");
+//                                                categoryItem.setId(selected_item_id);
+//                                                String selectd_itemname = cursor.getString(cursor.getColumnIndex("name"));
+//                                                viewHolder.itemNameTxt.setText(selected_ContimentName + " " + selectd_itemname);
+//                                                viewHolder.priceTxt.setText(selected_item_price + "");
+//                                                viewHolder.amountTxt.setText(selected_item_price + "");
+//                                                TotalitemArraylist.get(position).setItemName(selected_ContimentName + " " + selectd_itemname);
+//                                                TotalitemArraylist.get(position).setPrice(selected_item_price);
+//                                                TotalitemArraylist.get(position).setTotalAmount(selected_item_price);
+//                                                double tamt = 0.0;
+//                                                for (Category_Item category_item : TotalitemArraylist) {
+//                                                    tamt += category_item.getTotalAmount();
+//                                                }
+//
+//                                                tPriceTxt.setText(commaSepFormat.format(tamt));
+//                                                double taxValue = tamt * (taxAmt / 100);
+//                                                taxAmtTxt.setText(commaSepFormat.format(taxValue));
+//                                                taxPercentTxt.setText(taxAmt + "%");
+//                                                double serviceValue = tamt * (serviceAmt / 100);
+//                                                serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
+//                                                servicePercentTxt.setText(serviceAmt + "%");
+//                                                double netAmount = (tamt + taxValue + serviceValue);
+//                                                tnetPriceTxt.setText(commaSepFormat.format(netAmount));
+//
+//
+//                                            }
+//                                            cursor.close();
+//                                            categoryItemAdapter.notifyDataSetChanged();
+                                        }
+
+                                    }
+
+
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                                }
+                            });
+
+                            builder.setOnShowListener(new DialogInterface.OnShowListener() {
+                                @Override
+                                public void onShow(DialogInterface dialog) {
+                                    final Button btnAccept = builder.getButton(DialogInterface.BUTTON_POSITIVE);
+                                    btnAccept.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Toast.makeText(context, "Toast", Toast.LENGTH_SHORT).show();
 
                                             Cursor cursor = database.rawQuery("SELECT * FROM item where contiment_id='" + selected_Contiment_id + "' and group_id='" + group_id + "'", null);
 
@@ -2106,19 +2192,19 @@ public class CategoryActivity extends ActionBarActivity {
                                                 String selected_item_id = cursor.getString(cursor.getColumnIndex("id"));
                                                 double selected_item_price = cursor.getDouble(cursor.getColumnIndex("price"));
 
-                                                Cursor cursorContimentDiscount=database.rawQuery("SELECT * FROM discount WHERE item_id=\"" + selected_item_id+"\"",null);
+                                                Cursor cursorContimentDiscount = database.rawQuery("SELECT * FROM discount WHERE item_id=\"" + selected_item_id + "\"", null);
 
 
-                                                while (cursorContimentDiscount.moveToNext()){
+                                                while (cursorContimentDiscount.moveToNext()) {
 
-                                                     con_disamount=cursorContimentDiscount.getString(cursorContimentDiscount.getColumnIndex("amount"));
-                                                     con_distype  =cursorContimentDiscount.getString(cursorContimentDiscount.getColumnIndex("type"));
+                                                    con_disamount = cursorContimentDiscount.getString(cursorContimentDiscount.getColumnIndex("amount"));
+                                                    con_distype = cursorContimentDiscount.getString(cursorContimentDiscount.getColumnIndex("type"));
 //
 
 
                                                 }
 
-                                                if (con_distype!= null && !con_distype.equals("")){
+                                                if (con_distype != null && !con_distype.equals("")) {
 
                                                     if (con_distype.equalsIgnoreCase("%")) {
 
@@ -2128,7 +2214,7 @@ public class CategoryActivity extends ActionBarActivity {
                                                     } else {
                                                         TotalitemArraylist.get(position).setDiscount(Double.parseDouble(con_disamount));
                                                     }
-                                                }else {
+                                                } else {
                                                     TotalitemArraylist.get(position).setDiscount(0);
                                                 }
 
@@ -2148,31 +2234,29 @@ public class CategoryActivity extends ActionBarActivity {
                                                 }
 
                                                 tPriceTxt.setText(commaSepFormat.format(tamt));
-                                                double taxValue=tamt*(taxAmt/100);
+                                                double taxValue = tamt * (taxAmt / 100);
                                                 taxAmtTxt.setText(commaSepFormat.format(taxValue));
                                                 taxPercentTxt.setText(taxAmt + "%");
-                                                double serviceValue=tamt*(serviceAmt/100);
+                                                double serviceValue = tamt * (serviceAmt / 100);
                                                 serviceAmtTxt.setText(commaSepFormat.format(serviceValue));
                                                 servicePercentTxt.setText(serviceAmt + "%");
-                                                double netAmount=(tamt+taxValue+serviceValue);
+                                                double netAmount = (tamt + taxValue + serviceValue);
                                                 tnetPriceTxt.setText(commaSepFormat.format(netAmount));
 
 
                                             }
                                             cursor.close();
                                             categoryItemAdapter.notifyDataSetChanged();
+
+
+
+                                            builder.dismiss();
                                         }
-
-                                    }
-
-
-                                }
-
-                                @Override
-                                public void onNothingSelected(AdapterView<?> adapterView) {
-
+                                    });
                                 }
                             });
+
+                            builder.show();
 
 
                         } else {
@@ -2190,7 +2274,7 @@ public class CategoryActivity extends ActionBarActivity {
              * PhoneLinAung 12.9.17 End
              */
             String statusiddd = TotalitemArraylist.get(position).getStatusid();
-            Log.i("Status",statusiddd);
+            Log.i("Status", statusiddd);
             if (TAKE_AWAY == "table" || TAKE_AWAY == "room") {     // for from room and table including new invoice and exiting invoice
                 if ((statusiddd == "6" || statusiddd.equals("6")) || (statusiddd == "7" || statusiddd.equals("7"))) {
                     viewHolder.itemNameTxt.setText(categoryItem.getItemName());
@@ -2209,8 +2293,7 @@ public class CategoryActivity extends ActionBarActivity {
                     viewHolder.amountTxt.setPaintFlags(viewHolder.amountTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
                     viewHolder.takeAwayCheck.setEnabled(false);
 
-                }
-                else {
+                } else {
                     viewHolder.itemNameTxt.setText(categoryItem.getItemName());
                     viewHolder.quantityBtn.setText(categoryItem.getQuantity() + "");
                     viewHolder.priceTxt.setText(commaSepFormat.format(categoryItem.getPrice()));
@@ -2250,8 +2333,8 @@ public class CategoryActivity extends ActionBarActivity {
                                                 serviceValue = totalValue * serviceAmt / 100;
                                                 servicecharges = taxValue + serviceValue;
                                             } else {
-                                                taxValue=0;
-                                                serviceValue=0;
+                                                taxValue = 0;
+                                                serviceValue = 0;
                                                 servicecharges = 0;
                                             }
                                             totalAmt = totalValue;
@@ -2531,7 +2614,7 @@ public class CategoryActivity extends ActionBarActivity {
                 //ADD_INVOICE = null;
             } else {
                 Log.i("takeaway!!!!!", TAKE_AWAY + "");      // for from  take away including new invoice and exiting invoice
-                if ((statusiddd == "6" || statusiddd.equals("6")) || (statusiddd == "7" || statusiddd.equals("7")) ) {
+                if ((statusiddd == "6" || statusiddd.equals("6")) || (statusiddd == "7" || statusiddd.equals("7"))) {
                     viewHolder.itemNameTxt.setText(categoryItem.getItemName());
                     viewHolder.itemNameTxt.setPaintFlags(viewHolder.itemNameTxt.getPaintFlags() | STRIKE_THRU_TEXT_FLAG);
                     viewHolder.quantityBtn.setText(categoryItem.getQuantity() + "");
@@ -2556,8 +2639,7 @@ public class CategoryActivity extends ActionBarActivity {
                         }
                     });
                     viewHolder.takeAwayCheck.setEnabled(false);
-                }
-                else {
+                } else {
                     viewHolder.itemNameTxt.setText(categoryItem.getItemName());
                     viewHolder.quantityBtn.setText(categoryItem.getQuantity() + "");
                     viewHolder.priceTxt.setText(commaSepFormat.format(categoryItem.getPrice()));
@@ -2606,8 +2688,8 @@ public class CategoryActivity extends ActionBarActivity {
                                                     serviceValue = totalValue * serviceAmt / 100;
                                                     servicecharges = taxValue + serviceValue;
                                                 } else {
-                                                    taxValue=0;
-                                                    serviceValue=0;
+                                                    taxValue = 0;
+                                                    serviceValue = 0;
                                                     servicecharges = 0;
                                                 }
                                                 totalAmt = totalValue;
@@ -4445,9 +4527,9 @@ public class CategoryActivity extends ActionBarActivity {
             CheckBox add_on_check = (CheckBox) view.findViewById(R.id.check_box);
             TextView name_txt = (TextView) view.findViewById(R.id.name_txt);
             add_on_check.setChecked(addOn.isSelected());
-            if (addOn.isSelected()){
+            if (addOn.isSelected()) {
                 addOn.setStatus("1");
-            }else {
+            } else {
                 addOn.setStatus("0");
             }
             name_txt.setText(addOn.getFood_name());
@@ -4456,9 +4538,9 @@ public class CategoryActivity extends ActionBarActivity {
                                                         @Override
                                                         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                                             addOn.setSelected(isChecked);
-                                                            if (!isChecked){
+                                                            if (!isChecked) {
                                                                 addOn.setStatus("0");
-                                                            }else {
+                                                            } else {
                                                                 addOn.setStatus("1");
                                                             }
                                                             //addOnAdapter.notifyDataSetChanged();
@@ -4923,7 +5005,7 @@ public class CategoryActivity extends ActionBarActivity {
                             @Override
                             public void run() {
 
-                                    socket.emit("order", "blah blah");
+                                socket.emit("order", "blah blah");
 
                             }
                         });
@@ -5351,9 +5433,10 @@ public class CategoryActivity extends ActionBarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (socket.connected() || socket.hasListeners("order_remove")){
-        socket.disconnect();
-        socket.off("order_remove", onNewMessage);}
+        if (socket.connected() || socket.hasListeners("order_remove")) {
+            socket.disconnect();
+            socket.off("order_remove", onNewMessage);
+        }
     }
 }
 
