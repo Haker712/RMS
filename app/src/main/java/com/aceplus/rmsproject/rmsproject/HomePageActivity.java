@@ -510,26 +510,35 @@ public class HomePageActivity extends ActionBarActivity {
                         String imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
                         database.beginTransaction();
 
-                        download_setMenuArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getSet_menu()));
-                        if (download_setMenuArrayList.size() > 0) {
+                        if (jsonResponse.getSet_menu() == null) {
                             deleteTableVersion("setMenu");
+                        } else {
+
+                            download_setMenuArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getSet_menu()));
+                            if (download_setMenuArrayList.size() > 0) {
+                                deleteTableVersion("setMenu");
+                            }
+                            for (Download_SetMenu download_setMenu : download_setMenuArrayList) {
+                                ContentValues cv = new ContentValues();
+                                cv.put("id", download_setMenu.getId());
+                                cv.put("set_menu_name", download_setMenu.getSet_menus_name());
+                                cv.put("set_menu_price", download_setMenu.getSet_menus_price());
+                                cv.put("image", download_setMenu.getImage());
+                                cv.put("status", download_setMenu.getStatus());
+                                database.insert("setMenu", null, cv);
+                            }
+                            Log.d("Demo SetMenu", download_setMenuArrayList.size() + "");
                         }
-                        for (Download_SetMenu download_setMenu : download_setMenuArrayList) {
-                            ContentValues cv = new ContentValues();
-                            cv.put("id", download_setMenu.getId());
-                            cv.put("set_menu_name", download_setMenu.getSet_menus_name());
-                            cv.put("set_menu_price", download_setMenu.getSet_menus_price());
-                            cv.put("image", download_setMenu.getImage());
-                            cv.put("status", download_setMenu.getStatus());
-                            database.insert("setMenu", null, cv);
+
+                        if (jsonResponse.getCategory() == null) {
+                            deleteTableVersion("category");
                         }
-                        Log.d("Demo SetMenu", download_setMenuArrayList.size() + "");
 
                         if (jsonResponse.getCategory() != null) {
                             download_categoryArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getCategory()));
-//                            deleteTableVersion("category");
+                            //deleteTableVersion("category");
 //                            if (download_setMenuArrayList.size() > 0) {
-//                                // deleteTableVersion("category");
+//                               // deleteTableVersion("category");
 //                                ContentValues setMenuCV = new ContentValues();
 //                                setMenuCV.put("id", "set_menu");
 //                                setMenuCV.put("name", "SetMenu");
@@ -539,7 +548,7 @@ public class HomePageActivity extends ActionBarActivity {
 //                                setMenuCV.put("image", "setmenu.jpg");
 //                                database.insert("category", null, setMenuCV);
 //                            }
-                            if (download_categoryArrayList.size() > 0) {//kyi kyi ma kyi kyi delete ya ml//think again
+                            if (download_categoryArrayList.size() > 0) {
                                 deleteTableVersion("category");
                             }
                             for (Download_Category download_category : download_categoryArrayList) {
@@ -560,7 +569,7 @@ public class HomePageActivity extends ActionBarActivity {
                         Cursor cursor1 = database.rawQuery("SELECT * FROM category where id='set_menu'", null);
 
 
-                        if (cursor.getCount() > 0 && cursor1.getCount() != 1) {
+                        if (cursor.getCount() > 0 && cursor1.getCount() < 1) {
                             ContentValues setMenuCV = new ContentValues();
                             setMenuCV.put("id", "set_menu");
                             setMenuCV.put("name", "SetMenu");
@@ -571,53 +580,69 @@ public class HomePageActivity extends ActionBarActivity {
                             database.insert("category", null, setMenuCV);
                         }
 
-                        Log.d("Demo Category", download_categoryArrayList.size() + "");
-                        download_itemArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getItems()));
-                        if (download_itemArrayList.size() > 0) {
+                        if (jsonResponse.getItems() == null) {
                             deleteTableVersion("item");
-                        }
-                        for (Download_Item download_item : download_itemArrayList) {
-                            ContentValues cv = new ContentValues();
-                            cv.put("id", download_item.getId());
-                            cv.put("name", download_item.getName());
-                            cv.put("image", download_item.getImage());
-                            cv.put("price", download_item.getPrice());
-                            cv.put("status", download_item.getStatus());
-                            cv.put("category_id", download_item.getCategory_id());
-                            cv.put("contiment_id", download_item.getContiment_id());
-                            cv.put("group_id", download_item.getGroup_id());
-                            cv.put("isdefault", download_item.getIsdefault());
-                            cv.put("has_contiment", download_item.getHas_contiment());
+                        } else {
 
-                            database.insert("item", null, cv);
+                            download_itemArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getItems()));
+                            if (download_itemArrayList.size() > 0) {
+                                deleteTableVersion("item");
+                            }
+                            for (Download_Item download_item : download_itemArrayList) {
+                                ContentValues cv = new ContentValues();
+                                cv.put("id", download_item.getId());
+                                cv.put("name", download_item.getName());
+                                cv.put("image", download_item.getImage());
+                                cv.put("price", download_item.getPrice());
+                                cv.put("status", download_item.getStatus());
+                                cv.put("category_id", download_item.getCategory_id());
+                                cv.put("contiment_id", download_item.getContiment_id());
+                                cv.put("group_id", download_item.getGroup_id());
+                                cv.put("isdefault", download_item.getIsdefault());
+                                cv.put("has_contiment", download_item.getHas_contiment());
+
+                                database.insert("item", null, cv);
+                            }
+                            Log.d("Demo Item", download_itemArrayList.size() + "");
                         }
-                        Log.d("Demo Item", download_itemArrayList.size() + "");
-                        download_addOnArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getAddon()));
-                        if (download_addOnArrayList.size() > 0) {
+
+                        if (jsonResponse.getAddon() == null) {
                             deleteTableVersion("addOn");
+                        } else {
+
+                            download_addOnArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getAddon()));
+                            if (download_addOnArrayList.size() > 0) {
+                                deleteTableVersion("addOn");
+                            }
+                            for (Download_AddOn download_addOn : download_addOnArrayList) {
+                                ContentValues cv = new ContentValues();
+                                cv.put("id", download_addOn.getId());
+                                cv.put("food_name", download_addOn.getFood_name());
+                                cv.put("category_id", download_addOn.getCategory_id());
+                                cv.put("image", download_addOn.getImage());
+                                cv.put("price", download_addOn.getPrice());
+                                database.insert("addOn", null, cv);
+                            }
+                            Log.d("Demo Addon", download_addOnArrayList.size() + "");
                         }
-                        for (Download_AddOn download_addOn : download_addOnArrayList) {
-                            ContentValues cv = new ContentValues();
-                            cv.put("id", download_addOn.getId());
-                            cv.put("food_name", download_addOn.getFood_name());
-                            cv.put("category_id", download_addOn.getCategory_id());
-                            cv.put("image", download_addOn.getImage());
-                            cv.put("price", download_addOn.getPrice());
-                            database.insert("addOn", null, cv);
-                        }
-                        Log.d("Demo Addon", download_addOnArrayList.size() + "");
-                        download_memberArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getMember()));
-                        if (download_memberArrayList.size() > 0) {
+
+                        if (jsonResponse.getMember() == null) {
                             deleteTableVersion("member");
+                        } else {
+
+                            download_memberArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getMember()));
+                            if (download_memberArrayList.size() > 0) {
+                                deleteTableVersion("member");
+                            }
+                            for (Download_Member download_member : download_memberArrayList) {
+                                ContentValues cv = new ContentValues();
+                                cv.put("id", download_member.getId());
+                                cv.put("member_card_no", download_member.getMember_card_no());
+                                cv.put("discount", download_member.getDiscount_amount());
+                                database.insert("member", null, cv);
+                            }
+                            Log.d("Demo Member", download_memberArrayList.size() + "");
                         }
-                        for (Download_Member download_member : download_memberArrayList) {
-                            ContentValues cv = new ContentValues();
-                            cv.put("id", download_member.getId());
-                            cv.put("member_card_no", download_member.getMember_card_no());
-                            cv.put("discount", download_member.getDiscount_amount());
-                            database.insert("member", null, cv);
-                        }
-                        Log.d("Demo Member", download_memberArrayList.size() + "");
                         /*download_setMenuArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getSet_menu()));
                         if (download_setMenuArrayList.size() > 0) {
                             deleteTableVersion("setMenu");
@@ -632,123 +657,180 @@ public class HomePageActivity extends ActionBarActivity {
                             database.insert("setMenu", null, cv);
                         }
                         Log.d("Demo SetMenu", download_setMenuArrayList.size() + "");*/
-                        download_setItemArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getSet_item()));
-                        if (download_setItemArrayList.size() > 0) {
+
+                        if (jsonResponse.getSet_item() == null) {
                             deleteTableVersion("setItem");
+                        } else {
+
+                            download_setItemArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getSet_item()));
+                            if (download_setItemArrayList.size() > 0) {
+                                deleteTableVersion("setItem");
+                            }
+                            for (Download_SetItem download_setItem : download_setItemArrayList) {
+                                ContentValues cv = new ContentValues();
+                                cv.put("id", download_setItem.getId());
+                                cv.put("set_menu_id", download_setItem.getSet_menu_id());
+                                cv.put("item_id", download_setItem.getItem_id());
+                                database.insert("setItem", null, cv);
+                            }
+                            Log.d("Demo SetItem", download_setItemArrayList.size() + "");
                         }
-                        for (Download_SetItem download_setItem : download_setItemArrayList) {
-                            ContentValues cv = new ContentValues();
-                            cv.put("id", download_setItem.getId());
-                            cv.put("set_menu_id", download_setItem.getSet_menu_id());
-                            cv.put("item_id", download_setItem.getItem_id());
-                            database.insert("setItem", null, cv);
-                        }
-                        Log.d("Demo SetItem", download_setItemArrayList.size() + "");
-                        download_roomArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getRoom()));
-                        if (download_roomArrayList.size() > 0) {
+
+                        if (jsonResponse.getRoom() == null) {
                             deleteTableVersion("room");
+                        } else {
+                            download_roomArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getRoom()));
+                            if (download_roomArrayList.size() > 0) {
+                                deleteTableVersion("room");
+                            }
+                            for (Download_Room download_room : download_roomArrayList) {
+                                ContentValues cv = new ContentValues();
+                                cv.put("id", download_room.getId());
+                                cv.put("room_name", download_room.getRoom_name());
+                                cv.put("status", download_room.getStatus());
+                                database.insert("room", null, cv);
+                            }
+                            Log.d("Demo Room", download_roomArrayList.size() + "");
                         }
-                        for (Download_Room download_room : download_roomArrayList) {
-                            ContentValues cv = new ContentValues();
-                            cv.put("id", download_room.getId());
-                            cv.put("room_name", download_room.getRoom_name());
-                            cv.put("status", download_room.getStatus());
-                            database.insert("room", null, cv);
-                        }
-                        Log.d("Demo Room", download_roomArrayList.size() + "");
-                        download_tableArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getTable()));
-                        if (download_tableArrayList.size() > 0) {
+
+                        if (jsonResponse.getTable() == null) {
                             deleteTableVersion("tableList");
+                        } else {
+                            download_tableArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getTable()));
+                            if (download_tableArrayList.size() > 0) {
+                                deleteTableVersion("tableList");
+                            }
+                            for (Download_Table download_table : download_tableArrayList) {
+                                ContentValues cv = new ContentValues();
+                                cv.put("id", download_table.getId());
+                                cv.put("table_no", download_table.getTable_no());
+                                cv.put("status", download_table.getStatus());
+                                database.insert("tableList", null, cv);
+                            }
+                            Log.d("Demo Table", download_tableArrayList.size() + "");
                         }
-                        for (Download_Table download_table : download_tableArrayList) {
-                            ContentValues cv = new ContentValues();
-                            cv.put("id", download_table.getId());
-                            cv.put("table_no", download_table.getTable_no());
-                            cv.put("status", download_table.getStatus());
-                            database.insert("tableList", null, cv);
-                        }
-                        Log.d("Demo Table", download_tableArrayList.size() + "");
-                        download_bookingArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getBooking()));
-                        if (download_bookingArrayList.size() > 0) {
+
+                        if (jsonResponse.getBooking() == null) {
                             deleteTableVersion("booking");
                             deleteTableVersion("booking_table");
                             deleteTableVersion("booking_room");
-                        }
-                        for (Download_Booking download_booking : download_bookingArrayList) {
-                            ContentValues cv = new ContentValues();
-                            cv.put("id", download_booking.getId());
-                            cv.put("customer_name", download_booking.getCustomer_name());
-                            cv.put("from_time", download_booking.getFrom_time());
-                            Log.e("BTable", download_booking.getBooking_table() + "");
-                            for (BTable bTable : download_booking.getBooking_table()) {
-                                ContentValues contentValues = new ContentValues();
-                                contentValues.put("booking_id", bTable.getBooking_id());
-                                contentValues.put("table_id", bTable.getTable_id());
-                                database.insert("booking_table", null, contentValues);
+                        } else {
+                            download_bookingArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getBooking()));
+                            if (download_bookingArrayList.size() > 0) {
+                                deleteTableVersion("booking");
+                                deleteTableVersion("booking_table");
+                                deleteTableVersion("booking_room");
                             }
-                            for (BRoom bRoom : download_booking.getBooking_room()) {
-                                ContentValues contentValues = new ContentValues();
-                                contentValues.put("booking_id", bRoom.getBooking_id());
-                                contentValues.put("room_id", bRoom.getRoom_id());
-                                database.insert("booking_room", null, contentValues);
+                            for (Download_Booking download_booking : download_bookingArrayList) {
+                                ContentValues cv = new ContentValues();
+                                cv.put("id", download_booking.getId());
+                                cv.put("customer_name", download_booking.getCustomer_name());
+                                cv.put("from_time", download_booking.getFrom_time());
+                                Log.e("BTable", download_booking.getBooking_table() + "");
+                                for (BTable bTable : download_booking.getBooking_table()) {
+                                    ContentValues contentValues = new ContentValues();
+                                    contentValues.put("booking_id", bTable.getBooking_id());
+                                    contentValues.put("table_id", bTable.getTable_id());
+                                    database.insert("booking_table", null, contentValues);
+                                }
+                                for (BRoom bRoom : download_booking.getBooking_room()) {
+                                    ContentValues contentValues = new ContentValues();
+                                    contentValues.put("booking_id", bRoom.getBooking_id());
+                                    contentValues.put("room_id", bRoom.getRoom_id());
+                                    database.insert("booking_room", null, contentValues);
+                                }
+                                database.insert("booking", null, cv);
                             }
-                            database.insert("booking", null, cv);
+                            Log.d("Demo Booking", download_bookingArrayList.size() + "");
                         }
-                        Log.d("Demo Booking", download_bookingArrayList.size() + "");
 
-                        download_configArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getConfig()));
-                        if (download_configArrayList.size() > 0) {
+
+                        if (jsonResponse.getConfig() == null) {
                             deleteTableVersion("config");
-                        }
-                        for (Download_Config download_config : download_configArrayList) {
-                            ContentValues cv = new ContentValues();
-                            cv.put("tax", download_config.getTax());
-                            cv.put("service", download_config.getService());
-                            cv.put("booking_warning_time", download_config.getBooking_warning_time());
-                            cv.put("booking_waiting_time", download_config.getBooking_waiting_time());
-                            cv.put("booking_service_time", download_config.getBooking_service_time());
-                            cv.put("restaurant_name", download_config.getRestaurant_name());
-                            cv.put("logo", download_config.getLogo());
-                            cv.put("mobile_logo", download_config.getMobile_image());
-                            cv.put("email", download_config.getEmail());
-                            cv.put("website", download_config.getWebsite());
-                            cv.put("phone", download_config.getPhone());
-                            cv.put("address", download_config.getAddress());
-                            cv.put("message", download_config.getMessage());
-                            cv.put("remark", download_config.getRemark());
-                            cv.put("room_charge", download_config.getRoom_charge());
+                        } else {
+                            download_configArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getConfig()));
+                            if (download_configArrayList.size() > 0) {
+                                deleteTableVersion("config");
+                            }
+                            for (Download_Config download_config : download_configArrayList) {
+                                ContentValues cv = new ContentValues();
+                                cv.put("tax", download_config.getTax());
+                                cv.put("service", download_config.getService());
+                                cv.put("booking_warning_time", download_config.getBooking_warning_time());
+                                cv.put("booking_waiting_time", download_config.getBooking_waiting_time());
+                                cv.put("booking_service_time", download_config.getBooking_service_time());
+                                cv.put("restaurant_name", download_config.getRestaurant_name());
+                                cv.put("logo", download_config.getLogo());
+                                cv.put("mobile_logo", download_config.getMobile_image());
+                                cv.put("email", download_config.getEmail());
+                                cv.put("website", download_config.getWebsite());
+                                cv.put("phone", download_config.getPhone());
+                                cv.put("address", download_config.getAddress());
+                                cv.put("message", download_config.getMessage());
+                                cv.put("remark", download_config.getRemark());
+                                cv.put("room_charge", download_config.getRoom_charge());
+                                Log.i("RoomCharge", download_config.getRoom_charge() + "");
 
-                            database.insert("config", null, cv);
+                                database.insert("config", null, cv);
+                            }
+                            Log.d("Demo Config", download_configArrayList.size() + "");
                         }
-                        Log.d("Demo Config", download_configArrayList.size() + "");
-                        download_promotionArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getPromotion()));
-                        if (download_promotionArrayList.size() > 0) {
+
+                        if (jsonResponse.getPromotion() == null) {
                             deleteTableVersion("promotion");
+                        } else {
+                            download_promotionArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getPromotion()));
+                            if (download_promotionArrayList.size() > 0) {
+                                deleteTableVersion("promotion");
+                            }
+                            for (Download_Promotion download_promotion : download_promotionArrayList) {
+                                ContentValues cv = new ContentValues();
+                                cv.put("id", download_promotion.getId());
+                                cv.put("promotion_type", download_promotion.getPromotion_type());
+                                cv.put("from_date", download_promotion.getFrom_date());
+                                cv.put("to_date", download_promotion.getTo_date());
+                                cv.put("from_time", download_promotion.getFrom_time());
+                                cv.put("to_time", download_promotion.getTo_time());
+                                cv.put("sell_item_qty", download_promotion.getSell_item_qty());
+                                cv.put("present_item", download_promotion.getPresent_item());
+                                database.insert("promotion", null, cv);
+                            }
+                            Log.d("Demo Promotion", download_promotionArrayList.size() + "");
                         }
-                        for (Download_Promotion download_promotion : download_promotionArrayList) {
-                            ContentValues cv = new ContentValues();
-                            cv.put("id", download_promotion.getId());
-                            cv.put("promotion_type", download_promotion.getPromotion_type());
-                            cv.put("from_date", download_promotion.getFrom_date());
-                            cv.put("to_date", download_promotion.getTo_date());
-                            cv.put("from_time", download_promotion.getFrom_time());
-                            cv.put("to_time", download_promotion.getTo_time());
-                            cv.put("sell_item_qty", download_promotion.getSell_item_qty());
-                            cv.put("present_item", download_promotion.getPresent_item());
-                            database.insert("promotion", null, cv);
-                        }
-                        Log.d("Demo Promotion", download_promotionArrayList.size() + "");
-                        download_promotion_itemArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getPromotion_item()));
-                        if (download_promotion_itemArrayList.size() > 0) {
+
+                        if (jsonResponse.getPromotion_item() == null) {
                             deleteTableVersion("promotionItem");
+                        } else {
+                            download_promotion_itemArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getPromotion_item()));
+                            if (download_promotion_itemArrayList.size() > 0) {
+                                deleteTableVersion("promotionItem");
+                            }
+                            for (Download_Promotion_Item download_promotion_item : download_promotion_itemArrayList) {
+                                ContentValues cv = new ContentValues();
+                                cv.put("promotion_id", download_promotion_item.getPromotion_id());
+                                cv.put("item_id", download_promotion_item.getItem_id());
+                                database.insert("promotionItem", null, cv);
+                            }
+                            Log.d("Demo PromotionItem", download_promotion_itemArrayList.size() + "");
+
                         }
-                        for (Download_Promotion_Item download_promotion_item : download_promotion_itemArrayList) {
-                            ContentValues cv = new ContentValues();
-                            cv.put("promotion_id", download_promotion_item.getPromotion_id());
-                            cv.put("item_id", download_promotion_item.getItem_id());
-                            database.insert("promotionItem", null, cv);
-                        }
-                        Log.d("Demo PromotionItem", download_promotion_itemArrayList.size() + "");
+
+//                        if (jsonResponse.getContiments() == null) {
+//                            deleteTableVersion("contiment");
+//                        } else {
+//                            download_contimentArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getContiments()));
+//                            if (download_contimentArrayList.size() > 0) {
+//                                deleteTableVersion("contiment");
+//                            }
+//                            for (Download_Contiment download_contiment : download_contimentArrayList) {
+//
+//                                ContentValues cv = new ContentValues();
+//                                cv.put("id", download_contiment.getId());
+//                                cv.put("name", download_contiment.getName());
+//                                database.insert("contiment", null, cv);
+//                            }
+//                        }
+
                         database.setTransactionSuccessful();
                         database.endTransaction();
                         loadDiscountJson();
