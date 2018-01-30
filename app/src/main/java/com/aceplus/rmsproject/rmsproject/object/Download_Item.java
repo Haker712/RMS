@@ -14,6 +14,7 @@ public class Download_Item {
     String status;
     String category_id;
     String mobile_image;
+    int standard_cooking_time;
 
     @SerializedName("continent_id")
     @Expose
@@ -83,5 +84,9 @@ public class Download_Item {
 
     public void setHas_contiment(int has_contiment) {
         this.has_contiment = has_contiment;
+    }
+
+    public int getStandard_cooking_time() {
+        return standard_cooking_time;
     }
 }

@@ -878,6 +878,7 @@ public class MainActivity extends Activity {
                                 cv.put("group_id", download_item.getGroup_id());
                                 cv.put("isdefault", download_item.getIsdefault());
                                 cv.put("has_contiment", download_item.getHas_contiment());
+                                cv.put("standard_cooking_time",download_item.getStandard_cooking_time());
 
                                 database.insert("item", null, cv);
                             }

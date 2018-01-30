@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -233,6 +234,7 @@ public class FragmentMessageCancel extends Fragment {
             viewHolder.listView.getLayoutParams().height = 66 * order_complete.getOrder_item().size();
             orderItemAdapter = new OrderItemAdapter(getActivity(), order_complete.getOrder_item());
             viewHolder.listView.setAdapter(orderItemAdapter);
+            getListViewSize(viewHolder.listView);
             orderItemAdapter.notifyDataSetChanged();
             viewHolder.cancelBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -517,5 +519,26 @@ public class FragmentMessageCancel extends Fragment {
         super.onDestroy();
         socket.disconnect();
         socket.off("order_remove", onMessageCancel);
+    }
+
+    public static void getListViewSize(ListView myListView) {
+        ListAdapter myListAdapter = myListView.getAdapter();
+        if (myListAdapter == null) {
+            //do nothing return null
+            return;
+        }
+        //set listAdapter in loop for getting final size
+        int totalHeight = 0;
+        for (int size = 0; size < myListAdapter.getCount(); size++) {
+            View listItem = myListAdapter.getView(size, null, myListView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+        //setting listview item in adapter
+        ViewGroup.LayoutParams params = myListView.getLayoutParams();
+        params.height = totalHeight + (myListView.getDividerHeight() * (myListAdapter.getCount() - 1));
+        myListView.setLayoutParams(params);
+        // print height of adapter on log
+        Log.i("height of listItem:", String.valueOf(totalHeight));
     }
 }

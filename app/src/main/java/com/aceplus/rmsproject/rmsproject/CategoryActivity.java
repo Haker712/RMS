@@ -2028,6 +2028,7 @@ public class CategoryActivity extends ActionBarActivity {
 
                     while (cursor.moveToNext()) {
 
+                        int cookingtime=cursor.getInt(cursor.getColumnIndex("standard_cooking_time"));
                         int has_contiment = cursor.getInt(cursor.getColumnIndex("has_contiment"));
 
                         if (has_contiment == 1) {
@@ -2059,6 +2060,9 @@ public class CategoryActivity extends ActionBarActivity {
                                     .create();
                             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                             final View view1 = layoutInflater.inflate(R.layout.category_contiment_dialog, null);
+
+                            TextView cookingTimetxt= (TextView) view1.findViewById(R.id.cookingTime);
+                            cookingTimetxt.setText(cookingtime+" mins");
 
                             contimentnameList.clear();
                             for (ContimentforItemSelect c : contimentforItemSelectList) {
@@ -2262,6 +2266,24 @@ public class CategoryActivity extends ActionBarActivity {
                         } else {
 
                             Toast.makeText(CategoryActivity.this, "This item has no contiment", Toast.LENGTH_SHORT).show();
+
+                            final AlertDialog builder = new AlertDialog.Builder(CategoryActivity.this, R.style.InvitationDialog)
+                                    .setPositiveButton(R.string.invitation_ok, null)
+                                    .create();
+                            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                            final View view1 = layoutInflater.inflate(R.layout.category_contiment_dialog, null);
+
+                            Spinner spinner= (Spinner) view1.findViewById(R.id.contimentSpinner);
+                            spinner.setVisibility(View.GONE);
+
+                            TextView cookingTimetxt= (TextView) view1.findViewById(R.id.cookingTime);
+                            cookingTimetxt.setText(cookingtime+" mins");
+
+                            builder.setView(view1);
+                            builder.setTitle(categoryItem.getItemName());
+                            builder.setMessage("Item Info");
+
+                            builder.show();
 
                         }
 
