@@ -21,6 +21,7 @@ import com.aceplus.rmsproject.rmsproject.object.JSONResponseTableVersion;
 import com.aceplus.rmsproject.rmsproject.object.JsonResponseSyncs;
 import com.aceplus.rmsproject.rmsproject.object.JsonResponseforInvoice;
 import com.aceplus.rmsproject.rmsproject.object.JsonResponseforInvoiceDetail;
+import com.aceplus.rmsproject.rmsproject.object.LogUploadReturn;
 import com.aceplus.rmsproject.rmsproject.object.Login;
 import com.aceplus.rmsproject.rmsproject.object.LoginOrderIdRequest;
 import com.aceplus.rmsproject.rmsproject.object.Success;
@@ -219,4 +220,9 @@ public interface RequestInterface {
     @POST("api/v1/first_time_login")
     Call<LoginOrderIdRequest> LOGIN_ORDER_ID_REQUEST_CALL(@Field("tabletId") String username,
                                                           @Field("site_activation_key") String activate_key);
+
+    @FormUrlEncoded
+    @POST("api/frontend_log")
+    Call<LogUploadReturn> LOG_UPLOAD_CALL(@Field("tabletId") String tabletId,
+                                          @Field("logMessage") String logMessage);
 }

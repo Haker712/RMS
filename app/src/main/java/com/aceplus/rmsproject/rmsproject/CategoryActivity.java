@@ -272,6 +272,8 @@ public class CategoryActivity extends ActionBarActivity {
                 activity.getAssets(),
                 "fonts/zawgyi.ttf");
 
+        CustomExceptionHandler.newInstance().traceUnchagedException(this);
+
     }
 
     /**

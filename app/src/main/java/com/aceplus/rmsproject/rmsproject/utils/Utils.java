@@ -14,6 +14,9 @@ import com.aceplus.rmsproject.rmsproject.HomePageActivity;
 import com.aceplus.rmsproject.rmsproject.MainActivity;
 import com.aceplus.rmsproject.rmsproject.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by DELL on 11/2/2017.
  */
@@ -75,6 +78,17 @@ public class Utils {
             }
         });
         builder.show();
+    }
+
+
+    public static String getCurrentDate(boolean withTime) {
+
+        String dateFormat = "yyyy-MM-dd";
+        if (withTime) {
+            dateFormat += " HH:mm:ss";
+        }
+
+        return new SimpleDateFormat(dateFormat).format(new Date());
     }
 
 }
