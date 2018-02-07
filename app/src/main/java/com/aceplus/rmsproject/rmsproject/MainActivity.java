@@ -55,6 +55,7 @@ import com.aceplus.rmsproject.rmsproject.object.JSONResponseTableVersion;
 import com.aceplus.rmsproject.rmsproject.object.JsonResponseSyncs;
 import com.aceplus.rmsproject.rmsproject.object.Login;
 import com.aceplus.rmsproject.rmsproject.object.LoginOrderIdRequest;
+import com.aceplus.rmsproject.rmsproject.object.Shift;
 import com.aceplus.rmsproject.rmsproject.utils.ActivationRequestInterface;
 import com.aceplus.rmsproject.rmsproject.utils.Database;
 import com.aceplus.rmsproject.rmsproject.utils.RequestInterface;
@@ -129,6 +130,8 @@ public class MainActivity extends Activity {
     SharedPreferences sharedpreferences;
     public static final String LOGIN_PREFERENCES = "Login";
     public static final String WAITER_ID = "waiter_id";
+    public static final String DAY_CODE="day_code";
+    public static final String SHIFT_ID="shift_id";
     public static boolean userLogin = false;
 
     ActivateKey activateKey = new ActivateKey();
@@ -141,6 +144,8 @@ public class MainActivity extends Activity {
     String Waitername = "";
     String WaiterId = "";
     String UserRole = "";
+    String DayCode="";
+    int ShiftId=0;
 
     public static String tablet_id;
 
@@ -435,9 +440,13 @@ public class MainActivity extends Activity {
                         Waitername = jsonResponse.getWaiter_name();
                         WaiterId = jsonResponse.getWaiter_id();
                         UserRole = jsonResponse.getRole();
+                        DayCode=jsonResponse.getDaycode();
+                        ShiftId=jsonResponse.getShift_id();
 
                         SharedPreferences.Editor editor = sharedpreferences.edit();
                         editor.putString(WAITER_ID, jsonResponse.getWaiter_id());
+                        editor.putString("DayCode",DayCode);
+                        editor.putInt("ShitId",ShiftId);
                         editor.commit();
                         loadSyncsTable(getVersionList());
                     } else if (message.equals("Fail")) {

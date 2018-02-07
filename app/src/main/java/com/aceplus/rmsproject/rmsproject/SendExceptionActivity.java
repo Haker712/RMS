@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +38,7 @@ public class SendExceptionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_exception);
 
-        database=new Database(this).getDataBase();
+        database = new Database(this).getDataBase();
 
         Intent intent = getIntent();
         String Exp = intent.getStringExtra("ConstantKey");
@@ -45,47 +46,51 @@ public class SendExceptionActivity extends AppCompatActivity {
         TextView LogTxtView = (TextView) findViewById(R.id.LogTxtView);
         LogTxtView.setText(Exp);
 
+        Log.i("Exp", Exp);
+
 
         tabletId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        Interceptor interceptor = new Interceptor() {
-            @Override
-            public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", getActivateKeyFromDB()).build();
-                return chain.proceed(newRequest);
-            }
-        };
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.interceptors().add(interceptor);
-        builder.readTimeout(120, TimeUnit.SECONDS);
-        builder.connectTimeout(120, TimeUnit.SECONDS);
-        OkHttpClient client = builder.build();
-        retrofit = new Retrofit.Builder()
-                .baseUrl(MainActivity.URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
+        Log.i("TBID", tabletId);
 
-
-        RequestInterface requestInterfacefortable = retrofit.create(RequestInterface.class);
-        Call<LogUploadReturn> call = requestInterfacefortable.LOG_UPLOAD_CALL(tabletId, Exp);
-        call.enqueue(new Callback<LogUploadReturn>() {
-            @Override
-            public void onResponse(Call<LogUploadReturn> call, Response<LogUploadReturn> response) {
-                if (response.code() == 200) {
-
-                    Toast.makeText(SendExceptionActivity.this, "Success", Toast.LENGTH_SHORT).show();
-
-
-                }
-            }
-
-            @Override
-            public void onFailure(Call<LogUploadReturn> call, Throwable t) {
-
-            }
-        });
-
+//        Interceptor interceptor = new Interceptor() {
+//            @Override
+//            public okhttp3.Response intercept(Chain chain) throws IOException {
+//                Request newRequest = chain.request().newBuilder().addHeader("X-Authorization", getActivateKeyFromDB()).build();
+//                return chain.proceed(newRequest);
+//            }
+//        };
+//        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+//        builder.interceptors().add(interceptor);
+//        builder.readTimeout(120, TimeUnit.SECONDS);
+//        builder.connectTimeout(120, TimeUnit.SECONDS);
+//        OkHttpClient client = builder.build();
+//        retrofit = new Retrofit.Builder()
+//                .baseUrl(MainActivity.URL)
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .client(client)
+//                .build();
+//
+//
+//        RequestInterface requestInterfacefortable = retrofit.create(RequestInterface.class);
+//        Call<LogUploadReturn> call = requestInterfacefortable.LOG_UPLOAD_CALL(tabletId, Exp);
+//        call.enqueue(new Callback<LogUploadReturn>() {
+//            @Override
+//            public void onResponse(Call<LogUploadReturn> call, Response<LogUploadReturn> response) {
+//                if (response.code() == 200) {
+//
+//                    Toast.makeText(SendExceptionActivity.this, "Success", Toast.LENGTH_SHORT).show();
+//
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<LogUploadReturn> call, Throwable t) {
+//
+//            }
+//        });
+//
     }
 
     private String getActivateKeyFromDB() { // for activation key

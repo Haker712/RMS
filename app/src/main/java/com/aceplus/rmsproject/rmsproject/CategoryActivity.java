@@ -169,7 +169,7 @@ public class CategoryActivity extends ActionBarActivity {
     public static String VOUNCHER_ID = null;
     public static String ADD_INVOICE = null;
     public String ROOM_CHARGE = null;
-    public String WAITER_ID = null;
+
     public Date from_time = null;
     public Date to_time = null;
     public Date from_date = null;
@@ -234,11 +234,19 @@ public class CategoryActivity extends ActionBarActivity {
     String con_distype = "";
     String selected_ContimentName;
 
+    public String WAITER_ID = null;
+    public String DAY_CODE="";
+    public int SHIFT_ID=0;
+
+    SharedPreferences prefs = getSharedPreferences(MainActivity.LOGIN_PREFERENCES, MODE_PRIVATE);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
+
+        CustomExceptionHandler.newInstance().traceUnchagedException(this);
+
 
         activity = this;
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -272,7 +280,6 @@ public class CategoryActivity extends ActionBarActivity {
                 activity.getAssets(),
                 "fonts/zawgyi.ttf");
 
-        CustomExceptionHandler.newInstance().traceUnchagedException(this);
 
     }
 
@@ -4972,6 +4979,7 @@ public class CategoryActivity extends ActionBarActivity {
             } else {
                 orderjsonObject.put("take_id", "null");
             }
+            orderjsonObject.put("daycode","DC_20180206");
             orderjsonObject.put("total_price", tvalue);
             orderjsonObject.put("extra_price", totalExtraAmt);
             orderjsonObject.put("discount_amount", totalDisAmt);
@@ -5005,6 +5013,7 @@ public class CategoryActivity extends ActionBarActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         jsonArray.put(orderjsonObject);
         Log.i("orderjsonObject", orderjsonObject + "");
         Log.e("OrderJson", jsonArray + "");
@@ -5063,7 +5072,7 @@ public class CategoryActivity extends ActionBarActivity {
         database.beginTransaction();
         Calendar todayCal = Calendar.getInstance();
         String todayDate = orderTime.format(todayCal.getTime());
-        SharedPreferences prefs = getSharedPreferences(MainActivity.LOGIN_PREFERENCES, MODE_PRIVATE);
+//        SharedPreferences prefs = getSharedPreferences(MainActivity.LOGIN_PREFERENCES, MODE_PRIVATE);
         WAITER_ID = prefs.getString(MainActivity.WAITER_ID, "No name defined");
         //gjhkljh
 //        String order_id = makeOrderID();

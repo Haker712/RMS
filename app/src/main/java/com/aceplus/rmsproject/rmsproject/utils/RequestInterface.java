@@ -209,7 +209,8 @@ public interface RequestInterface {
                                           @Field("promotion_items") int promotion_items,
                                           @Field("discount") int discount,
                                           @Field("continent") int continent,
-                                          @Field("site_activation_key") String activate_key);
+                                          @Field("site_activation_key") String activate_key,
+                                          @Field("shift_category") String shift_category);
 
 
     @FormUrlEncoded
@@ -222,7 +223,7 @@ public interface RequestInterface {
                                                           @Field("site_activation_key") String activate_key);
 
     @FormUrlEncoded
-    @POST("api/frontend_log")
+    @POST("api/v1/frontend_log")
     Call<LogUploadReturn> LOG_UPLOAD_CALL(@Field("tabletId") String tabletId,
                                           @Field("logMessage") String logMessage);
 }
