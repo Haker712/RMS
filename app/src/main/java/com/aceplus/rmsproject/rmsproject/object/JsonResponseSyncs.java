@@ -18,6 +18,8 @@ public class JsonResponseSyncs {
     private Download_Discount[] discount;
     private Download_Config[] config;
     private Download_Contiment[] continent;
+    private Download_ShiftCategory[] shift_category;
+    private Download_ShiftSetmenu[] shift_setmenu;
 
     public Download_Category[] getCategory() {
         return category;
@@ -73,5 +75,13 @@ public class JsonResponseSyncs {
 
     public Download_Contiment[] getContiments() {
         return continent;
+    }
+
+    public Download_ShiftCategory[] getShift_category() {
+        return shift_category;
+    }
+
+    public Download_ShiftSetmenu[] getShift_setmenu() {
+        return shift_setmenu;
     }
 }

@@ -24,7 +24,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -104,10 +107,16 @@ public class InvoiceActivity extends AppCompatActivity {
     Socket socket;
     Activity activity = this;
 
+
+    String selected_Mode = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_invoice);
+
+        CustomExceptionHandler.newInstance().traceUnchagedException(this);
+
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         try {
@@ -196,7 +205,7 @@ public class InvoiceActivity extends AppCompatActivity {
             }
         };
         detailDataMap = new HashMap<>();
-        getInvoiceData();
+        //getInvoiceData();
         recyclerView.setAdapter(adapter);
         recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
             GestureDetector gestureDetector = new GestureDetector(getApplicationContext(), new GestureDetector.SimpleOnGestureListener() {
@@ -226,6 +235,44 @@ public class InvoiceActivity extends AppCompatActivity {
             public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
             }
         });
+
+
+        final String[] strings = {"Login Waiter","Other Waiters","All Waiters"};
+
+        final Spinner Spinner = (Spinner) findViewById(R.id.spinner);
+        ArrayAdapter<String> stringAdapter = new ArrayAdapter<String>(InvoiceActivity.this, android.R.layout.simple_spinner_item, strings);
+        stringAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Spinner.setAdapter(stringAdapter);
+
+
+        Spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                selected_Mode = strings[position];
+                Log.i("SM",selected_Mode);
+
+//                if (selected_Mode.equals("Login Waiter")) {
+//
+//                    getInvoiceData();
+//
+//                } else if (selected_Mode.equals("")) {
+//
+//                    getInvoiceData();
+//
+//                }
+                getInvoiceData();
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                getInvoiceData();
+            }
+        });
+
+
     }
 
     private Emitter.Listener onNewMessage = new Emitter.Listener() {
@@ -259,20 +306,68 @@ public class InvoiceActivity extends AppCompatActivity {
                     Log.i("<<<<<<<<body>>>>>", download_forInvoiceArrayList + "");
                     forInvoice.clear();
                     for (Download_forInvoice download_forInvoice : download_forInvoiceArrayList) {
-                        Invoice invoice = new Invoice();
-                        invoice.setVouncherID(download_forInvoice.getId());
-                        DataForRoomTable = getRoomOrTable(invoice.getVouncherID());
-                        Log.i("DataForRoomTable", DataForRoomTable + "ffff");
-                        invoice.setRoonOrTable(DataForRoomTable);
-                        Log.i("invoicesize>>>>>>>", invoice.getVouncherID() + "");
-                        invoice.setTake_id(download_forInvoice.getTakeId());
-                        invoice.setDate(download_forInvoice.getOrderTime());
-                        invoice.setDiscountAmount(download_forInvoice.getTotal_discount_amount());
-                        invoice.setExtraAmount(download_forInvoice.getTotal_extra_price());
-                        invoice.setTotalAmount(download_forInvoice.getTotalPrice());
-                        invoice.setNetAmount(download_forInvoice.getAllTotalAmount());
-                        invoice.setStatus(Integer.parseInt(download_forInvoice.getStatus()));
-                        forInvoice.add(invoice);
+
+                        Log.i("Selected", selected_Mode);
+
+                        if (selected_Mode.equals("Login Waiter")) {
+
+                            Invoice invoice = new Invoice();
+                            if (download_forInvoice.getUser_id().equals(MainActivity.WaiterId)) {
+                                invoice.setVouncherID(download_forInvoice.getId());
+                                DataForRoomTable = getRoomOrTable(invoice.getVouncherID());
+                                Log.i("DataForRoomTable", DataForRoomTable + "ffff");
+                                invoice.setRoonOrTable(DataForRoomTable);
+                                Log.i("invoicesize>>>>>>>", invoice.getVouncherID() + "");
+                                invoice.setTake_id(download_forInvoice.getTakeId());
+                                invoice.setDate(download_forInvoice.getOrderTime());
+                                invoice.setDiscountAmount(download_forInvoice.getTotal_discount_amount());
+                                invoice.setExtraAmount(download_forInvoice.getTotal_extra_price());
+                                invoice.setTotalAmount(download_forInvoice.getTotalPrice());
+                                invoice.setNetAmount(download_forInvoice.getAllTotalAmount());
+                                invoice.setStatus(Integer.parseInt(download_forInvoice.getStatus()));
+                                forInvoice.add(invoice);
+                            }
+
+                        }else if (selected_Mode.equals("Other Waiters")){
+
+                            Invoice invoice = new Invoice();
+                            if (!download_forInvoice.getUser_id().equals(MainActivity.WaiterId)) {
+                                invoice.setVouncherID(download_forInvoice.getId());
+                                DataForRoomTable = getRoomOrTable(invoice.getVouncherID());
+                                Log.i("DataForRoomTable", DataForRoomTable + "ffff");
+                                invoice.setRoonOrTable(DataForRoomTable);
+                                Log.i("invoicesize>>>>>>>", invoice.getVouncherID() + "");
+                                invoice.setTake_id(download_forInvoice.getTakeId());
+                                invoice.setDate(download_forInvoice.getOrderTime());
+                                invoice.setDiscountAmount(download_forInvoice.getTotal_discount_amount());
+                                invoice.setExtraAmount(download_forInvoice.getTotal_extra_price());
+                                invoice.setTotalAmount(download_forInvoice.getTotalPrice());
+                                invoice.setNetAmount(download_forInvoice.getAllTotalAmount());
+                                invoice.setStatus(Integer.parseInt(download_forInvoice.getStatus()));
+                                forInvoice.add(invoice);
+                            }
+
+                        } else {
+
+                            Invoice invoice = new Invoice();
+
+                            invoice.setVouncherID(download_forInvoice.getId());
+                            DataForRoomTable = getRoomOrTable(invoice.getVouncherID());
+                            Log.i("DataForRoomTable", DataForRoomTable + "ffff");
+                            invoice.setRoonOrTable(DataForRoomTable);
+                            Log.i("invoicesize>>>>>>>", invoice.getVouncherID() + "");
+                            invoice.setTake_id(download_forInvoice.getTakeId());
+                            invoice.setDate(download_forInvoice.getOrderTime());
+                            invoice.setDiscountAmount(download_forInvoice.getTotal_discount_amount());
+                            invoice.setExtraAmount(download_forInvoice.getTotal_extra_price());
+                            invoice.setTotalAmount(download_forInvoice.getTotalPrice());
+                            invoice.setNetAmount(download_forInvoice.getAllTotalAmount());
+                            invoice.setStatus(Integer.parseInt(download_forInvoice.getStatus()));
+                            forInvoice.add(invoice);
+
+                        }
+
+
                     }
                     Log.i("invoicesize>>>>>>>", forInvoice.size() + "");
                     adapter.notifyDataSetChanged();

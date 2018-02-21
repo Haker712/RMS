@@ -171,6 +171,9 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_invoice_detail_test);
+
+        CustomExceptionHandler.newInstance().traceUnchagedException(this);
+
         ButterKnife.inject(this);
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -344,13 +347,14 @@ public class InvoiceDetailActivity extends ActionBarActivity {
 
             Cursor cur = database.rawQuery("SELECT * FROM config", null);
             while (cur.moveToNext()) {
-                taxAmt = cur.getDouble(cur.getColumnIndex("tax"));
+                taxAmt = cur.getDouble(cur.getColumnIndex("taax"));
                 serviceAmt = cur.getDouble(cur.getColumnIndex("service"));
                 roomchargeAmt = cur.getDouble(cur.getColumnIndex("room_charge"));
             }
             cur.close();
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }

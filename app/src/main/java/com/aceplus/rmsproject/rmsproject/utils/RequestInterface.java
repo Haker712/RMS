@@ -209,8 +209,9 @@ public interface RequestInterface {
                                           @Field("promotion_items") int promotion_items,
                                           @Field("discount") int discount,
                                           @Field("continent") int continent,
-                                          @Field("site_activation_key") String activate_key,
-                                          @Field("shift_category") String shift_category);
+                                          @Field("shift_category") int shift_category,
+                                          @Field("shift_setmenu") int shift_setmenu,
+                                          @Field("site_activation_key") String activate_key);
 
 
     @FormUrlEncoded

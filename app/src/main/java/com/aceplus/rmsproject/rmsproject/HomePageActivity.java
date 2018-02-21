@@ -49,6 +49,8 @@ import com.aceplus.rmsproject.rmsproject.object.Download_Promotion_Item;
 import com.aceplus.rmsproject.rmsproject.object.Download_Room;
 import com.aceplus.rmsproject.rmsproject.object.Download_SetItem;
 import com.aceplus.rmsproject.rmsproject.object.Download_SetMenu;
+import com.aceplus.rmsproject.rmsproject.object.Download_ShiftCategory;
+import com.aceplus.rmsproject.rmsproject.object.Download_ShiftSetmenu;
 import com.aceplus.rmsproject.rmsproject.object.Download_Table;
 import com.aceplus.rmsproject.rmsproject.object.Download_TableVersion;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseDiscount;
@@ -104,6 +106,9 @@ public class HomePageActivity extends ActionBarActivity {
     private ArrayList<Download_Promotion> download_promotionArrayList;
     private ArrayList<Download_Promotion_Item> download_promotion_itemArrayList;
     private ArrayList<Download_Discount> download_discountArrayList;
+
+    private ArrayList<Download_ShiftCategory> download_shiftCategoryArrayList;
+    private ArrayList<Download_ShiftSetmenu> download_shiftSetmenuArrayList;
     private ArrayList<Download_TableVersion> download_tableVersionArrayList;
     //    public static final String URL = "http://192.168.11.57:9090";
     //public static  String URL = "http://192.168.11.62:8800";
@@ -148,6 +153,8 @@ public class HomePageActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
+
+        CustomExceptionHandler.newInstance().traceUnchagedException(this);
 
         activity = this;
 
@@ -450,6 +457,8 @@ public class HomePageActivity extends ActionBarActivity {
         int vPromotionItem = 0;
         int vDiscount = 0;
         int vContiment=0;
+        int vShiftCategory = 0;
+        int vShiftSetMenu=0;
         for (int i = 0; i < version.size(); i++) {
             vCategory = version.get(0);
             Log.d("vCategory", vCategory + "");
@@ -492,8 +501,14 @@ public class HomePageActivity extends ActionBarActivity {
 
             vContiment = version.get(13);
             Log.d("vDiscount", vDiscount + "");
+
+            vShiftCategory = version.get(14);
+            Log.d("vShiftCategory", vShiftCategory + "");
+
+            vShiftCategory = version.get(15);
+            Log.d("vShiftSetMenu", vShiftSetMenu + "");
         }
-        Call<JsonResponseSyncs> call = request.getUpdateData(vCategory, vItem, vAddon, vMember, vSetMenu, vSetItem, vRoom, vTable, vBooking, vConfig, vPromotion, vPromotionItem, vDiscount,vContiment, getActivateKeyFromDB());
+        Call<JsonResponseSyncs> call = request.getUpdateData(vCategory, vItem, vAddon, vMember, vSetMenu, vSetItem, vRoom, vTable, vBooking, vConfig, vPromotion, vPromotionItem, vDiscount,vContiment,vShiftCategory,vShiftSetMenu, getActivateKeyFromDB());
         call.enqueue(new Callback<JsonResponseSyncs>() {
             @Override
             public void onResponse(Call<JsonResponseSyncs> call, Response<JsonResponseSyncs> response) {
@@ -563,22 +578,22 @@ public class HomePageActivity extends ActionBarActivity {
                             }
                         }
 
-                        Cursor cursor = database.rawQuery("SELECT * FROM setMenu", null);
-
-
-                        Cursor cursor1 = database.rawQuery("SELECT * FROM category where id='set_menu'", null);
-
-
-                        if (cursor.getCount() > 0 && cursor1.getCount() < 1) {
-                            ContentValues setMenuCV = new ContentValues();
-                            setMenuCV.put("id", "set_menu");
-                            setMenuCV.put("name", "SetMenu");
-                            setMenuCV.put("status", "1");
-                            setMenuCV.put("parent_id", "0");
-                            setMenuCV.put("kitchen_id", "0");
-                            setMenuCV.put("image", "setmenu.jpg");
-                            database.insert("category", null, setMenuCV);
-                        }
+//                        Cursor cursor = database.rawQuery("SELECT * FROM setMenu", null);
+//
+//
+//                        Cursor cursor1 = database.rawQuery("SELECT * FROM category where id='set_menu'", null);
+//
+//
+//                        if (cursor.getCount() > 0 && cursor1.getCount() < 1) {
+//                            ContentValues setMenuCV = new ContentValues();
+//                            setMenuCV.put("id", "set_menu");
+//                            setMenuCV.put("name", "SetMenu");
+//                            setMenuCV.put("status", "1");
+//                            setMenuCV.put("parent_id", "0");
+//                            setMenuCV.put("kitchen_id", "0");
+//                            setMenuCV.put("image", "setmenu.jpg");
+//                            database.insert("category", null, setMenuCV);
+//                        }
 
                         if (jsonResponse.getItems() == null) {
                             deleteTableVersion("item");
@@ -600,6 +615,7 @@ public class HomePageActivity extends ActionBarActivity {
                                 cv.put("group_id", download_item.getGroup_id());
                                 cv.put("isdefault", download_item.getIsdefault());
                                 cv.put("has_contiment", download_item.getHas_contiment());
+                                cv.put("standard_cooking_time",download_item.getStandard_cooking_time());
 
                                 database.insert("item", null, cv);
                             }
@@ -830,6 +846,70 @@ public class HomePageActivity extends ActionBarActivity {
 //                                database.insert("contiment", null, cv);
 //                            }
 //                        }
+
+                        if (jsonResponse.getShift_category() == null) {
+                            deleteTableVersion("shift_category");
+                        } else {
+                            download_shiftCategoryArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getShift_category()));
+                            if (download_shiftCategoryArrayList.size() > 0) {
+                                deleteTableVersion("shift_category");
+                            }
+
+                            for (Download_ShiftCategory download_shiftCategory : download_shiftCategoryArrayList) {
+
+                                ContentValues cv = new ContentValues();
+                                cv.put("id", download_shiftCategory.getId());
+                                cv.put("shift_id", download_shiftCategory.getShift_id());
+                                cv.put("category_id", download_shiftCategory.getCategory_id());
+                                database.insert("shift_category", null, cv);
+
+                            }
+
+                        }
+
+
+                        if (jsonResponse.getShift_setmenu() == null) {
+
+                            deleteTableVersion("shift_setmenu");
+                            database.execSQL("DELETE FROM category WHERE id='set_menu'");
+
+                        } else {
+                            download_shiftSetmenuArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getShift_setmenu()));
+                            if (download_shiftSetmenuArrayList.size() > 0) {
+                                deleteTableVersion("shift_setmenu");
+                            }
+
+                            for (Download_ShiftSetmenu download_shiftSetmenu : download_shiftSetmenuArrayList) {
+
+                                ContentValues cv = new ContentValues();
+                                cv.put("id", download_shiftSetmenu.getId());
+                                cv.put("shift_id", download_shiftSetmenu.getShift_id());
+                                cv.put("shift_setid", download_shiftSetmenu.getShit_setid());
+                                database.insert("shift_setmenu", null, cv);
+
+
+                            }
+
+
+                        }
+
+
+                       Cursor cursor = database.rawQuery("SELECT * FROM shift_setmenu", null);
+
+
+                       Cursor cursor1 = database.rawQuery("SELECT * FROM category where id='set_menu'", null);
+
+
+                        if (cursor.getCount() > 0 && cursor1.getCount() < 1) {
+                            ContentValues setMenuCV = new ContentValues();
+                            setMenuCV.put("id", "set_menu");
+                            setMenuCV.put("name", "SetMenu");
+                            setMenuCV.put("status", "1");
+                            setMenuCV.put("parent_id", "0");
+                            setMenuCV.put("kitchen_id", "0");
+                            setMenuCV.put("image", "setmenu.jpg");
+                            database.insert("category", null, setMenuCV);
+                        }
 
                         database.setTransactionSuccessful();
                         database.endTransaction();

@@ -235,15 +235,20 @@ public class CategoryActivity extends ActionBarActivity {
     String selected_ContimentName;
 
     public String WAITER_ID = null;
-    public String DAY_CODE="";
-    public int SHIFT_ID=0;
+    public String DAY_CODE = "";
+    public int SHIFT_ID = 0;
 
-    SharedPreferences prefs = getSharedPreferences(MainActivity.LOGIN_PREFERENCES, MODE_PRIVATE);
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
+
+        prefs = getSharedPreferences(MainActivity.LOGIN_PREFERENCES, MODE_PRIVATE);
+
+        DAY_CODE = prefs.getString(MainActivity.DAY_CODE, "");
+        SHIFT_ID = prefs.getInt(MainActivity.SHIFT_ID, 0);
 
         CustomExceptionHandler.newInstance().traceUnchagedException(this);
 
@@ -401,7 +406,35 @@ public class CategoryActivity extends ActionBarActivity {
         ArrayList<Category> categoryList = new ArrayList<>();
         try {
             database.beginTransaction();
-            Cursor cur = database.rawQuery("SELECT * FROM category WHERE parent_id = \"" + parent_id + "\"", null);
+
+            Cursor cur_shiftsetmenu = database.rawQuery("SELECT ss.shift_id,sm.id,sm.set_menu_name,sm.image,sm.status,sm.set_menu_price FROM shift_setmenu as ss, setMenu as sm where ss.shift_setid = sm.id and ss.shift_id=" + SHIFT_ID + " ",null);
+
+            if (cur_shiftsetmenu.getCount()!=0) {
+
+                Cursor cursor = database.rawQuery("SELECT * FROM category WHERE id='set_menu'", null);
+                Log.i("Cur Count", cursor.getCount() + "");
+
+                while (cursor.moveToNext()) {
+                    Category category = new Category();
+                    category.setId(cursor.getString(cursor.getColumnIndex("id")));
+                    category.setName(cursor.getString(cursor.getColumnIndex("name")));
+                    try {
+                        category.setImage(cursor.getString(cursor.getColumnIndex("image")));
+                    } catch (OutOfMemoryError outOfMemoryError) {
+                        Runtime.getRuntime().gc();
+                        category.setImage(cursor.getString(cursor.getColumnIndex("image")));
+                    }
+                    category.setStatus(cursor.getString(cursor.getColumnIndex("status")));
+                    category.setParent_id(cursor.getString(cursor.getColumnIndex("parent_id")));
+                    category.setKitchen_id(cursor.getString(cursor.getColumnIndex("kitchen_id")));
+                    categoryList.add(category);
+                }
+
+            }
+
+            //Cursor cur = database.rawQuery("SELECT * FROM category WHERE parent_id = \"" + parent_id + "\"", null);
+            Cursor cur = database.rawQuery("SELECT sc.shift_id,ct.id,ct.name,ct.image,ct.status,ct.parent_id,ct.kitchen_id FROM shift_category as sc, category as ct where sc.category_id = ct.id and ct.parent_id =" + parent_id + " and sc.shift_id='" + SHIFT_ID + "' ", null);
+            // Log.i("Cc",cur.getCount()+"");
             while (cur.moveToNext()) {
 
                 Category category = new Category();
@@ -433,6 +466,25 @@ public class CategoryActivity extends ActionBarActivity {
         database.beginTransaction();
         ArrayList<Category> categoryList = new ArrayList<>();
         Cursor cur = database.rawQuery("SELECT * FROM category WHERE id = \"" + id + "\"", null);
+        while (cur.moveToNext()) {
+            Category category = new Category();
+            category.setId(cur.getString(cur.getColumnIndex("id")));
+            category.setName(cur.getString(cur.getColumnIndex("name")));
+            category.setImage(cur.getString(cur.getColumnIndex("image")));
+            category.setStatus(cur.getString(cur.getColumnIndex("status")));
+            category.setParent_id(cur.getString(cur.getColumnIndex("parent_id")));
+            category.setKitchen_id(cur.getString(cur.getColumnIndex("kitchen_id")));
+            categoryList.add(category);
+        }
+        cur.close();
+        database.setTransactionSuccessful();
+        database.endTransaction();
+        return categoryList;
+    }
+    private ArrayList<Category> cateDataFromDB1(String id) {
+        database.beginTransaction();
+        ArrayList<Category> categoryList = new ArrayList<>();
+        Cursor cur = database.rawQuery("SELECT * FROM category WHERE parent_id = \"" + id + "\"", null);
         while (cur.moveToNext()) {
             Category category = new Category();
             category.setId(cur.getString(cur.getColumnIndex("id")));
@@ -535,7 +587,12 @@ public class CategoryActivity extends ActionBarActivity {
         ArrayList<Category> itemArrayList = new ArrayList<>();
         try {
             database.beginTransaction();
-            Cursor cur = database.rawQuery("SELECT * FROM setMenu", null);
+            //Cursor cur = database.rawQuery("SELECT * FROM setMenu", null);
+
+            Log.i("SHID",SHIFT_ID+"");
+
+            Cursor cur = database.rawQuery("SELECT ss.shift_id,sm.id,sm.set_menu_name,sm.image,sm.status,sm.set_menu_price FROM shift_setmenu as ss, setMenu as sm where ss.shift_setid = sm.id and ss.shift_id=" + SHIFT_ID + " ",null);
+            Log.i("Cc",cur.getCount()+"");
             while (cur.moveToNext()) {
                 Category item = new Category();
                 String itemID = cur.getString(cur.getColumnIndex("id"));
@@ -1152,6 +1209,8 @@ public class CategoryActivity extends ActionBarActivity {
                 orderjsonObject.put("take_id", "null");
             }
             orderjsonObject.put("order_id", VOUNCHER_ID);
+            orderjsonObject.put("daycode", DAY_CODE);
+            orderjsonObject.put("shift_id",SHIFT_ID);
             orderjsonObject.put("total_price", tvalue);
             orderjsonObject.put("extra_price", totalExtraAmt);
             orderjsonObject.put("discount_amount", totalDisAmt);
@@ -1450,6 +1509,7 @@ public class CategoryActivity extends ActionBarActivity {
                         cv.put("group_id", download_item.getGroup_id());
                         cv.put("isdefault", download_item.getIsdefault());
                         cv.put("has_contiment", download_item.getHas_contiment());
+                        cv.put("standard_cooking_time", download_item.getStandard_cooking_time());
                         database.insert("item", null, cv);
                     }
                     database.setTransactionSuccessful();
@@ -2037,7 +2097,8 @@ public class CategoryActivity extends ActionBarActivity {
 
                     while (cursor.moveToNext()) {
 
-                        int cookingtime=cursor.getInt(cursor.getColumnIndex("standard_cooking_time"));
+                        int cookingtime = cursor.getInt(cursor.getColumnIndex("standard_cooking_time"));
+                        Log.i("CookingTime", cookingtime + "");
                         int has_contiment = cursor.getInt(cursor.getColumnIndex("has_contiment"));
 
                         if (has_contiment == 1) {
@@ -2070,7 +2131,7 @@ public class CategoryActivity extends ActionBarActivity {
                             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                             final View view1 = layoutInflater.inflate(R.layout.category_contiment_dialog, null);
 
-                            TextView cookingTimetxt= (TextView) view1.findViewById(R.id.cookingTime);
+                            TextView cookingTimetxt = (TextView) view1.findViewById(R.id.cookingTime);
                             cookingTimetxt.setText(cookingtime+" mins");
 
                             contimentnameList.clear();
@@ -2106,7 +2167,7 @@ public class CategoryActivity extends ActionBarActivity {
 //                                    String con_disamount = "";
 //                                    String con_distype = "";
 
-                                     selected_ContimentName = contimentnameList.get(i);
+                                    selected_ContimentName = contimentnameList.get(i);
 
                                     for (i = 0; i < contimentnameList.size(); i++) {
 
@@ -2262,7 +2323,6 @@ public class CategoryActivity extends ActionBarActivity {
                                             categoryItemAdapter.notifyDataSetChanged();
 
 
-
                                             builder.dismiss();
                                         }
                                     });
@@ -2282,11 +2342,11 @@ public class CategoryActivity extends ActionBarActivity {
                             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                             final View view1 = layoutInflater.inflate(R.layout.category_contiment_dialog, null);
 
-                            Spinner spinner= (Spinner) view1.findViewById(R.id.contimentSpinner);
+                            Spinner spinner = (Spinner) view1.findViewById(R.id.contimentSpinner);
                             spinner.setVisibility(View.GONE);
 
-                            TextView cookingTimetxt= (TextView) view1.findViewById(R.id.cookingTime);
-                            cookingTimetxt.setText(cookingtime+" mins");
+                            TextView cookingTimetxt = (TextView) view1.findViewById(R.id.cookingTime);
+                            cookingTimetxt.setText(cookingtime + " mins");
 
                             builder.setView(view1);
                             builder.setTitle(categoryItem.getItemName());
@@ -4609,8 +4669,9 @@ public class CategoryActivity extends ActionBarActivity {
                         parent_ID = albumList.get(getPosition()).getParent_id();
                         next_ID = ID;
                         previous_ID = parent_ID;
-                        if (categoryDataFromDB(ID).size() > 0) {
-                            CategoryArrayAdapter adapter = new CategoryArrayAdapter(CategoryActivity.this, categoryDataFromDB(ID));
+                        if (!ID.equals("set_menu") && cateDataFromDB1(ID).size() > 0) {
+                            Log.i("size", cateDataFromDB1(ID).size() + "");
+                            CategoryArrayAdapter adapter = new CategoryArrayAdapter(CategoryActivity.this, cateDataFromDB1(ID));
                             recyclerView.setAdapter(adapter);
                             adapter.notifyDataSetChanged();
                         } else {
@@ -4979,7 +5040,9 @@ public class CategoryActivity extends ActionBarActivity {
             } else {
                 orderjsonObject.put("take_id", "null");
             }
-            orderjsonObject.put("daycode","DC_20180206");
+            orderjsonObject.put("daycode", DAY_CODE);
+            orderjsonObject.put("shift_id",SHIFT_ID);
+
             orderjsonObject.put("total_price", tvalue);
             orderjsonObject.put("extra_price", totalExtraAmt);
             orderjsonObject.put("discount_amount", totalDisAmt);

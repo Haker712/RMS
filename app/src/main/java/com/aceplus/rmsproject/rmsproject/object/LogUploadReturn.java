@@ -6,9 +6,9 @@ package com.aceplus.rmsproject.rmsproject.object;
 
 public class LogUploadReturn {
 
-    String Message;
+    String message;
 
     public String getMessage() {
-        return Message;
+        return message;
     }
 }

@@ -48,6 +48,8 @@ import com.aceplus.rmsproject.rmsproject.object.Download_Promotion_Item;
 import com.aceplus.rmsproject.rmsproject.object.Download_Room;
 import com.aceplus.rmsproject.rmsproject.object.Download_SetItem;
 import com.aceplus.rmsproject.rmsproject.object.Download_SetMenu;
+import com.aceplus.rmsproject.rmsproject.object.Download_ShiftCategory;
+import com.aceplus.rmsproject.rmsproject.object.Download_ShiftSetmenu;
 import com.aceplus.rmsproject.rmsproject.object.Download_Table;
 import com.aceplus.rmsproject.rmsproject.object.Download_TableVersion;
 import com.aceplus.rmsproject.rmsproject.object.JSONResponseDiscount;
@@ -106,6 +108,8 @@ public class MainActivity extends Activity {
     private ArrayList<Download_Promotion_Item> download_promotion_itemArrayList;
     private ArrayList<Download_Discount> download_discountArrayList;
     private ArrayList<Download_Contiment> download_contimentArrayList;
+    private ArrayList<Download_ShiftCategory> download_shiftCategoryArrayList;
+    private ArrayList<Download_ShiftSetmenu> download_shiftSetmenuArrayList;
     private ArrayList<Download_TableVersion> download_tableVersionArrayList;
     //    public static final String URL = "http://192.168.11.57:9090";
     //public static  String URL = "http://192.168.11.62:8800";
@@ -130,8 +134,8 @@ public class MainActivity extends Activity {
     SharedPreferences sharedpreferences;
     public static final String LOGIN_PREFERENCES = "Login";
     public static final String WAITER_ID = "waiter_id";
-    public static final String DAY_CODE="day_code";
-    public static final String SHIFT_ID="shift_id";
+    public static final String DAY_CODE = "day_code";
+    public static final String SHIFT_ID = "shift_id";
     public static boolean userLogin = false;
 
     ActivateKey activateKey = new ActivateKey();
@@ -142,10 +146,10 @@ public class MainActivity extends Activity {
     SharedPreferences.Editor editor;
 
     String Waitername = "";
-    String WaiterId = "";
+    public static String WaiterId = "";
     String UserRole = "";
-    String DayCode="";
-    int ShiftId=0;
+    String DayCode = "";
+    int ShiftId = 0;
 
     public static String tablet_id;
 
@@ -368,6 +372,7 @@ public class MainActivity extends Activity {
 
                 if (prefs.getString("BACKEND_URL", "") != null) {
                     String BACKEND_URL = prefs.getString("BACKEND_URL", "");
+                    Log.i("BE_URL", BACKEND_URL);
                     URL = BACKEND_URL;
                     IMG_URL_PREFIX = BACKEND_URL + "/uploads/";
                 }
@@ -440,13 +445,13 @@ public class MainActivity extends Activity {
                         Waitername = jsonResponse.getWaiter_name();
                         WaiterId = jsonResponse.getWaiter_id();
                         UserRole = jsonResponse.getRole();
-                        DayCode=jsonResponse.getDaycode();
-                        ShiftId=jsonResponse.getShift_id();
+                        DayCode = jsonResponse.getDaycode();
+                        ShiftId = jsonResponse.getShift_id();
 
                         SharedPreferences.Editor editor = sharedpreferences.edit();
                         editor.putString(WAITER_ID, jsonResponse.getWaiter_id());
-                        editor.putString("DayCode",DayCode);
-                        editor.putInt("ShitId",ShiftId);
+                        editor.putString(DAY_CODE, DayCode);
+                        editor.putInt(SHIFT_ID, ShiftId);
                         editor.commit();
                         loadSyncsTable(getVersionList());
                     } else if (message.equals("Fail")) {
@@ -506,6 +511,10 @@ public class MainActivity extends Activity {
                             }
                         });
                         builder.show();
+
+                    } else if (message.equals("Day does not start")) {
+
+                        Toast.makeText(MainActivity.this, "Day need to start", Toast.LENGTH_SHORT).show();
 
                     }
                 } catch (Exception e) {
@@ -737,6 +746,8 @@ public class MainActivity extends Activity {
         int vPromotionItem = 0;
         int vDiscount = 0;
         int vContinent = 0;
+        int vShiftCategory = 0;
+        int vShiftSetMenu = 0;
         for (int i = 0; i < version.size(); i++) {
             vCategory = version.get(0);
             // Log.d("vCategory", vCategory);
@@ -779,8 +790,14 @@ public class MainActivity extends Activity {
 
             vContinent = version.get(13);
             Log.d("vCon", vContinent + "");
+
+            vShiftCategory = version.get(14);
+            Log.d("vShiftCategory", vShiftCategory + "");
+
+            vShiftCategory = version.get(15);
+            Log.d("vShiftSetMenu", vShiftSetMenu + "");
         }
-        Call<JsonResponseSyncs> call = request.getUpdateData(vCategory, vItem, vAddon, vMember, vSetMenu, vSetItem, vRoom, vTable, vBooking, vConfig, vPromotion, vPromotionItem, vDiscount, vContinent, getActivateKeyFromDB());
+        Call<JsonResponseSyncs> call = request.getUpdateData(vCategory, vItem, vAddon, vMember, vSetMenu, vSetItem, vRoom, vTable, vBooking, vConfig, vPromotion, vPromotionItem, vDiscount, vContinent, vShiftCategory, vShiftSetMenu, getActivateKeyFromDB());
         call.enqueue(new Callback<JsonResponseSyncs>() {
             @Override
             public void onResponse(Call<JsonResponseSyncs> call, Response<JsonResponseSyncs> response) {
@@ -850,22 +867,22 @@ public class MainActivity extends Activity {
                             }
                         }
 
-                        Cursor cursor = database.rawQuery("SELECT * FROM setMenu", null);
-
-
-                        Cursor cursor1 = database.rawQuery("SELECT * FROM category where id='set_menu'", null);
-
-
-                        if (cursor.getCount() > 0 && cursor1.getCount() < 1) {
-                            ContentValues setMenuCV = new ContentValues();
-                            setMenuCV.put("id", "set_menu");
-                            setMenuCV.put("name", "SetMenu");
-                            setMenuCV.put("status", "1");
-                            setMenuCV.put("parent_id", "0");
-                            setMenuCV.put("kitchen_id", "0");
-                            setMenuCV.put("image", "setmenu.jpg");
-                            database.insert("category", null, setMenuCV);
-                        }
+//                        Cursor cursor = database.rawQuery("SELECT * FROM setMenu", null);
+//
+//
+//                        Cursor cursor1 = database.rawQuery("SELECT * FROM category where id='set_menu'", null);
+//
+//
+//                        if (cursor.getCount() > 0 && cursor1.getCount() < 1) {
+//                            ContentValues setMenuCV = new ContentValues();
+//                            setMenuCV.put("id", "set_menu");
+//                            setMenuCV.put("name", "SetMenu");
+//                            setMenuCV.put("status", "1");
+//                            setMenuCV.put("parent_id", "0");
+//                            setMenuCV.put("kitchen_id", "0");
+//                            setMenuCV.put("image", "setmenu.jpg");
+//                            database.insert("category", null, setMenuCV);
+//                        }
 
                         if (jsonResponse.getItems() == null) {
                             deleteTableVersion("item");
@@ -887,7 +904,7 @@ public class MainActivity extends Activity {
                                 cv.put("group_id", download_item.getGroup_id());
                                 cv.put("isdefault", download_item.getIsdefault());
                                 cv.put("has_contiment", download_item.getHas_contiment());
-                                cv.put("standard_cooking_time",download_item.getStandard_cooking_time());
+                                cv.put("standard_cooking_time", download_item.getStandard_cooking_time());
 
                                 database.insert("item", null, cv);
                             }
@@ -1117,6 +1134,70 @@ public class MainActivity extends Activity {
                                 cv.put("name", download_contiment.getName());
                                 database.insert("contiment", null, cv);
                             }
+                        }
+
+                        if (jsonResponse.getShift_category() == null) {
+                            deleteTableVersion("shift_category");
+                        } else {
+                            download_shiftCategoryArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getShift_category()));
+                            if (download_shiftCategoryArrayList.size() > 0) {
+                                deleteTableVersion("shift_category");
+                            }
+
+                            for (Download_ShiftCategory download_shiftCategory : download_shiftCategoryArrayList) {
+
+                                ContentValues cv = new ContentValues();
+                                cv.put("id", download_shiftCategory.getId());
+                                cv.put("shift_id", download_shiftCategory.getShift_id());
+                                cv.put("category_id", download_shiftCategory.getCategory_id());
+                                database.insert("shift_category", null, cv);
+
+                            }
+
+                        }
+
+
+                        if (jsonResponse.getShift_setmenu() == null) {
+
+                            deleteTableVersion("shift_setmenu");
+                            database.execSQL("DELETE FROM category WHERE id='set_menu'");
+
+                        } else {
+                            download_shiftSetmenuArrayList = new ArrayList<>(Arrays.asList(jsonResponse.getShift_setmenu()));
+                            if (download_shiftSetmenuArrayList.size() > 0) {
+                                deleteTableVersion("shift_setmenu");
+                            }
+
+                            for (Download_ShiftSetmenu download_shiftSetmenu : download_shiftSetmenuArrayList) {
+
+                                ContentValues cv = new ContentValues();
+                                cv.put("id", download_shiftSetmenu.getId());
+                                cv.put("shift_id", download_shiftSetmenu.getShift_id());
+                                cv.put("shift_setid", download_shiftSetmenu.getShit_setid());
+                                database.insert("shift_setmenu", null, cv);
+
+
+                            }
+
+
+                        }
+
+
+                        Cursor cursor = database.rawQuery("SELECT * FROM shift_setmenu", null);
+
+
+                        Cursor cursor1 = database.rawQuery("SELECT * FROM category where id='set_menu'", null);
+
+
+                        if (cursor.getCount() > 0 && cursor1.getCount() < 1) {
+                            ContentValues setMenuCV = new ContentValues();
+                            setMenuCV.put("id", "set_menu");
+                            setMenuCV.put("name", "SetMenu");
+                            setMenuCV.put("status", "1");
+                            setMenuCV.put("parent_id", "0");
+                            setMenuCV.put("kitchen_id", "0");
+                            setMenuCV.put("image", "setmenu.jpg");
+                            database.insert("category", null, setMenuCV);
                         }
 
                         database.setTransactionSuccessful();
