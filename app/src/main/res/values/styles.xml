@@ -24,7 +24,7 @@
 
     <style name="MyCheckBox" parent="Theme.AppCompat.Light">
         <item name="colorControlNormal">@color/gray</item>
-        <item name="colorControlActivated">@color/orange</item>
+        <item name="colorControlActivated">@color/status_blue</item>
     </style>
 
     <style name="ExtraCheckBox" parent="Theme.AppCompat.Light">

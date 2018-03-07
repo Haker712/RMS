@@ -1,579 +1,448 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
-    tools:context=".CategoryActivity">
+    android:background="@drawable/background_new">
 
     <include
         android:id="@+id/app_bar"
         layout="@layout/app_bar" />
 
-    <LinearLayout
+    <Button
+        android:id="@+id/add_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingTop="@dimen/button_bar_top_padding"
-        android:paddingRight="5dp">
+        android:background="@drawable/edit"
+        android:layout_alignRight="@+id/app_bar" />
 
-        <Button
-            android:id="@+id/add_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/edit" />
+    <Button
+        android:id="@+id/paid_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/paid"
+        android:visibility="gone"/>
 
-        <View
-            android:layout_width="20dp"
-            android:layout_height="10dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/app_bar"
+        android:weightSum="4">
 
-        <!--<Button-->
-            <!--android:id="@+id/print_btn"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="@drawable/print"/>-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginBottom="50dp"
+            android:layout_weight="3"
+            android:background="#0feeeeee"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/paid_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/paid"
-            android:visibility="gone"/>
+            <LinearLayout
+                android:id="@+id/staffInfoLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="#3deeeeee">
+
+                <TextView
+                    android:id="@+id/staffid_view_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="7dp"
+                    android:text="Staff ID : "
+                    android:textColor="@color/colorAccent"
+                    android:textAllCaps="true"
+                    android:textSize="20sp"/>
+
+                <TextView
+                    android:id="@+id/staffid_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/name_view_txt"
+                    android:padding="7dp"
+                    android:text="admin"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="20sp"/>
+
+                <TextView
+                    android:id="@+id/staffname_view_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="7dp"
+                    android:text="Staff Name : "
+                    android:textColor="@color/colorAccent"
+                    android:textAllCaps="true"
+                    android:textSize="20sp"/>
+
+                <TextView
+                    android:id="@+id/staffname_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/name_view_txt"
+                    android:padding="7dp"
+                    android:text="admin"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="20sp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linear_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/staffInfoLayout"
+                android:background="@drawable/auotcomplete_normal"
+                android:orientation="horizontal"
+                android:padding="13dp"
+                android:layout_margin="10dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.5"
+                    android:gravity="center_horizontal"
+                    android:text="Item Name"
+                    android:textColor="@color/blackColor" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="Pirce"
+                    android:textColor="@color/blackColor" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="Quantity"
+                    android:textColor="@color/blackColor" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="ExtraPrice"
+                    android:textColor="@color/blackColor" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="Discount"
+                    android:textColor="@color/blackColor" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="Amount"
+                    android:textColor="@color/blackColor" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="Status"
+                    android:textColor="@color/blackColor" />
+            </LinearLayout>
+
+            <ListView
+                android:id="@+id/list_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:descendantFocusability="blocksDescendants" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="50dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:background="#0feeeeee"
+            android:orientation="vertical"
+            android:weightSum="2">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Status"
+                    android:layout_alignParentTop="true"
+                    android:textColor="@color/colorAccent"
+                    android:textAllCaps="true"
+                    android:textSize="20sp"
+                    android:padding="7dp"
+                    android:background="#3deeeeee"/>
+
+                <TextView
+                    android:id="@+id/txtview1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Date :"
+                    android:layout_marginTop="50dp"
+                    android:layout_marginLeft="5dp"
+                    android:textColor="@color/colorAccent"
+                    android:layout_below="@+id/status"
+                    android:paddingTop="20dp"
+                    android:textSize="20sp"/>
+
+                <TextView
+                    android:id="@+id/date_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtview1"
+                    android:layout_margin="5dp"
+                    android:text="2018-02-22"
+                    android:textColor="@color/secondColor"
+                    android:textSize="23sp"/>
+
+                <TextView
+                    android:id="@+id/txtview2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/date_txt"
+                    android:layout_margin="5dp"
+                    android:text="Vouncher No :"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="20sp"/>
+
+                <TextView
+                    android:id="@+id/vouncher_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/txtview2"
+                    android:layout_margin="5dp"
+                    android:text="2018-02-22"
+                    android:textColor="@color/secondColor"
+                    android:textSize="23sp"/>
+
+                <TextView
+                    android:id="@+id/txtview3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/vouncher_txt"
+                    android:layout_margin="5dp"
+                    android:text="Vouncher Info :"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="20sp"/>
+
+                <TextView
+                    android:id="@+id/table_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtview3"
+                    android:layout_margin="5dp"
+                    android:text="2018-02-22"
+                    android:textColor="@color/secondColor"
+                    android:textSize="23sp"
+                    />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:layout_weight="1">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/secondColor"></View>
+
+                <TextView
+                    android:id="@+id/txtview4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:text="Total Amount :"
+                    android:textColor="@color/colorAccent" />
+
+                <TextView
+                    android:id="@+id/total_amount_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_margin="5dp"
+                    android:text="2018-02-22"
+                    android:textColor="@color/colorAccent" />
+
+                <View
+                    android:id="@+id/view2"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@+id/total_amount_txt"
+                    android:background="@color/secondColor"
+                    ></View>
+
+                <TextView
+                    android:id="@+id/txtview5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/view2"
+                    android:layout_margin="5dp"
+                    android:text="Tax :"
+                    android:textColor="@color/colorAccent" />
+
+                <TextView
+                    android:id="@+id/tax_percent_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="140dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_below="@+id/view2"
+                    android:text="10%"
+                    android:textColor="@color/colorAccent"/>
+
+                <TextView
+                    android:id="@+id/tax_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/view2"
+                    android:layout_margin="5dp"
+                    android:text="2018-02-22"
+                    android:textColor="@color/colorAccent" />
+
+                <TextView
+
+                    android:id="@+id/txtview6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtview5"
+                    android:layout_margin="5dp"
+                    android:text="Service :"
+                    android:textColor="@color/colorAccent" />
+
+                <TextView
+                    android:id="@+id/service_percent_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/txtview5"
+                    android:layout_below="@+id/tax_percent_txt"
+                    android:layout_marginLeft="101dp"
+                    android:layout_marginTop="10dp"
+                    android:text="10%"
+                    android:textColor="@color/colorAccent" />
+
+                <TextView
+                    android:id="@+id/service_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtview5"
+                    android:layout_margin="5dp"
+                    android:text="2018-02-22"
+                    android:textColor="@color/colorAccent"
+                    android:layout_alignParentRight="true"/>
+
+                <TextView
+                    android:id="@+id/Roomcharges"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/service_txt"
+                    android:text="Room Charges :"
+                    android:textColor="@color/colorAccent"
+                    android:layout_margin="5dp"/>
+
+
+
+                <TextView
+                    android:id="@+id/Roomcharges_amt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="0"
+                    android:layout_below="@+id/service_txt"
+                    android:textColor="@color/colorAccent"
+                    android:layout_margin="5dp"/>
+
+                <View
+                    android:id="@+id/view3"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@+id/Roomcharges"
+                    android:background="@color/secondColor"
+                    ></View>
+
+                <TextView
+                    android:id="@+id/txtview7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:text="Net Amount :"
+                    android:layout_below="@+id/view3"
+                    android:textColor="@color/colorAccent" />
+
+                <TextView
+                    android:id="@+id/net_amount_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/view3"
+                    android:layout_alignParentRight="true"
+                    android:text="0"
+                    android:layout_margin="5dp"
+                    android:textColor="@color/colorAccent"/>
+
+                <EditText
+                    android:id="@+id/pay_amount_edit"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="pay amount"
+                    android:inputType="number"
+                    android:singleLine="true"
+                    android:textColor="@color/blackColor"
+                    android:textSize="16dp"
+                    android:visibility="gone"/>
+
+                <EditText
+                    android:id="@+id/member_card_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="member card no"
+                    android:inputType="number"
+                    android:singleLine="true"
+                    android:textColor="@color/blackColor"
+                    android:textSize="16dp"
+                    android:visibility="gone"/>
+
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
 
     </LinearLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:padding="10dp"
-        android:layout_below="@+id/app_bar"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            android:background="#eeFFFFFF">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:orientation="vertical">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <LinearLayout
-                            android:id="@+id/staffInfoLayout"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:id="@+id/staffid_view_txt"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:padding="7dp"
-                                android:text="Staff ID : "
-                                android:textColor="@color/blackColor" />
-
-                            <TextView
-                                android:id="@+id/staffid_txt"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_toRightOf="@+id/name_view_txt"
-                                android:padding="7dp"
-                                android:text="admin"
-                                android:textColor="@color/blackColor" />
-
-                            <TextView
-                                android:id="@+id/staffname_view_txt"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:padding="7dp"
-                                android:text="Staff Name : "
-                                android:textColor="@color/blackColor" />
-
-                            <TextView
-                                android:id="@+id/staffname_txt"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_toRightOf="@+id/name_view_txt"
-                                android:padding="7dp"
-                                android:text="admin"
-                                android:textColor="@color/blackColor" />
-
-                        </LinearLayout>
-
-
-
-
-
-                        <LinearLayout
-                            android:id="@+id/linear_layout"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/staffInfoLayout"
-                            android:background="@drawable/auotcomplete_normal"
-                            android:orientation="horizontal"
-                            android:padding="13dp">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1.5"
-                                android:gravity="center_horizontal"
-                                android:text="Item Name"
-                                android:textColor="@color/blackColor" />
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="center_horizontal"
-                                android:text="Pirce"
-                                android:textColor="@color/blackColor" />
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="center_horizontal"
-                                android:text="Quantity"
-                                android:textColor="@color/blackColor" />
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="center_horizontal"
-                                android:text="ExtraPrice"
-                                android:textColor="@color/blackColor" />
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="center_horizontal"
-                                android:text="Discount"
-                                android:textColor="@color/blackColor" />
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="center_horizontal"
-                                android:text="Amount"
-                                android:textColor="@color/blackColor" />
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="center_horizontal"
-                                android:text="Status"
-                                android:textColor="@color/blackColor" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="fill_parent"
-                            android:layout_below="@+id/linear_layout"
-                            android:orientation="vertical"
-                            android:paddingLeft="10dp"
-                            android:paddingRight="10dp">
-
-                            <ListView
-                                android:id="@+id/list_view"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:descendantFocusability="blocksDescendants" />
-                        </LinearLayout>
-                    </RelativeLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:padding="7dp">
-
-                    <ScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal">
-
-                                <TextView
-                                    android:layout_width="100dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="Date"
-                                    android:textColor="@color/orange" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text=":  "
-                                    android:textColor="@color/orange" />
-
-                                <TextView
-                                    android:id="@+id/date_txt"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="2016/08/04 12:00:00"
-                                    android:textColor="@color/orange" />
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal">
-
-                                <TextView
-                                    android:layout_width="100dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="Vouncher No"
-                                    android:textColor="@color/orange" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text=":  "
-                                    android:textColor="@color/orange" />
-
-                                <TextView
-                                    android:id="@+id/vouncher_txt"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="ADMIN16080400001"
-                                    android:textColor="@color/orange" />
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal">
-
-                                <TextView
-                                    android:layout_width="100dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="Voucher Info"
-                                    android:textColor="@color/orange" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text=":  "
-                                    android:textColor="@color/orange" />
-
-                                <TextView
-                                    android:id="@+id/table_txt"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="A001"
-                                    android:textColor="@color/orange" />
-                            </LinearLayout>
-
-                            <EditText
-                                android:id="@+id/member_card_edit"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:ems="10"
-                                android:hint="member card no"
-                                android:inputType="number"
-                                android:singleLine="true"
-                                android:textColor="@color/blackColor"
-                                android:textSize="16dp"
-                                android:visibility="gone">
-
-                                <requestFocus />
-                            </EditText>
-
-
-                            //ksl
-
-                            <EditText
-                                android:id="@+id/FOC_amount_edit"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/blackColor"
-                                android:singleLine="true"
-                                android:hint="Free Of Charge"
-                                android:textSize="16dp"
-                                android:inputType="number"
-                                android:visibility="gone"/>
-
-                            <EditText
-                                android:id="@+id/remark_of_FOC_edit"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/blackColor"
-                                android:singleLine="true"
-                                android:hint="Remark"
-                                android:textSize="16dp"
-                                android:visibility="gone"/>
-
-
-
-                            <EditText
-                                android:id="@+id/pay_amount_edit"
-                                android:layout_width="fill_parent"
-                                android:layout_height="wrap_content"
-                                android:ems="10"
-                                android:hint="pay amount"
-                                android:inputType="number"
-                                android:singleLine="true"
-                                android:textColor="@color/blackColor"
-                                android:textSize="16dp"
-                                android:visibility="gone">
-
-
-
-
-                                <requestFocus />
-                            </EditText>
-
-
-                            <RelativeLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="7dp"
-                                android:visibility="gone"
-                                >
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Refund :" />
-
-                                <TextView
-                                    android:id="@+id/refund_txt"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_alignParentRight="true"
-                                    android:text="0" />
-                            </RelativeLayout>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:background="@color/colorPrimaryDark"/>
-
-                            <RelativeLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="7dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Total Amount :" />
-
-                                <TextView
-                                    android:id="@+id/total_amount_txt"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_alignParentRight="true"
-                                    android:text="0" />
-                            </RelativeLayout>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:background="@color/colorPrimaryDark"/>
-
-                            <!--<RelativeLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="7dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Total Extra Amount :" />
-
-                                <TextView
-                                    android:id="@+id/total_extra_amount_txt"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_alignParentRight="true"
-                                    android:text="0" />
-                            </RelativeLayout>-->
-
-                            <!--<RelativeLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="7dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Total Discount Amount :" />
-
-                                <TextView
-                                    android:id="@+id/total_discount_amount_txt"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_alignParentRight="true"
-                                    android:text="0" />
-                            </RelativeLayout>-->
-
-                            <!--<RelativeLayout-->
-                                <!--android:layout_width="match_parent"-->
-                                <!--android:layout_height="wrap_content"-->
-                                <!--android:padding="7dp">-->
-
-                                <!--<TextView-->
-                                    <!--android:layout_width="wrap_content"-->
-                                    <!--android:layout_height="wrap_content"-->
-                                    <!--android:text="Member Discount Amount :" />-->
-
-                                <!--<TextView-->
-                                    <!--android:id="@+id/member_discount_txt"-->
-                                    <!--android:layout_width="wrap_content"-->
-                                    <!--android:layout_height="wrap_content"-->
-                                    <!--android:layout_alignParentRight="true"-->
-                                    <!--android:text="0" />-->
-                            <!--</RelativeLayout>-->
-
-                            <RelativeLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="7dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Tax :" />
-
-                                <TextView
-                                    android:id="@+id/tax_percent_txt"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_toLeftOf="@+id/tax_txt"
-                                    android:gravity="center"
-                                    android:layout_marginRight="50dp"/>
-
-                                <TextView
-                                    android:id="@+id/tax_txt"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_alignParentRight="true"
-                                    android:text="0" />
-                            </RelativeLayout>
-
-                            <RelativeLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="7dp">
-
-                                <TextView
-                                    android:id="@+id/Roomcharges"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Room Charges :" />
-
-
-
-                                <TextView
-                                    android:id="@+id/Roomcharges_amt"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_alignParentRight="true"
-                                    android:text="0" />
-                            </RelativeLayout>
-
-
-                            <RelativeLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="7dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Service :" />
-
-                                <TextView
-                                    android:id="@+id/service_percent_txt"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_toLeftOf="@+id/service_txt"
-                                    android:gravity="center"
-                                    android:layout_marginRight="50dp"/>
-
-                                <TextView
-                                    android:id="@+id/service_txt"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_alignParentRight="true"
-                                    android:text="0" />
-                            </RelativeLayout>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:background="@color/colorPrimaryDark"/>
-
-                            <RelativeLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="7dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Net Amount :" />
-
-                                <TextView
-                                    android:id="@+id/net_amount_txt"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_alignParentRight="true"
-                                    android:text="0" />
-                            </RelativeLayout>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:background="@color/colorPrimaryDark"/>
-
-                        </LinearLayout>
-                    </ScrollView>
-                </LinearLayout>
-            </LinearLayout>
-        </RelativeLayout>
-    </RelativeLayout>
-
     <TextView
-        android:id="@+id/txt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/txtview"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:paddingBottom="10dp"
-        android:text="@string/company_message"
-        android:textColor="@color/colorAccent" />
+        android:text="Copyright Blah Blah Blah Copyright Blah Blah Blah "
+        android:textColor="@color/secondColor"
+        android:gravity="center"
+        android:background="#363535"/>
+
 
 </RelativeLayout>

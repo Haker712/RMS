@@ -154,7 +154,7 @@ public class HomePageActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
 
-        CustomExceptionHandler.newInstance().traceUnchagedException(this);
+       // CustomExceptionHandler.newInstance().traceUnchagedException(this);
 
         activity = this;
 

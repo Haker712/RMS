@@ -235,7 +235,7 @@ public class CategoryActivity extends ActionBarActivity {
     String selected_ContimentName;
 
     public String WAITER_ID = null;
-    public String DAY_CODE = "";
+    public int DAY_CODE = 0;
     public int SHIFT_ID = 0;
 
     SharedPreferences prefs;
@@ -247,10 +247,10 @@ public class CategoryActivity extends ActionBarActivity {
 
         prefs = getSharedPreferences(MainActivity.LOGIN_PREFERENCES, MODE_PRIVATE);
 
-        DAY_CODE = prefs.getString(MainActivity.DAY_CODE, "");
+        DAY_CODE = prefs.getInt(MainActivity.DAY_CODE, 0);
         SHIFT_ID = prefs.getInt(MainActivity.SHIFT_ID, 0);
 
-        CustomExceptionHandler.newInstance().traceUnchagedException(this);
+        //CustomExceptionHandler.newInstance().traceUnchagedException(this);
 
 
         activity = this;
@@ -1209,7 +1209,7 @@ public class CategoryActivity extends ActionBarActivity {
                 orderjsonObject.put("take_id", "null");
             }
             orderjsonObject.put("order_id", VOUNCHER_ID);
-            orderjsonObject.put("daycode", DAY_CODE);
+            orderjsonObject.put("day_id", DAY_CODE);
             orderjsonObject.put("shift_id",SHIFT_ID);
             orderjsonObject.put("total_price", tvalue);
             orderjsonObject.put("extra_price", totalExtraAmt);
@@ -5040,7 +5040,7 @@ public class CategoryActivity extends ActionBarActivity {
             } else {
                 orderjsonObject.put("take_id", "null");
             }
-            orderjsonObject.put("daycode", DAY_CODE);
+            orderjsonObject.put("day_id", DAY_CODE);
             orderjsonObject.put("shift_id",SHIFT_ID);
 
             orderjsonObject.put("total_price", tvalue);

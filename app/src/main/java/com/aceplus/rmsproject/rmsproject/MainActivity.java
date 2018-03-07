@@ -27,6 +27,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -89,7 +90,7 @@ public class MainActivity extends Activity {
     private TextView nameTxt;
     private TextView ipchangeTxt;
     private ImageView logoImage;
-    private RelativeLayout loginLayout;
+    private LinearLayout loginLayout;
     private RelativeLayout activateLayout;
     SQLiteDatabase database;
     private Retrofit retrofit;
@@ -148,7 +149,7 @@ public class MainActivity extends Activity {
     String Waitername = "";
     public static String WaiterId = "";
     String UserRole = "";
-    String DayCode = "";
+    int DayCode = 0;
     int ShiftId = 0;
 
     public static String tablet_id;
@@ -220,6 +221,7 @@ public class MainActivity extends Activity {
                                     database.setTransactionSuccessful();
                                     database.endTransaction();
                                     Toast.makeText(MainActivity.this, "Successfully!", Toast.LENGTH_LONG).show();
+                                    findViewById(R.id.user_login_txt).setVisibility(View.GONE);
                                     activateLayout.setVisibility(View.GONE);
                                     loginLayout.setVisibility(View.VISIBLE);
                                     nameTxt.setText("User Login");
@@ -273,9 +275,10 @@ public class MainActivity extends Activity {
                 }
             });
         } else {
+            findViewById(R.id.user_login_txt).setVisibility(View.GONE);
             activateLayout.setVisibility(View.GONE);
             loginLayout.setVisibility(View.VISIBLE);
-            nameTxt.setText("User Login");
+//            nameTxt.setText("User Login");
             catchEvents();
         }
     }
@@ -344,7 +347,7 @@ public class MainActivity extends Activity {
         ipchangeTxt = (TextView) findViewById(R.id.user_login_txt);
         loginBtn = (Button) findViewById(R.id.login_btn);
         submmitBtn = (Button) findViewById(R.id.submmit_btn);
-        loginLayout = (RelativeLayout) findViewById(R.id.relative_layout);
+        loginLayout = (LinearLayout) findViewById(R.id.Login_LinearLayout);
         activateLayout = (RelativeLayout) findViewById(R.id.activate_relative_layout);
         nameTxt = (TextView) findViewById(R.id.user_login_txt);
         logoImage = (ImageView) findViewById(R.id.logo_img);
@@ -450,7 +453,7 @@ public class MainActivity extends Activity {
 
                         SharedPreferences.Editor editor = sharedpreferences.edit();
                         editor.putString(WAITER_ID, jsonResponse.getWaiter_id());
-                        editor.putString(DAY_CODE, DayCode);
+                        editor.putInt(DAY_CODE, DayCode);
                         editor.putInt(SHIFT_ID, ShiftId);
                         editor.commit();
                         loadSyncsTable(getVersionList());

@@ -12,7 +12,7 @@
         android:gravity="center_horizontal"
         android:text="Item Name"
         android:layout_gravity="center"
-        android:textColor="@color/blackColor" />
+        android:textColor="@color/colorAccent" />
 
     <TextView
         android:id="@+id/price_txt"
@@ -22,7 +22,7 @@
         android:gravity="center_horizontal"
         android:text="Pirce"
         android:layout_gravity="center"
-        android:textColor="@color/blackColor" />
+        android:textColor="@color/colorAccent" />
 
     <TextView
         android:id="@+id/qty_txt"
@@ -32,7 +32,7 @@
         android:gravity="center_horizontal"
         android:text="Quantity"
         android:layout_gravity="center"
-        android:textColor="@color/blackColor" />
+        android:textColor="@color/colorAccent" />
 
     <TextView
         android:id="@+id/extra_price_txt"
@@ -42,7 +42,7 @@
         android:gravity="center_horizontal"
         android:layout_gravity="center"
         android:text="ExtraPrice"
-        android:textColor="@color/blackColor" />
+        android:textColor="@color/colorAccent" />
 
     <TextView
         android:id="@+id/discount_txt"
@@ -52,7 +52,7 @@
         android:gravity="center_horizontal"
         android:layout_gravity="center"
         android:text="Discount"
-        android:textColor="@color/blackColor" />
+        android:textColor="@color/colorAccent" />
 
     <TextView
         android:id="@+id/amount_txt"
@@ -62,15 +62,14 @@
         android:gravity="center_horizontal"
         android:layout_gravity="center"
         android:text="Amount"
-        android:textColor="@color/blackColor" />
+        android:textColor="@color/colorAccent" />
 
     <Button
         android:id="@+id/status_btn"
         android:layout_width="0dp"
         android:layout_height="@dimen/icon_size"
         android:layout_weight="1"
-        android:text="Cancel"
         android:layout_gravity="center"
-        android:background="@drawable/btn_selector"
+        android:background="#C32D40"
         android:textColor="@color/colorAccent" />
 </LinearLayout>

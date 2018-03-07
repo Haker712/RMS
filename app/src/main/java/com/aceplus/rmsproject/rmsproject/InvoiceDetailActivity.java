@@ -129,8 +129,8 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     private TextView roomChargesAmtTxt;
     private TextView netAmtTxt;
     private EditText payAmtEdit;
-    @InjectView(R.id.FOC_amount_edit)
-    EditText focAmtEdit;
+//    @InjectView(R.id.FOC_amount_edit)
+//    EditText focAmtEdit;
     private EditText focdescription;
     private TextView totaldiscamounttxt;
     private TextView refundTxt;
@@ -172,7 +172,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_invoice_detail_test);
 
-        CustomExceptionHandler.newInstance().traceUnchagedException(this);
+       // CustomExceptionHandler.newInstance().traceUnchagedException(this);
 
         ButterKnife.inject(this);
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
@@ -297,7 +297,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         tableNoTxt = (TextView) findViewById(R.id.table_txt);
         memberCardEdit = (EditText) findViewById(R.id.member_card_edit);
         payAmtEdit = (EditText) findViewById(R.id.pay_amount_edit);
-        payAmtEdit.requestFocus();
+//        payAmtEdit.requestFocus();
         focdescription = (EditText) findViewById(R.id.remark_of_FOC_edit);
         totaldiscamounttxt = (TextView) findViewById(R.id.total_discount_amount_txt);
         totalAmtTxt = (TextView) findViewById(R.id.total_amount_txt);
@@ -347,7 +347,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
 
             Cursor cur = database.rawQuery("SELECT * FROM config", null);
             while (cur.moveToNext()) {
-                taxAmt = cur.getDouble(cur.getColumnIndex("taax"));
+                taxAmt = cur.getDouble(cur.getColumnIndex("tax"));
                 serviceAmt = cur.getDouble(cur.getColumnIndex("service"));
                 roomchargeAmt = cur.getDouble(cur.getColumnIndex("room_charge"));
             }
@@ -402,7 +402,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         serviceTxt.setText(commaSepFormat.format(serviceValue));
         servicepercentTxt.setText(serviceAmt + "%");
         Log.d("Service", serviceValue + "%");
-        focAmtEdit.setEnabled(false);
+       // focAmtEdit.setEnabled(false);
         payAmtEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
@@ -428,7 +428,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                         refundTxt.setText("0");
                     }
                 }
-                focAmtEdit.setEnabled(true);
+                //focAmtEdit.setEnabled(true);
             }
         });
         memberCardEdit.addTextChangedListener(new TextWatcher() {    // for  when enter member ID !!
@@ -464,46 +464,46 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                 }
             }
         });
-        focAmtEdit.addTextChangedListener(new TextWatcher() {   // when  enter foc amount !
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String focAmount = String.valueOf(s);
-                old_totalAmt = Double.parseDouble(totalAmount.trim().replaceAll(",", ""));
-                totalAmt_calc = Double.parseDouble(totalAmtTxt.getText().toString().trim().replaceAll(",", ""));
-                double pay_amount = Double.parseDouble(payAmtEdit.getText().toString().trim().replaceAll(",", ""));
-                if (!focAmtEdit.getText().toString().equals("")) {
-                    FOC_Amount = Double.parseDouble(focAmtEdit.getText().toString());
-                    totalAmt_calc = old_totalAmt;
-                    FOC_toatalamount = totalAmt_calc - FOC_Amount;
-                    setTotalAmt(FOC_toatalamount);
-                    double FOC_tax_amount = FOC_toatalamount * 0.1;
-                    taxTxt.setText(commaSepFormat.format(FOC_tax_amount));
-                    double FOC_Service_amount = FOC_toatalamount * 0.1;
-                    serviceTxt.setText(commaSepFormat.format(FOC_Service_amount));
-                    double FOC_Net_amount = FOC_toatalamount + (FOC_tax_amount + FOC_Service_amount);
-                    netAmtTxt.setText(commaSepFormat.format(FOC_Net_amount));
-                    double foc_refund = pay_amount - FOC_Net_amount;
-                    refundTxt.setText(commaSepFormat.format(foc_refund));
-                } else {
-                    FOC_Amount = 0.0;
-                    totalAmtTxt.setText(totalAmount);
-                    netAmtTxt.setText(netAmount);
-                    double no_foc_netamount = Double.parseDouble(netAmount.trim().replaceAll(",", ""));
-                    double no_foc_refund = pay_amount - no_foc_netamount;
-                    refundTxt.setText(commaSepFormat.format(no_foc_refund));
-                }
-                Log.i("FOC_Amount>>>", FOC_Amount + "");
-                Log.i("FOC_toatalamount>>>", FOC_toatalamount + "");
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
+//        focAmtEdit.addTextChangedListener(new TextWatcher() {   // when  enter foc amount !
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                String focAmount = String.valueOf(s);
+//                old_totalAmt = Double.parseDouble(totalAmount.trim().replaceAll(",", ""));
+//                totalAmt_calc = Double.parseDouble(totalAmtTxt.getText().toString().trim().replaceAll(",", ""));
+//                double pay_amount = Double.parseDouble(payAmtEdit.getText().toString().trim().replaceAll(",", ""));
+//                if (!focAmtEdit.getText().toString().equals("")) {
+//                    FOC_Amount = Double.parseDouble(focAmtEdit.getText().toString());
+//                    totalAmt_calc = old_totalAmt;
+//                    FOC_toatalamount = totalAmt_calc - FOC_Amount;
+//                    setTotalAmt(FOC_toatalamount);
+//                    double FOC_tax_amount = FOC_toatalamount * 0.1;
+//                    taxTxt.setText(commaSepFormat.format(FOC_tax_amount));
+//                    double FOC_Service_amount = FOC_toatalamount * 0.1;
+//                    serviceTxt.setText(commaSepFormat.format(FOC_Service_amount));
+//                    double FOC_Net_amount = FOC_toatalamount + (FOC_tax_amount + FOC_Service_amount);
+//                    netAmtTxt.setText(commaSepFormat.format(FOC_Net_amount));
+//                    double foc_refund = pay_amount - FOC_Net_amount;
+//                    refundTxt.setText(commaSepFormat.format(foc_refund));
+//                } else {
+//                    FOC_Amount = 0.0;
+//                    totalAmtTxt.setText(totalAmount);
+//                    netAmtTxt.setText(netAmount);
+//                    double no_foc_netamount = Double.parseDouble(netAmount.trim().replaceAll(",", ""));
+//                    double no_foc_refund = pay_amount - no_foc_netamount;
+//                    refundTxt.setText(commaSepFormat.format(no_foc_refund));
+//                }
+//                Log.i("FOC_Amount>>>", FOC_Amount + "");
+//                Log.i("FOC_toatalamount>>>", FOC_toatalamount + "");
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//            }
+//        });
 
         addBtn.setOnClickListener(new View.OnClickListener()
 
@@ -675,9 +675,9 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                                    double all_total_amount = Double.parseDouble(netAmtTxt.getText().toString().trim().replace(",", ""));
                                                    double dicount_amount = Double.parseDouble(totaldiscamounttxt.getText().toString().trim().replace(",", ""));
                                                    double foc_amount = 0;
-                                                   if (focAmtEdit.getText().toString().trim().length() != 0) {
-                                                       foc_amount = Double.parseDouble(focAmtEdit.getText().toString().trim().replace(",", ""));
-                                                   }
+//                                                   if (focAmtEdit.getText().toString().trim().length() != 0) {
+//                                                       foc_amount = Double.parseDouble(focAmtEdit.getText().toString().trim().replace(",", ""));
+//                                                   }
                                                    String foc_description = null;
                                                    if (focdescription.getText().toString().trim().replace(",", "") != null) {
                                                        foc_description = focdescription.getText().toString().trim().replace(",", "");

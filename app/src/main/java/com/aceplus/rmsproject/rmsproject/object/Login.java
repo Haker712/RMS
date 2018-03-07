@@ -14,7 +14,7 @@ public class Login {
     String waiter_id;
     String username;
     String role;
-    String daycode;
+    int day_id;
     int shift_id;
 
 
@@ -34,8 +34,8 @@ public class Login {
         return role;
     }
 
-    public String getDaycode() {
-        return daycode;
+    public int getDaycode() {
+        return day_id;
     }
 
     public int getShift_id() {

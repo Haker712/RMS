@@ -115,7 +115,7 @@ public class InvoiceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_invoice);
 
-        CustomExceptionHandler.newInstance().traceUnchagedException(this);
+       // CustomExceptionHandler.newInstance().traceUnchagedException(this);
 
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
