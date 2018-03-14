@@ -14,16 +14,20 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -154,17 +158,23 @@ public class MainActivity extends Activity {
 
     public static String tablet_id;
 
+    Button n1, n2, n3, n4, n5, n6, n7, n8, n9, n0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         appVersion();
-
+        registerNoBtn();
+        noBtnActions();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         database = new Database(this).getDataBase();
         sharedpreferences = getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE);
         registerIds();
+        usernameEdit.setInputType(InputType.TYPE_NULL);
+        passwordEdit.setInputType(InputType.TYPE_NULL);
+
         activateEdit.setText("b4c4447b954302f373c01d320d8b5c58");
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -797,7 +807,7 @@ public class MainActivity extends Activity {
             vShiftCategory = version.get(14);
             Log.d("vShiftCategory", vShiftCategory + "");
 
-            vShiftCategory = version.get(15);
+            vShiftSetMenu = version.get(15);
             Log.d("vShiftSetMenu", vShiftSetMenu + "");
         }
         Call<JsonResponseSyncs> call = request.getUpdateData(vCategory, vItem, vAddon, vMember, vSetMenu, vSetItem, vRoom, vTable, vBooking, vConfig, vPromotion, vPromotionItem, vDiscount, vContinent, vShiftCategory, vShiftSetMenu, getActivateKeyFromDB());
@@ -1298,4 +1308,159 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }
     }
+
+    private void registerNoBtn() {
+
+        n1 = (Button) findViewById(R.id.button1);
+        n2 = (Button) findViewById(R.id.button2);
+        n3 = (Button) findViewById(R.id.button3);
+        n4 = (Button) findViewById(R.id.button4);
+        n5 = (Button) findViewById(R.id.button5);
+        n6 = (Button) findViewById(R.id.button6);
+        n7 = (Button) findViewById(R.id.button7);
+        n8 = (Button) findViewById(R.id.button8);
+        n9 = (Button) findViewById(R.id.button9);
+        n0 = (Button) findViewById(R.id.button10);
+
+    }
+
+    private void noBtnActions() {
+
+        n1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (usernameEdit.hasFocus()) {
+                    //TODO code here for edit text 1
+                    usernameEdit.setText(usernameEdit.getText().toString() + "1");
+                } else if (passwordEdit.hasFocus()) {
+                    //TODO code here for edit text 2
+                    passwordEdit.setText(passwordEdit.getText().toString() + "1");
+
+                }
+
+
+            }
+        });
+        n2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (usernameEdit.hasFocus()) {
+                    //TODO code here for edit text 1
+                    usernameEdit.setText(usernameEdit.getText().toString() + "2");
+                } else if (passwordEdit.hasFocus()) {
+                    //TODO code here for edit text 2
+                    passwordEdit.setText(passwordEdit.getText().toString() + "2");
+
+                }
+            }
+        });
+        n3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (usernameEdit.hasFocus()) {
+                    //TODO code here for edit text 1
+                    usernameEdit.setText(usernameEdit.getText().toString() + "3");
+                } else if (passwordEdit.hasFocus()) {
+                    //TODO code here for edit text 2
+                    passwordEdit.setText(passwordEdit.getText().toString() + "3");
+
+                }
+            }
+        });
+        n4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (usernameEdit.hasFocus()) {
+                    //TODO code here for edit text 1
+                    usernameEdit.setText(usernameEdit.getText().toString() + "4");
+                } else if (passwordEdit.hasFocus()) {
+                    //TODO code here for edit text 2
+                    passwordEdit.setText(passwordEdit.getText().toString() + "4");
+
+                }
+            }
+        });
+        n5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (usernameEdit.hasFocus()) {
+                    //TODO code here for edit text 1
+                    usernameEdit.setText(usernameEdit.getText().toString() + "5");
+                } else if (passwordEdit.hasFocus()) {
+                    //TODO code here for edit text 2
+                    passwordEdit.setText(passwordEdit.getText().toString() + "5");
+
+                }
+            }
+        });
+        n6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (usernameEdit.hasFocus()) {
+                    //TODO code here for edit text 1
+                    usernameEdit.setText(usernameEdit.getText().toString() + "6");
+                } else if (passwordEdit.hasFocus()) {
+                    //TODO code here for edit text 2
+                    passwordEdit.setText(passwordEdit.getText().toString() + "6");
+
+                }
+            }
+        });
+        n7.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (usernameEdit.hasFocus()) {
+                    //TODO code here for edit text 1
+                    usernameEdit.setText(usernameEdit.getText().toString() + "7");
+                } else if (passwordEdit.hasFocus()) {
+                    //TODO code here for edit text 2
+                    passwordEdit.setText(passwordEdit.getText().toString() + "7");
+
+                }
+            }
+        });
+        n8.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (usernameEdit.hasFocus()) {
+                    //TODO code here for edit text 1
+                    usernameEdit.setText(usernameEdit.getText().toString() + "8");
+                } else if (passwordEdit.hasFocus()) {
+                    //TODO code here for edit text 2
+                    passwordEdit.setText(passwordEdit.getText().toString() + "8");
+
+                }
+            }
+        });
+        n9.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (usernameEdit.hasFocus()) {
+                    //TODO code here for edit text 1
+                    usernameEdit.setText(usernameEdit.getText().toString() + "9");
+                } else if (passwordEdit.hasFocus()) {
+                    //TODO code here for edit text 2
+                    passwordEdit.setText(passwordEdit.getText().toString() + "9");
+
+                }
+            }
+        });
+        n0.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (usernameEdit.hasFocus()) {
+                    //TODO code here for edit text 1
+                    usernameEdit.setText(usernameEdit.getText().toString() + "0");
+                } else if (passwordEdit.hasFocus()) {
+                    //TODO code here for edit text 2
+                    passwordEdit.setText(passwordEdit.getText().toString() + "0");
+
+                }
+            }
+        });
+
+    }
+
+
 }

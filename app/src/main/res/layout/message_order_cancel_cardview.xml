@@ -4,17 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="5dp"
-    card_view:cardCornerRadius="5dp">
+    card_view:cardCornerRadius="5dp"
+    card_view:cardBackgroundColor="#0feeeeee">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#00eeeeee">
 
         <RelativeLayout
             android:id="@+id/relative_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="7dp">
+            android:padding="7dp"
+            android:background="#14eeeeee">
 
             <TextView
                 android:id="@+id/vouncher_view"
@@ -22,7 +25,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:text="Vouncher No : "
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="@color/colorAccent"/>
 
             <TextView
                 android:id="@+id/vouncher_txt"
@@ -31,7 +35,8 @@
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/vouncher_view"
                 android:text="ADMIN16081900001"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="@color/colorAccent"/>
 
             <TextView
                 android:id="@+id/table_view"
@@ -41,7 +46,8 @@
                 android:layout_toRightOf="@+id/vouncher_txt"
                 android:paddingLeft="40dp"
                 android:text="Table No : "
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="@color/colorAccent"/>
 
             <TextView
                 android:id="@+id/table_txt"
@@ -50,7 +56,8 @@
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/table_view"
                 android:text="A007"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="@color/colorAccent"/>
 
             <Button
                 android:id="@+id/cancel_btn"
@@ -71,7 +78,8 @@
             android:layout_below="@+id/relative_layout"
             android:background="@drawable/auotcomplete_normal"
             android:orientation="horizontal"
-            android:padding="13dp">
+            android:padding="13dp"
+            android:layout_margin="15dp">
 
             <TextView
                 android:layout_width="0dp"
@@ -79,7 +87,9 @@
                 android:layout_gravity="center"
                 android:layout_weight="1.5"
                 android:text="Product Name"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:textColor="@color/blackColor"
+                android:textStyle="bold"/>
 
             <!--<TextView-->
                 <!--android:layout_width="0dp"-->
@@ -96,7 +106,9 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:text="Order Type"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:textColor="@color/blackColor"
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/remark"
@@ -105,7 +117,9 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:text="Remark"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:textColor="@color/blackColor"
+                android:textStyle="bold"/>
 
             <!--<TextView-->
                 <!--android:id="@+id/Status"-->

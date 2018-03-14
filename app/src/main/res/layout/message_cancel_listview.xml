@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="52dp"
     android:orientation="horizontal"
-    android:padding="7dp">
+    android:padding="7dp"
+    android:background="#00eeeeee">
 
     <TextView
         android:id="@+id/product_txt"
@@ -12,7 +13,8 @@
         android:layout_gravity="center"
         android:layout_weight="1.5"
         android:text="Product Name"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:textColor="@color/colorAccent"/>
 
     <!--<TextView-->
         <!--android:id="@+id/duration_time_txt"-->
@@ -30,7 +32,8 @@
         android:layout_gravity="center"
         android:layout_weight="1"
         android:text="eatin"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:textColor="@color/colorAccent"/>
 
     <TextView
         android:id="@+id/remark_txt"
@@ -39,7 +42,8 @@
         android:layout_gravity="center"
         android:layout_weight="1"
         android:text="remark"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:textColor="@color/colorAccent"/>
 
     <!--<LinearLayout-->
         <!--android:layout_width="0dp"-->
