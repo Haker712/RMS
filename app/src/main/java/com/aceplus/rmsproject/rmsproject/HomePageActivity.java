@@ -158,10 +158,11 @@ public class HomePageActivity extends ActionBarActivity {
 
         activity = this;
 
+        prefs = getSharedPreferences(MainActivity.LOGIN_PREFERENCES, MODE_PRIVATE);
 
-        waiterName = getIntent().getStringExtra("WaiterName");
-        waiterId = getIntent().getStringExtra("WaiterId");
-        waiterRole = getIntent().getStringExtra("UserRole");
+        waiterName = prefs.getString(MainActivity.WAITER_NAME, "No name defined");
+        waiterId = prefs.getString(MainActivity.WAITER_ID, "No name defined");
+        waiterRole = prefs.getString(MainActivity.USER_ROLE, "No name defined");
         final Button homeMenuBtn = (Button) findViewById(R.id.home_menu_btn);
         homeMenuBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -188,9 +189,9 @@ public class HomePageActivity extends ActionBarActivity {
                             txtwaiterId = (TextView) view.findViewById(R.id.waiter_id);
                             txtwaiterRole = (TextView) view.findViewById(R.id.waiter_role);
 
-//                            txtwaiterName.setText(waiterName);
-//                            txtwaiterId.setText(waiterId);
-//                            txtwaiterRole.setText(waiterRole);
+                            txtwaiterName.setText(waiterName);
+                            txtwaiterId.setText(waiterId);
+                            txtwaiterRole.setText(waiterRole);
 
                             builder.setView(view);
                             builder.show();

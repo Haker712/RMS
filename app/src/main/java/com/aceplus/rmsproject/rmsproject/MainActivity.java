@@ -90,6 +90,7 @@ public class MainActivity extends Activity {
     private EditText passwordEdit;
     private EditText activateEdit;
     private Button loginBtn;
+    private Button deleteBtn;
     private Button submmitBtn;
     private TextView nameTxt;
     private TextView ipchangeTxt;
@@ -139,6 +140,8 @@ public class MainActivity extends Activity {
     SharedPreferences sharedpreferences;
     public static final String LOGIN_PREFERENCES = "Login";
     public static final String WAITER_ID = "waiter_id";
+    public static final String WAITER_NAME="waiter_name";
+    public static final String USER_ROLE="user_role";
     public static final String DAY_CODE = "day_code";
     public static final String SHIFT_ID = "shift_id";
     public static boolean userLogin = false;
@@ -356,6 +359,7 @@ public class MainActivity extends Activity {
         activateEdit = (EditText) findViewById(R.id.activate_edit);
         ipchangeTxt = (TextView) findViewById(R.id.user_login_txt);
         loginBtn = (Button) findViewById(R.id.login_btn);
+        deleteBtn= (Button) findViewById(R.id.delete_btn);
         submmitBtn = (Button) findViewById(R.id.submmit_btn);
         loginLayout = (LinearLayout) findViewById(R.id.Login_LinearLayout);
         activateLayout = (RelativeLayout) findViewById(R.id.activate_relative_layout);
@@ -378,6 +382,14 @@ public class MainActivity extends Activity {
                 setIPAddress();
             }
         });
+
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -463,6 +475,8 @@ public class MainActivity extends Activity {
 
                         SharedPreferences.Editor editor = sharedpreferences.edit();
                         editor.putString(WAITER_ID, jsonResponse.getWaiter_id());
+                        editor.putString(WAITER_NAME,jsonResponse.getWaiter_name());
+                        editor.putString(USER_ROLE,jsonResponse.getRole());
                         editor.putInt(DAY_CODE, DayCode);
                         editor.putInt(SHIFT_ID, ShiftId);
                         editor.commit();

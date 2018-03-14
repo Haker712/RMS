@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -129,7 +130,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     private TextView roomChargesAmtTxt;
     private TextView netAmtTxt;
     private EditText payAmtEdit;
-//    @InjectView(R.id.FOC_amount_edit)
+    //    @InjectView(R.id.FOC_amount_edit)
 //    EditText focAmtEdit;
     private EditText focdescription;
     private TextView totaldiscamounttxt;
@@ -165,6 +166,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
     Socket socket;
 
     Typeface font;
+    SharedPreferences prefs;
 
 
     @Override
@@ -172,7 +174,9 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_invoice_detail_test);
 
-       // CustomExceptionHandler.newInstance().traceUnchagedException(this);
+        // CustomExceptionHandler.newInstance().traceUnchagedException(this);
+
+        prefs = getSharedPreferences(MainActivity.LOGIN_PREFERENCES, MODE_PRIVATE);
 
         ButterKnife.inject(this);
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
@@ -260,8 +264,8 @@ public class InvoiceDetailActivity extends ActionBarActivity {
 
 
         vouncherID = detailDataMap.get("vouncherID");
-        userID = detailDataMap.get("userId");
-        userName = detailDataMap.get("userName");
+//        userID = detailDataMap.get("userId");
+//        userName = detailDataMap.get("userName");
         date = detailDataMap.get("date");
         tableNo = detailDataMap.get("tableNo");
         if (tableNo.equals("")) {
@@ -353,8 +357,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
             }
             cur.close();
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -402,7 +405,7 @@ public class InvoiceDetailActivity extends ActionBarActivity {
         serviceTxt.setText(commaSepFormat.format(serviceValue));
         servicepercentTxt.setText(serviceAmt + "%");
         Log.d("Service", serviceValue + "%");
-       // focAmtEdit.setEnabled(false);
+        // focAmtEdit.setEnabled(false);
         payAmtEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
@@ -1110,10 +1113,11 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                                                     String message = jsonResponse.getMessage();
                                                     if (message.equals("Success")) {
                                                         Log.d("CustomerCancel", message);
-                                                        mProgressDialog.dismiss();
+
                                                         String arg[] = {order_detail_id};
 
                                                         detailProductArrayList.remove(position);
+                                                        mProgressDialog.dismiss();
                                                         invoiceDetailAdapter.notifyDataSetChanged();
                                                         taxTxt.setText(commaSepFormat.format(taxValue));
                                                         serviceTxt.setText(commaSepFormat.format(serviceValue));
@@ -1207,8 +1211,13 @@ public class InvoiceDetailActivity extends ActionBarActivity {
                 JsonResponseforInvoiceDetail jsonResponseforInvoiceDetail = response.body();
                 ArrayList<Download_ForInvoiceDetail> Download_ForInvoiveDetailArrayList = jsonResponseforInvoiceDetail.getDownload_forInvoiceDetailArrayList();
                 for (Download_ForInvoiceDetail download_forInvoiceDetail : Download_ForInvoiveDetailArrayList) {
-                    detailDataMap.put("userId", download_forInvoiceDetail.getUserId());
-                    detailDataMap.put("userName",download_forInvoiceDetail.getUsername());
+//                    detailDataMap.put("userId", download_forInvoiceDetail.getUserId());
+//                    detailDataMap.put("userName",download_forInvoiceDetail.getUsername());
+                    userID=download_forInvoiceDetail.getUserId();
+                    waiterIDTxt.setText(userID);
+                    userName=download_forInvoiceDetail.getUsername();
+                    waiterNameTxt.setText(userName);
+
                     //InvoiceDetailActivity.userID = download_forInvoiceDetail.getUserId();
                     ArrayList<Download_ForInvoiveItemDetail> Download_ForInoviceItemDetailArrayList = download_forInvoiceDetail.getForInvoiveItemDetail();
                     for (Download_ForInvoiveItemDetail download_forInvoiveItemDetail : Download_ForInoviceItemDetailArrayList) {
