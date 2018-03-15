@@ -386,7 +386,11 @@ public class MainActivity extends Activity {
         deleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (usernameEdit.hasFocus()){
+                    usernameEdit.setText("");
+                }else if (passwordEdit.hasFocus()){
+                    passwordEdit.setText("");
+                }
             }
         });
 
